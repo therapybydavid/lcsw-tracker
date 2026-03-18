@@ -36,7 +36,7 @@ function writeDB(data) {
 
 // ── Middleware ─────────────────────────────────────────────────
 app.use(express.json({ limit: '5mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // ── API: GET all data ──────────────────────────────────────────
 app.get('/api/data', (req, res) => {
@@ -57,7 +57,7 @@ app.put('/api/data', (req, res) => {
 
 // ── Catch-all: serve the app ───────────────────────────────────
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(PORT, () => {
