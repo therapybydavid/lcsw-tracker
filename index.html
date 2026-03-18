@@ -516,8 +516,7 @@ function fmtDate(d) {
 // ============================================================
 // SEED DATA (from LMSW_2026.xlsx)
 // ============================================================
-function seedData() { return; // seed disabled — data lives in cloud
-  /*
+function seedData() {
   if (_db.seeded) {
     // Add missing clients without overwriting existing
     const existing = load(KEYS.clients);
@@ -636,7 +635,6 @@ function seedData() { return; // seed disabled — data lives in cloud
   // Write seeded flag in the same request as a final full sync
   _db.seeded = true;
   fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(_db) });
-  */ 
 }
 
 // ============================================================
@@ -1366,13 +1364,16 @@ async function boot() {
     const data = await res.json();
     _db = data;
 
-    // If the server has never been seeded, seed it now
-    if (!_db.seeded) {
+    // Seed if there are no sessions — regardless of seeded flag
+    // This handles Railway wiping the .data folder on redeploy
+    if (!_db.sessions || _db.sessions.length === 0) {
+      _db.seeded = false;
       seedData();
     }
   } catch (e) {
     console.warn('Could not load from server, starting fresh:', e);
-    if (!_db.seeded) seedData();
+    _db.seeded = false;
+    seedData();
   }
 
   document.getElementById('sync-status').style.opacity = '0';
