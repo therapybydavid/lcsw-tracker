@@ -176,6 +176,8 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
     <div class="title">LCSW Tracker</div>
     <div class="sync-row">
       <button class="sync-btn" onclick="fullBackup()" style="background:rgba(56,201,142,0.12);border-color:rgba(56,201,142,0.3);color:var(--green);">⬇ Backup</button>
+      <button class="sync-btn" onclick="document.getElementById('restore-input').click()" style="background:rgba(247,164,79,0.12);border-color:rgba(247,164,79,0.3);color:var(--amber);">⬆ Restore</button>
+      <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreFromBackup(this)">
       <span id="sync-status"></span>
     </div>
   </div>
@@ -680,6 +682,40 @@ function showSyncStatus(msg, color) {
 // ============================================================
 // FULL BACKUP
 // ============================================================
+
+async function restoreFromBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.sessions) { toast('Invalid backup file', true); return; }
+      if (!confirm('This will replace all your current data with the backup. Are you sure?')) return;
+      _db.sessions = backup.sessions || [];
+      _db.clients = backup.clients || [];
+      _db.supervision = backup.supervision || [];
+      _db.referrals = backup.referrals || [];
+      _db.inv_dates = backup.inv_dates || {};
+      _db.seeded = true;
+      const res = await fetch('/api/data', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_db)
+      });
+      await res.json();
+      toast('Backup restored successfully');
+      renderDashboard();
+      renderSupervision();
+      populateClientLists();
+      input.value = '';
+    } catch(e) {
+      toast('Restore failed — invalid file', true);
+    }
+  };
+  reader.readAsText(file);
+}
+
 async function fullBackup() {
   try {
     // Always fetch fresh from server so backup reflects actual stored data
