@@ -249,7 +249,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
       <div class="field"><label>Method</label><select id="s-method"><option value="IP">In-Person (IP)</option><option value="V">Virtual (V)</option><option value="—">N/A</option></select></div>
       <div class="field"><label>Activity</label><select id="s-desc-select" onchange="handleDescSelect()"><option value="">Select...</option><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other (custom)</option></select></div>
       <div class="field" id="s-desc-custom-wrap" style="display:none;"><label>Custom Description</label><input type="text" id="s-desc-custom" placeholder="Describe activity..."></div>
-      <div class="field"><label>Session Type</label><select id="s-type"><option value="clinical">Clinical (toward 3,000)</option><option value="supervision">Supervision (toward 100)</option><option value="training">Training / CEU</option><option value="admin">Admin</option></select></div>
+      <div class="field"><label>Session Type</label><select id="s-type"><option value="clinical">Clinical (toward 3,000)</option><option value="supervision">Supervision (toward 100)</option><option value="training">Training / CEU</option></select></div>
 
       <input type="hidden" id="s-desc">
     </div>
@@ -443,7 +443,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
       <div class="field"><label>Method</label><select id="es-method"><option value="IP">In-Person</option><option value="V">Virtual</option><option value="—">N/A</option></select></div>
       <div class="field"><label>Description</label><select id="es-desc-sel" onchange="handleEditDescSel()"><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other</option></select></div>
       <div class="field" id="es-custom-wrap" style="display:none;"><label>Custom</label><input type="text" id="es-custom"></div>
-      <div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option><option value="admin">Admin</option></select></div>
+      <div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option></select></div>
       <div class="field"><label>Insurance</label><input type="text" id="es-insurance"></div>
     </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="saveEditSession()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-session')">Cancel</button></div>
@@ -715,7 +715,7 @@ function renderDashboard() {
   document.getElementById('d-sup-bar').style.width = Math.min(100,(supHrs/100)*100) + '%';
   document.getElementById('d-sup-pct').textContent = ((supHrs/100)*100).toFixed(1) + '% complete';
 
-  const thisMonth = sessions.filter(s => s.date && s.date.startsWith(monthStr));
+  const thisMonth = sessions.filter(s => s.date && s.date.startsWith(monthStr) && s.type === 'clinical');
   document.getElementById('d-month-sessions').textContent = thisMonth.length;
   document.getElementById('d-month-label').textContent = monthName;
   document.getElementById('d-month-income').textContent = '$' + thisMonth.reduce((a,s)=>a+(parseFloat(s.fee)||0),0).toLocaleString();
@@ -725,7 +725,7 @@ function renderDashboard() {
   const mnames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   let rows = '';
   months.forEach((m,i) => {
-    const ms = sessions.filter(s => s.date && s.date.startsWith(m));
+    const ms = sessions.filter(s => s.date && s.date.startsWith(m) && s.type === 'clinical');
     if (!ms.length) return;
     const ip = ms.filter(s => s.method==='IP').length;
     const v = ms.filter(s => s.method==='V').length;
@@ -1267,10 +1267,10 @@ function renderStatistics() {
   const monStr = mon.toISOString().split('T')[0];
   const sunStr = sun.toISOString().split('T')[0];
 
-  const totalYTD = sessions.filter(s=>(s.date||'').startsWith('2026')).length;
-  const earnedYTD = sessions.filter(s=>(s.date||'').startsWith('2026')&&parseFloat(s.fee)>0).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
-  const weekSessions = sessions.filter(s=>s.date&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;
-  const weekEarned = sessions.filter(s=>s.date&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  const totalYTD = sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical').length;
+  const earnedYTD = sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical'&&parseFloat(s.fee)>0).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  const weekSessions = sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;
+  const weekEarned = sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
 
   document.getElementById('stats-boxes').innerHTML = `
     <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -1288,7 +1288,7 @@ function renderStatistics() {
   const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
   const agColors = {DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
   const total = sessions.length;
-  const agData = agencies.map(a=>({a,label:agNames[a],count:sessions.filter(s=>s.agency===a).length,income:sessions.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
+  const agData = agencies.map(a=>({a,label:agNames[a],count:sessions.filter(s=>s.agency===a&&s.type==='clinical').length,income:sessions.filter(s=>s.agency===a&&s.type==='clinical').reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
   const canvas = document.getElementById('agency-chart');
   if (canvas && typeof Chart !== 'undefined') {
     if (window._agencyChart) window._agencyChart.destroy();
@@ -1297,7 +1297,7 @@ function renderStatistics() {
   document.getElementById('agency-legend').innerHTML = agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:13px;">${d.count} · ${total?Math.round((d.count/total)*100):0}%</div><div style="font-family:var(--mono);font-size:11px;color:var(--text3);">$${d.income.toLocaleString()}</div></div></div>`).join('');
 
   // IP vs V
-  const monthSessions = sessions.filter(s=>(s.date||'').startsWith(monthStr));
+  const monthSessions = sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');
   document.getElementById('stat-ip').textContent = monthSessions.filter(s=>s.method==='IP').length;
   document.getElementById('stat-v').textContent = monthSessions.filter(s=>s.method==='V').length;
 
