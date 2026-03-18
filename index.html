@@ -1128,14 +1128,14 @@ function switchInvoice(agency, el) {
   renderInvoice();
 }
 
-function saveInvDates() {
+async function saveInvDates() {
   const agency = currentInvAgency;
   const due = document.getElementById('inv-due').value;
   const start = document.getElementById('inv-start').value;
-  const saved = (_db.inv_dates || {});
-  saved[agency] = {due, start};
-  _db.inv_dates = saved;
-  fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ inv_dates: saved }) });
+  if (!start || !due) { toast('Please set both dates', true); return; }
+  if (!_db.inv_dates) _db.inv_dates = {};
+  _db.inv_dates[agency] = { due, start };
+  await fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ inv_dates: _db.inv_dates }) });
   toast('Dates saved');
   renderInvoice();
 }
@@ -1659,7 +1659,7 @@ function renderStatistics() {
   const agencies = ['DC','SMS','Emora','ME'];
   const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
   const agColors = {DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
-  const total = sessions.length;
+  const total = sessions.filter(s=>s.type==='clinical').length;
   const agData = agencies.map(a=>({a,label:agNames[a],count:sessions.filter(s=>s.agency===a&&s.type==='clinical').length,income:sessions.filter(s=>s.agency===a&&s.type==='clinical').reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
   const canvas = document.getElementById('agency-chart');
   if (canvas && typeof Chart !== 'undefined') {
