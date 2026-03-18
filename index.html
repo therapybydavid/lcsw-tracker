@@ -681,23 +681,32 @@ function showSyncStatus(msg, color) {
 // ============================================================
 // FULL BACKUP
 // ============================================================
-function fullBackup() {
-  const backup = {
-    exported: new Date().toISOString(),
-    sessions: load(KEYS.sessions),
-    clients: load(KEYS.clients),
-    supervision: load(KEYS.supervision),
-    referrals: load(KEYS.referrals),
-    inv_dates: _db.inv_dates || {}
-  };
-  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'LCSW_Backup_' + new Date().toISOString().slice(0,10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('Full backup downloaded');
+async function fullBackup() {
+  try {
+    // Always fetch fresh from server so backup reflects actual stored data
+    const res = await fetch('/api/data');
+    const freshData = await res.json();
+    const backup = {
+      exported: new Date().toISOString(),
+      sessions: freshData.sessions || [],
+      clients: freshData.clients || [],
+      supervision: freshData.supervision || [],
+      referrals: freshData.referrals || [],
+      inv_dates: freshData.inv_dates || {}
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'LCSW_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Full backup downloaded');
+  } catch(e) {
+    toast('Backup failed - try again', true);
+  }
 }
 
 function doSync() {
