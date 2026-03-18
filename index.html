@@ -292,8 +292,8 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
   <div class="card">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;">
       <div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03" selected>March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option></select></div>
-      <div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" onchange="renderInvoice()"></div>
-      <div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" onchange="renderInvoice()"></div>
+      <div class="field"><label id="inv-start-label">Billing Start</label><input type="text" id="inv-start" placeholder="MM/DD/YYYY" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;width:130px;"></div>
+      <div class="field"><label id="inv-due-label">Due Date</label><input type="text" id="inv-due" placeholder="MM/DD/YYYY" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;width:130px;"></div>
       <div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div>
       <div><button class="btn btn-ghost" onclick="window.print()">🖨 Print</button></div>
     </div>
@@ -1024,10 +1024,19 @@ function switchInvoice(agency, el) {
   renderInvoice();
 }
 
+function parseInvDate(str) {
+  // Accept MM/DD/YYYY and convert to YYYY-MM-DD
+  if (!str) return '';
+  if (str.includes('-')) return str; // already YYYY-MM-DD
+  const parts = str.split('/');
+  if (parts.length !== 3) return str;
+  return parts[2] + '-' + parts[0].padStart(2,'0') + '-' + parts[1].padStart(2,'0');
+}
+
 function saveInvDates() {
   const agency = currentInvAgency;
-  const due = document.getElementById('inv-due').value;
-  const start = document.getElementById('inv-start').value;
+  const due = parseInvDate(document.getElementById('inv-due').value);
+  const start = parseInvDate(document.getElementById('inv-start').value);
   const saved = (_db.inv_dates || {});
   saved[agency] = {due, start};
   _db.inv_dates = saved;
@@ -1045,8 +1054,9 @@ function renderInvoice() {
   const startInput = document.getElementById('inv-start');
   const dueLabel = document.getElementById('inv-due-label');
   const startLabel = document.getElementById('inv-start-label');
-  if (dueInput) dueInput.value = agDates.due||'';
-  if (startInput) startInput.value = agDates.start||'';
+  const fmtForInput = v => { if (!v) return ''; const [y,m,d]=v.split('-'); return m+'/'+d+'/'+y; };
+  if (dueInput) dueInput.value = fmtForInput(agDates.due);
+  if (startInput) startInput.value = fmtForInput(agDates.start);
   if (dueLabel) dueLabel.textContent = (agency==='DC'?'DC':'SMS') + ' Due Date';
   if (startLabel) startLabel.textContent = 'Billing Start';
 
