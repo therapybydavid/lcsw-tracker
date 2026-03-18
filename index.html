@@ -176,6 +176,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
     <div class="title">LCSW Tracker</div>
     <div class="sync-row">
       <button class="sync-btn" onclick="doSync()">⟳ Sync</button>
+      <button class="sync-btn" onclick="fullBackup()" style="background:rgba(56,201,142,0.12);border-color:rgba(56,201,142,0.3);color:var(--green);">⬇ Backup</button>
       <span id="sync-status"></span>
     </div>
   </div>
@@ -515,7 +516,8 @@ function fmtDate(d) {
 // ============================================================
 // SEED DATA (from LMSW_2026.xlsx)
 // ============================================================
-function seedData() {
+function seedData() { return; // seed disabled — data lives in cloud
+  /*
   if (_db.seeded) {
     // Add missing clients without overwriting existing
     const existing = load(KEYS.clients);
@@ -634,6 +636,7 @@ function seedData() {
   // Write seeded flag in the same request as a final full sync
   _db.seeded = true;
   fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(_db) });
+  */ 
 }
 
 // ============================================================
@@ -674,6 +677,29 @@ function showSyncStatus(msg, color) {
   el.style.color = color;
   el.style.opacity = '1';
   setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
+
+// ============================================================
+// FULL BACKUP
+// ============================================================
+function fullBackup() {
+  const backup = {
+    exported: new Date().toISOString(),
+    sessions: load(KEYS.sessions),
+    clients: load(KEYS.clients),
+    supervision: load(KEYS.supervision),
+    referrals: load(KEYS.referrals),
+    inv_dates: _db.inv_dates || {}
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'LCSW_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Full backup downloaded');
 }
 
 function doSync() {
