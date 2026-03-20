@@ -207,7 +207,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
   <div id="invoice-reminders" style="margin-bottom:16px;"></div>
   <div class="grid-2" style="margin-bottom:18px;">
     <div class="progress-card">
-      <div class="progress-label">Clinical Hours toward LCSW</div>
+      <div class="progress-label">Hours toward LCSW</div>
       <div class="progress-nums"><span class="current" id="d-clinical-hrs">0</span><span class="total">/ 3,000 hrs</span></div>
       <div class="progress-bar"><div class="progress-fill" id="d-clinical-bar" style="background:var(--accent);width:0%"></div></div>
       <div class="progress-pct" id="d-clinical-pct">0.0% complete</div>
@@ -450,7 +450,7 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
         <button onclick="filterClients('inactive',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Inactive</button>
       </div>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div>
+    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Last Seen</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div>
     <div id="clients-empty" class="empty" style="display:none;"><div class="empty-icon">👤</div>No clients yet.</div>
   </div>
 </div>
@@ -1128,14 +1128,14 @@ function switchInvoice(agency, el) {
   renderInvoice();
 }
 
-async function saveInvDates() {
+function saveInvDates() {
   const agency = currentInvAgency;
   const due = document.getElementById('inv-due').value;
   const start = document.getElementById('inv-start').value;
-  if (!start || !due) { toast('Please set both dates', true); return; }
-  if (!_db.inv_dates) _db.inv_dates = {};
-  _db.inv_dates[agency] = { due, start };
-  await fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ inv_dates: _db.inv_dates }) });
+  const saved = (_db.inv_dates || {});
+  saved[agency] = {due, start};
+  _db.inv_dates = saved;
+  fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ inv_dates: saved }) });
   toast('Dates saved');
   renderInvoice();
 }
@@ -1245,18 +1245,23 @@ function renderClients() {
   const empty = document.getElementById('clients-empty');
   if (!sorted.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  tbody.innerHTML = sorted.map(c => `<tr>
+  const allSessions = load(KEYS.sessions);
+  tbody.innerHTML = sorted.map(c => {
+    const clientSessions = allSessions.filter(s => s.name === c.name && s.date).sort((a,b) => b.date.localeCompare(a.date));
+    const lastDate = clientSessions.length ? fmtDate(clientSessions[0].date) : '—';
+    return `<tr>
     <td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${c.name.replace(/'/g,"&#39;")}')">${c.name}</td>
     <td><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></td>
     <td style="font-family:var(--mono)">$${c.rate}</td>
     <td><span class="badge b-${c.method.toLowerCase()}">${c.method}</span></td>
     <td style="font-size:12px;color:var(--text2)">${c.gender?c.gender.charAt(0).toUpperCase()+c.gender.slice(1):'—'}</td>
+    <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${lastDate}</td>
     <td><button onclick="toggleClientStatus('${c.id}')" class="status-toggle" style="background:${c.status==='active'?'rgba(56,201,142,0.15)':'rgba(90,98,120,0.2)'};color:${c.status==='active'?'var(--green)':'var(--text3)'}">${c.status==='active'?'Active':'Inactive'}</button></td>
     <td style="display:flex;gap:4px;">
       <button class="btn-edit" onclick="openEditClient('${c.id}')">Edit</button>
       <button class="btn-danger" onclick="deleteClient('${c.id}')">✕</button>
     </td>
-  </tr>`).join('');
+  </tr>`;}).join('');
 }
 
 function toggleClientStatus(id) {
@@ -1659,14 +1664,15 @@ function renderStatistics() {
   const agencies = ['DC','SMS','Emora','ME'];
   const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
   const agColors = {DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
-  const total = sessions.filter(s=>s.type==='clinical').length;
-  const agData = agencies.map(a=>({a,label:agNames[a],count:sessions.filter(s=>s.agency===a&&s.type==='clinical').length,income:sessions.filter(s=>s.agency===a&&s.type==='clinical').reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
+  const clinicalSessions = sessions.filter(s=>s.type==='clinical');
+  const total = clinicalSessions.length;
+  const agData = agencies.map(a=>({a,label:agNames[a],count:clinicalSessions.filter(s=>s.agency===a).length,income:clinicalSessions.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
   const canvas = document.getElementById('agency-chart');
   if (canvas && typeof Chart !== 'undefined') {
     if (window._agencyChart) window._agencyChart.destroy();
     window._agencyChart = new Chart(canvas, {type:'doughnut',data:{labels:agData.map(d=>d.label),datasets:[{data:agData.map(d=>d.count),backgroundColor:agData.map(d=>d.color),borderWidth:2,borderColor:'#181c27'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} sessions (${Math.round((ctx.parsed/total)*100)}%)`}}}}});
   }
-  document.getElementById('agency-legend').innerHTML = agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:13px;">${d.count} · ${total?Math.round((d.count/total)*100):0}%</div><div style="font-family:var(--mono);font-size:11px;color:var(--text3);">$${d.income.toLocaleString()}</div></div></div>`).join('');
+  document.getElementById('agency-legend').innerHTML = agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:18px;">${d.count} · <span style="font-size:17px;">${total?Math.round((d.count/total)*100):0}%</span></div><div style="font-family:var(--mono);font-size:15px;color:var(--green);">$${d.income.toLocaleString()}</div></div></div>`).join('');
 
   // IP vs V
   const monthSessions = sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');
