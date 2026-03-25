@@ -737,10 +737,6 @@ function rSettings() {
       <p style="font-size:12px;color:#888;margin-bottom:8px">All client data syncs in real time via Firebase. Access from any device, any browser — same data everywhere.</p>
       <div style="display:flex;align-items:center;gap:8px">${syncBadge()}<span style="font-size:11px;color:#aaa">${S.clients.length} client${S.clients.length !== 1 ? 's' : ''} synced</span></div>
     </div>
-    <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Security</h3>
-      <p style="font-size:12px;color:#888;margin-bottom:12px">Your PIN protects access on this device. Data is synced to Firebase cloud storage.</p>
-      <button class="btn" id="chpinBtn">Change PIN</button>
-    </div>
     <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Export backup</h3>
       <p style="font-size:12px;color:#888;margin-bottom:12px">Download all client data as a JSON file. Store on an encrypted drive or HIPAA-compliant cloud folder.</p>
       <button class="btn" id="exportBtn">Export all data (.json)</button>
@@ -875,12 +871,8 @@ function bindEvents() {
 // ─── INIT ─────────────────────────────────────────────────
 
 async function init() {
-  if (await pinSet()) {
-    nav('pin');
-  } else {
-    S.view = 'setup';
-    render();
-  }
+  startListening();
+  nav('clients');
 }
 
 init();
