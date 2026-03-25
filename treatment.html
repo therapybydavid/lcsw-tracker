@@ -28,13 +28,13 @@
   --rs: 6px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;min-height:100vh}
-h1{font-size:20px;font-weight:600}
-h2{font-size:16px;font-weight:600}
-h3{font-size:14px;font-weight:500}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--t1);font-size:16px;line-height:1.6;min-height:100vh}
+h1{font-size:24px;font-weight:600}
+h2{font-size:19px;font-weight:600}
+h3{font-size:16px;font-weight:500}
 p{color:var(--t2)}
 button{font-family:inherit;cursor:pointer}
-input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
+input,select,textarea{font-family:inherit;font-size:15px;color:var(--t1)}
 
 .center-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
 .pin-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 28px;width:290px;text-align:center}
@@ -46,31 +46,31 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 .pkey{padding:14px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);font-size:18px;font-weight:500;transition:background .1s}
 .pkey:hover{background:var(--surface2)}
 .pkey:active{background:var(--blueBg)}
-.perr{color:var(--red);font-size:12px;margin-top:8px;min-height:18px}
+.perr{color:var(--red);font-size:14px;margin-top:8px;min-height:18px}
 
 .nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10}
 .nav-l{display:flex;align-items:center;gap:10px}
 .nav-r{display:flex;gap:8px;align-items:center}
-.ntitle{font-size:15px;font-weight:600}
-.nsub{font-size:10px;color:var(--t3)}
+.ntitle{font-size:17px;font-weight:600}
+.nsub{font-size:12px;color:var(--t3)}
 
-.sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:600}
+.sync-ind{font-size:12px;padding:3px 8px;border-radius:10px;font-weight:600}
 .sync-ok{background:var(--greenBg);color:var(--green)}
 .sync-saving{background:var(--amberBg);color:var(--amber)}
 .sync-err{background:var(--redBg);color:var(--red)}
 
 .tabs{display:flex;gap:3px;padding:14px 20px 0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
-.tab{padding:7px 13px;font-size:12px;font-weight:500;cursor:pointer;border-radius:var(--rs) var(--rs) 0 0;color:var(--t3);border:1px solid transparent;border-bottom:none;white-space:nowrap;transition:all .15s}
+.tab{padding:7px 13px;font-size:14px;font-weight:500;cursor:pointer;border-radius:var(--rs) var(--rs) 0 0;color:var(--t3);border:1px solid transparent;border-bottom:none;white-space:nowrap;transition:all .15s}
 .tab.on{background:var(--bg);color:var(--t1);border-color:var(--border);border-bottom-color:var(--bg);position:relative;top:1px}
 
-.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--rs);border:1px solid var(--borderS);background:var(--surface);color:var(--t1);font-size:12px;font-weight:500;transition:opacity .15s}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--rs);border:1px solid var(--borderS);background:var(--surface);color:var(--t1);font-size:14px;font-weight:500;transition:opacity .15s}
 .btn:hover{opacity:.75}
 .btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 .btn.danger{background:var(--redBg);color:var(--red);border-color:rgba(163,45,45,.3)}
-.btn.sm{padding:5px 10px;font-size:11px}
+.btn.sm{padding:5px 10px;font-size:13px}
 
 .field{margin-bottom:13px}
-.field label{display:block;font-size:10px;font-weight:600;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
 .field input,.field select,.field textarea{width:100%;padding:8px 10px;border:1px solid var(--borderS);border-radius:var(--rs);background:var(--surface);color:var(--t1)}
 .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px}
 .field textarea{resize:vertical;min-height:65px}
@@ -79,7 +79,7 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:15px}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
 
-.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
 .bg{background:var(--greenBg);color:var(--green)}
 .bb{background:var(--blueBg);color:var(--blue)}
 .ba{background:var(--amberBg);color:var(--amber)}
@@ -94,8 +94,8 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 .pbf{height:100%;border-radius:3px;transition:width .3s}
 
 .metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:8px 13px;text-align:center}
-.mval{font-size:18px;font-weight:700}
-.mlbl{font-size:10px;color:var(--t3)}
+.mval{font-size:22px;font-weight:700}
+.mlbl{font-size:12px;color:var(--t3)}
 .metrics{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 
 .gcard{border-left:3px solid;padding:11px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface);border-top:1px solid var(--border);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -107,9 +107,9 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 .sb.open{display:block}
 
 .srow{margin-bottom:13px;border-bottom:1px solid #eee;padding-bottom:13px}
-.srow label{display:flex;justify-content:space-between;font-size:11px;font-weight:500;margin-bottom:5px}
+.srow label{display:flex;justify-content:space-between;font-size:13px;font-weight:500;margin-bottom:5px}
 .srow input[type=range]{width:100%;accent-color:var(--blue)}
-.srow textarea{width:100%;margin-top:5px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rs);font-size:11px;min-height:42px;resize:vertical;background:var(--surface)}
+.srow textarea{width:100%;margin-top:5px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;min-height:42px;resize:vertical;background:var(--surface)}
 
 .ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .ccard:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(24,95,165,.1)}
@@ -118,7 +118,7 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .content{padding:20px;max-width:820px}
 .content.wide{max-width:1100px}
-.conf{font-size:10px;color:var(--t3);text-align:center;padding:12px;border-top:1px solid var(--border);margin-top:24px}
+.conf{font-size:12px;color:var(--t3);text-align:center;padding:12px;border-top:1px solid var(--border);margin-top:24px}
 
 .loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:12px}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite}
@@ -128,7 +128,7 @@ input,select,textarea{font-family:inherit;font-size:13px;color:var(--t1)}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading-wrap"><div class="spinner"></div><p style="font-size:12px;color:#aaa">Connecting...</p></div></div>
+<div id="app"><div class="loading-wrap"><div class="spinner"></div><p style="font-size:14px;color:#aaa">Connecting...</p></div></div>
 
 <script>
 // ─── FIREBASE CONFIG ──────────────────────────────────────
@@ -316,7 +316,7 @@ function reco(c) {
 
 function lineChart(sessions, goals, w, h) {
   if (!sessions || sessions.length < 2)
-    return `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px">Add more sessions to see trends</div>`;
+    return `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:14px">Add more sessions to see trends</div>`;
   const pl = 32, pr = 12, pt = 10, pb = 28, cw = w - pl - pr, ch = h - pt - pb;
   const xs = sessions.length > 1 ? cw / (sessions.length - 1) : cw;
   const ys = v => ch - Math.min(100, Math.max(0, v)) / 100 * ch;
@@ -343,7 +343,7 @@ function lineChart(sessions, goals, w, h) {
 function phqChart(sessions, w, h) {
   const sc = sessions.filter(s => s.phq9 !== null && s.phq9 !== undefined);
   if (sc.length < 2)
-    return `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px">${sc.length === 1 ? `Baseline — PHQ-9: ${sc[0].phq9} · GAD-7: ${sc[0].gad7} · Add more to see trend` : 'No assessment scores recorded yet'}</div>`;
+    return `<div style="height:${h}px;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:14px">${sc.length === 1 ? `Baseline — PHQ-9: ${sc[0].phq9} · GAD-7: ${sc[0].gad7} · Add more to see trend` : 'No assessment scores recorded yet'}</div>`;
   const pl = 32, pr = 12, pt = 10, pb = 28, cw = w - pl - pr, ch = h - pt - pb;
   const xs = sc.length > 1 ? cw / (sc.length - 1) : cw;
   const ys = v => ch - Math.min(27, Math.max(0, v)) / 27 * ch;
@@ -396,7 +396,7 @@ function rPIN() {
   return `<div class="center-wrap"><div class="pin-card">
     <div class="pin-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
     <h1 style="font-size:17px;margin-bottom:3px">Treatment Tracker</h1>
-    <p style="font-size:12px">Enter your PIN to continue</p>
+    <p style="font-size:14px">Enter your PIN to continue</p>
     <div class="pin-dots">${[0, 1, 2, 3].map(i => `<div class="dot ${S.pinEntry.length > i ? 'on' : ''}"></div>`).join('')}</div>
     <div class="pin-pad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="pkey" data-pk="${n}">${n}</button>`).join('')}<div></div><button class="pkey" data-pk="0">0</button><button class="pkey" data-pk="del">⌫</button></div>
     <div class="perr">${S.pinAttempts > 0 ? 'Incorrect PIN. Try again.' : ''}</div>
@@ -410,7 +410,7 @@ function rSetup() {
   return `<div class="center-wrap"><div class="pin-card">
     <div class="pin-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
     <h1 style="font-size:17px;margin-bottom:3px">${confirm ? 'Confirm your PIN' : 'Create your PIN'}</h1>
-    <p style="font-size:12px">${confirm ? 'Enter the same PIN again' : 'Choose a 4-digit PIN to protect all client data'}</p>
+    <p style="font-size:14px">${confirm ? 'Enter the same PIN again' : 'Choose a 4-digit PIN to protect all client data'}</p>
     <div class="pin-dots">${[0, 1, 2, 3].map(i => `<div class="dot ${S.pinEntry.length > i ? 'on' : ''}"></div>`).join('')}</div>
     <div class="pin-pad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="pkey" data-pk="${n}">${n}</button>`).join('')}<div></div><button class="pkey" data-pk="0">0</button><button class="pkey" data-pk="del">⌫</button></div>
     <div class="perr">${S.pinAttempts > 0 ? "PINs didn't match. Try again." : 'Step ' + (S.setupStep) + ' of 2'}</div>
@@ -420,7 +420,7 @@ function rSetup() {
 // CLIENT LIST
 function rClients() {
   const cards = S.clients.length === 0
-    ? `<div style="text-align:center;padding:48px 20px;color:#bbb"><p style="font-size:15px;margin-bottom:6px">No clients yet</p><p style="font-size:12px">Click "New Client" to get started</p></div>`
+    ? `<div style="text-align:center;padding:48px 20px;color:#bbb"><p style="font-size:15px;margin-bottom:6px">No clients yet</p><p style="font-size:14px">Click "New Client" to get started</p></div>`
     : S.clients.map(c => {
       const sess = c.sessions || [];
       const last = sess[sess.length - 1];
@@ -433,8 +433,8 @@ function rClients() {
             <h2 style="font-size:15px">${c.name}</h2>${sBadge}
             ${sflg ? '<span class="badge br">&#9888; Safety</span>' : ''}
           </div>
-          <p style="font-size:11px;color:#aaa">${sess.length} session${sess.length !== 1 ? 's' : ''} &nbsp;·&nbsp; Last: ${fmt(last?.date)}</p></div>
-          <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:${avg >= 65 ? '#3B6D11' : avg >= 45 ? '#185FA5' : '#854F0B'}">${avg}%</div><div style="font-size:10px;color:#aaa">avg progress</div></div>
+          <p style="font-size:13px;color:#aaa">${sess.length} session${sess.length !== 1 ? 's' : ''} &nbsp;·&nbsp; Last: ${fmt(last?.date)}</p></div>
+          <div style="text-align:right"><div style="font-size:20px;font-weight:700;color:${avg >= 65 ? '#3B6D11' : avg >= 45 ? '#185FA5' : '#854F0B'}">${avg}%</div><div style="font-size:12px;color:#aaa">avg progress</div></div>
         </div>
         <div style="display:flex;gap:4px">${c.goals.map(g => {
           const p = last?.goals?.[g.id]?.progress ?? 0;
@@ -444,10 +444,10 @@ function rClients() {
     }).join('');
   return `
     <div class="nav"><div class="nav-l"><span class="ntitle">Treatment Tracker</span>${syncBadge()}</div>
-      <div class="nav-r"><button class="btn sm" data-nv="settings">Settings</button><button class="btn sm primary" data-nv="addClient">+ New Client</button></div>
+      <div class="nav-r"><button class="btn sm" data-nv="settings">Settings</button><input type="file" id="importPlanFile" accept=".json" style="display:none"><button class="btn sm" onclick="document.getElementById('importPlanFile').click()" style="background:var(--blueBg);color:var(--blue);border-color:rgba(24,95,165,.3)">Import Plan</button><button class="btn sm primary" data-nv="addClient">+ New Client</button></div>
     </div>
     <div class="content" style="max-width:700px">
-      <div style="margin-bottom:16px"><h2>Your caseload</h2><p style="font-size:11px;color:#aaa">${S.clients.length} client${S.clients.length !== 1 ? 's' : ''}</p></div>
+      <div style="margin-bottom:16px"><h2>Your caseload</h2><p style="font-size:13px;color:#aaa">${S.clients.length} client${S.clients.length !== 1 ? 's' : ''}</p></div>
       <div class="cgrid" style="grid-template-columns:1fr">${cards}</div>
     </div>
     <div class="conf">Treatment Progress Tracker &nbsp;·&nbsp; Cloud-synced via Firebase &nbsp;·&nbsp; Confidential</div>`;
@@ -471,7 +471,7 @@ function rClient() {
         <div><div class="ntitle">${c.name}</div><div class="nsub">${c.therapist} &nbsp;·&nbsp; ${sess.length} sessions</div></div>
         ${syncBadge()}
       </div>
-      <div class="nav-r">${sflg ? '<span class="badge br" style="font-size:11px;padding:4px 8px">&#9888; Safety flag</span>' : ''}
+      <div class="nav-r">${sflg ? '<span class="badge br" style="font-size:13px;padding:4px 8px">&#9888; Safety flag</span>' : ''}
         <button class="btn sm primary" data-tab="addSession">+ Add Session</button>
       </div>
     </div>
@@ -499,23 +499,23 @@ function rDash(c) {
   const phqLbl = lastPHQ && lastPHQ.id !== last?.id ? `PHQ-9 (S${lastPHQ.sessionNum})` : 'Last PHQ-9';
   const gadLbl = lastGAD && lastGAD.id !== last?.id ? `GAD-7 (S${lastGAD.sessionNum})` : 'Last GAD-7';
   return `<div class="content wide">
-    ${sflg ? `<div class="alert adanger"><div style="width:8px;height:8px;border-radius:50%;background:#A32D2D;flex-shrink:0;margin-top:3px"></div><div style="font-size:12px"><strong>Safety flag active — most recent session.</strong> ${(last.sessionNote || '').slice(0, 130)}${(last.sessionNote || '').length > 130 ? '…' : ''}</div></div>` : ''}
+    ${sflg ? `<div class="alert adanger"><div style="width:8px;height:8px;border-radius:50%;background:#A32D2D;flex-shrink:0;margin-top:3px"></div><div style="font-size:14px"><strong>Safety flag active — most recent session.</strong> ${(last.sessionNote || '').slice(0, 130)}${(last.sessionNote || '').length > 130 ? '…' : ''}</div></div>` : ''}
     <div class="metrics">
       ${[[sess.length, 'Sessions'], [avg + '%', 'Avg progress'], [days + 'd', 'In treatment']].map(([v, l]) =>
         `<div class="metric"><div class="mval">${v}</div><div class="mlbl">${l}</div></div>`).join('')}
-      <div class="metric"><div class="mval">${phqVal}</div><div class="mlbl">${phqLbl}</div>${phqSevLabel ? `<div style="font-size:10px;font-weight:600;color:${phqSevColor};margin-top:1px">${phqSevLabel}</div>` : ''}</div>
-      <div class="metric"><div class="mval">${gadVal}</div><div class="mlbl">${gadLbl}</div>${gadSevLabel ? `<div style="font-size:10px;font-weight:600;color:${gadSevColor};margin-top:1px">${gadSevLabel}</div>` : ''}</div>
+      <div class="metric"><div class="mval">${phqVal}</div><div class="mlbl">${phqLbl}</div>${phqSevLabel ? `<div style="font-size:12px;font-weight:600;color:${phqSevColor};margin-top:1px">${phqSevLabel}</div>` : ''}</div>
+      <div class="metric"><div class="mval">${gadVal}</div><div class="mlbl">${gadLbl}</div>${gadSevLabel ? `<div style="font-size:12px;font-weight:600;color:${gadSevColor};margin-top:1px">${gadSevLabel}</div>` : ''}</div>
     </div>
     <div class="two-col" style="margin-bottom:14px">
       <div class="card"><h3 style="margin-bottom:12px">Recommended focus — next session</h3>
         ${rec.length ? rec.map((r, i) => `<div style="${i > 0 ? 'border-top:1px solid #eee;padding-top:10px;margin-top:10px' : ''}display:flex;gap:10px;align-items:flex-start">
-          <div style="width:24px;height:24px;border-radius:50%;background:${r.goal.color};color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">${i + 1}</div>
-          <div><div style="font-size:13px;font-weight:500">${r.goal.name}</div>
-          <div style="font-size:11px;color:#888">${r.rsn} · ${r.cur}%${r.change !== null ? ` (${r.change >= 0 ? '+' : ''}${r.change})` : ''}</div></div></div>`).join('') : '<p style="font-size:12px;color:#bbb">Add sessions to see recommendations</p>'}
+          <div style="width:24px;height:24px;border-radius:50%;background:${r.goal.color};color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${i + 1}</div>
+          <div><div style="font-size:15px;font-weight:500">${r.goal.name}</div>
+          <div style="font-size:13px;color:#888">${r.rsn} · ${r.cur}%${r.change !== null ? ` (${r.change >= 0 ? '+' : ''}${r.change})` : ''}</div></div></div>`).join('') : '<p style="font-size:14px;color:#bbb">Add sessions to see recommendations</p>'}
       </div>
       <div class="card"><h3 style="margin-bottom:10px">Last session · ${fmt(last?.date)}</h3>
-        <p style="font-size:12px;line-height:1.6">${(last?.sessionNote || 'No sessions recorded yet.').slice(0, 210)}${(last?.sessionNote || '').length > 210 ? '…' : ''}</p>
-        ${last?.nextFocus?.length ? `<div style="margin-top:10px;padding:6px 10px;background:#edf4fd;border-radius:6px"><p style="font-size:11px;color:var(--blue)"><strong>Flagged for today:</strong> ${last.nextFocus.map(id => c.goals.find(g => g.id === id)?.name.split(' ')[0]).filter(Boolean).join(', ')}</p></div>` : ''}
+        <p style="font-size:14px;line-height:1.6">${(last?.sessionNote || 'No sessions recorded yet.').slice(0, 210)}${(last?.sessionNote || '').length > 210 ? '…' : ''}</p>
+        ${last?.nextFocus?.length ? `<div style="margin-top:10px;padding:6px 10px;background:#edf4fd;border-radius:6px"><p style="font-size:13px;color:var(--blue)"><strong>Flagged for today:</strong> ${last.nextFocus.map(id => c.goals.find(g => g.id === id)?.name.split(' ')[0]).filter(Boolean).join(', ')}</p></div>` : ''}
       </div>
     </div>
     <div style="margin-bottom:14px">
@@ -528,27 +528,27 @@ function rDash(c) {
           const st = status(cur);
           return `<div class="gcard" style="border-left-color:${g.color}">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
-              <span style="font-size:12px;font-weight:500;line-height:1.3;flex:1;padding-right:8px">${g.name}</span>
+              <span style="font-size:14px;font-weight:500;line-height:1.3;flex:1;padding-right:8px">${g.name}</span>
               <span class="badge ${st.c}">${st.l}</span>
             </div>
             <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px">
               <div class="pb" style="flex:1"><div class="pbf" style="width:${cur}%;background:${g.color}"></div></div>
               <span style="font-size:14px;font-weight:700;min-width:36px;text-align:right">${cur}%</span>
-              ${chg !== null ? `<span style="font-size:11px;color:${chg >= 0 ? '#3B6D11' : '#A32D2D'};min-width:28px">${chg >= 0 ? '+' : ''}${chg}</span>` : ''}
+              ${chg !== null ? `<span style="font-size:13px;color:${chg >= 0 ? '#3B6D11' : '#A32D2D'};min-width:28px">${chg >= 0 ? '+' : ''}${chg}</span>` : ''}
             </div>
-            ${last?.goals?.[g.id]?.note ? `<p style="font-size:10px;color:#777;line-height:1.5">${last.goals[g.id].note.slice(0, 100)}${last.goals[g.id].note.length > 100 ? '…' : ''}</p>` : ''}
+            ${last?.goals?.[g.id]?.note ? `<p style="font-size:12px;color:#777;line-height:1.5">${last.goals[g.id].note.slice(0, 100)}${last.goals[g.id].note.length > 100 ? '…' : ''}</p>` : ''}
           </div>`;
         }).join('')}
       </div>
     </div>
     <div class="chart-wrap"><h3 style="margin-bottom:10px">Progress over time — all goals</h3>
       <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px">
-        ${c.goals.map(g => `<div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:${g.color}"></div><span style="font-size:10px;color:#777">${g.name.split(' ')[0]}</span></div>`).join('')}
+        ${c.goals.map(g => `<div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:${g.color}"></div><span style="font-size:12px;color:#777">${g.name.split(' ')[0]}</span></div>`).join('')}
       </div>
       ${lineChart(sess, c.goals, 720, 200)}
     </div>
     <div class="chart-wrap"><h3 style="margin-bottom:6px">Standardized measures (PHQ-9 / GAD-7)</h3>
-      <p style="font-size:10px;color:#bbb;margin-bottom:8px">PHQ-9: 0–9 minimal/mild · 10–14 moderate · 15–19 mod-severe · 20–27 severe &nbsp;|&nbsp; GAD-7: 0–9 minimal/mild · 10–14 moderate · 15+ severe</p>
+      <p style="font-size:12px;color:#bbb;margin-bottom:8px">PHQ-9: 0–9 minimal/mild · 10–14 moderate · 15–19 mod-severe · 20–27 severe &nbsp;|&nbsp; GAD-7: 0–9 minimal/mild · 10–14 moderate · 15+ severe</p>
       ${phqChart(sess, 720, 180)}
     </div>
   </div>`;
@@ -565,28 +565,28 @@ function rHistory(c) {
       const open = S.expanded === s.id;
       return `<div class="si"><div class="sh" data-toggle="${s.id}">
         <div style="display:flex;align-items:center;gap:9px;flex:1">
-          <span style="font-weight:600;font-size:13px">Session ${s.sessionNum}</span>
-          <span style="font-size:12px;color:#aaa">${fmt(s.date)}</span>
+          <span style="font-weight:600;font-size:15px">Session ${s.sessionNum}</span>
+          <span style="font-size:14px;color:#aaa">${fmt(s.date)}</span>
           ${s.safetyFlag ? '<span class="badge br">&#9888; Safety</span>' : ''}
-          ${s.phq9 !== null && s.phq9 !== undefined ? `<span style="font-size:11px;color:#bbb">PHQ-9: ${s.phq9} · GAD-7: ${s.gad7}</span>` : ''}
+          ${s.phq9 !== null && s.phq9 !== undefined ? `<span style="font-size:13px;color:#bbb">PHQ-9: ${s.phq9} · GAD-7: ${s.gad7}</span>` : ''}
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-size:15px;font-weight:700">${avg}%</span>
-          <span style="font-size:11px;color:#bbb">${open ? '▲' : '▼'}</span>
+          <span style="font-size:13px;color:#bbb">${open ? '▲' : '▼'}</span>
         </div>
       </div>
       <div class="sb ${open ? 'open' : ''}">
-        ${s.sessionNote ? `<p style="font-size:12px;color:#555;line-height:1.65;margin-bottom:12px;background:white;padding:10px;border-radius:6px">${s.sessionNote}</p>` : ''}
+        ${s.sessionNote ? `<p style="font-size:14px;color:#555;line-height:1.65;margin-bottom:12px;background:white;padding:10px;border-radius:6px">${s.sessionNote}</p>` : ''}
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px">
           ${c.goals.map(g => `<div style="border-left:3px solid ${g.color};padding:8px 10px;background:white;border-radius:0 6px 6px 0">
             <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-              <span style="font-size:11px;font-weight:500">${g.name}</span>
-              <span style="font-size:12px;font-weight:700">${s.goals?.[g.id]?.progress ?? 0}%</span>
+              <span style="font-size:13px;font-weight:500">${g.name}</span>
+              <span style="font-size:14px;font-weight:700">${s.goals?.[g.id]?.progress ?? 0}%</span>
             </div>
-            ${s.goals?.[g.id]?.note ? `<p style="font-size:10px;color:#777;line-height:1.5">${s.goals[g.id].note}</p>` : ''}
+            ${s.goals?.[g.id]?.note ? `<p style="font-size:12px;color:#777;line-height:1.5">${s.goals[g.id].note}</p>` : ''}
           </div>`).join('')}
         </div>
-        ${s.nextFocus?.length ? `<div style="margin-top:10px;padding:7px 10px;background:#edf4fd;border-radius:6px"><p style="font-size:11px;color:var(--blue)"><strong>Flagged for next session:</strong> ${s.nextFocus.map(id => c.goals.find(g => g.id === id)?.name).filter(Boolean).join(', ')}</p></div>` : ''}
+        ${s.nextFocus?.length ? `<div style="margin-top:10px;padding:7px 10px;background:#edf4fd;border-radius:6px"><p style="font-size:13px;color:var(--blue)"><strong>Flagged for next session:</strong> ${s.nextFocus.map(id => c.goals.find(g => g.id === id)?.name).filter(Boolean).join(', ')}</p></div>` : ''}
       </div></div>`;
     }).join('')}
   </div>`;
@@ -598,7 +598,7 @@ function rAddSess(c) {
   const last = sess[sess.length - 1];
   const today = new Date().toISOString().split('T')[0];
   return `<div class="content">
-    <p style="font-size:12px;color:#aaa;margin-bottom:16px">Session ${sess.length + 1} · Sliders default to last session values — only adjust what changed.</p>
+    <p style="font-size:14px;color:#aaa;margin-bottom:16px">Session ${sess.length + 1} · Sliders default to last session values — only adjust what changed.</p>
     <form id="sf">
       <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">Session details</h3>
         <div class="frow">
@@ -608,7 +608,7 @@ function rAddSess(c) {
         <div class="frow">
           <div class="field"><label>GAD-7 (0–21, optional)</label><input type="number" name="gad7" min="0" max="21" placeholder="Leave blank to skip"></div>
           <div class="field" style="display:flex;align-items:flex-end;padding-bottom:3px">
-            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;font-size:13px;letter-spacing:0;font-weight:400">
+            <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;font-size:15px;letter-spacing:0;font-weight:400">
               <input type="checkbox" name="safetyFlag"> Flag for safety monitoring
             </label>
           </div>
@@ -631,7 +631,7 @@ function rAddSess(c) {
       </div>
       <div class="card" style="margin-bottom:18px"><h3 style="margin-bottom:10px">Flag goals for next session</h3>
         <div style="display:flex;flex-wrap:wrap;gap:7px">
-          ${c.goals.map(g => `<label style="display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;font-size:12px">
+          ${c.goals.map(g => `<label style="display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;font-size:14px">
             <input type="checkbox" name="f-${g.id}"> ${g.name.split(' ')[0]}
           </label>`).join('')}
         </div>
@@ -650,26 +650,26 @@ function rCView(c) {
   return `<div class="content">
     <div class="alert ainfo" style="margin-bottom:20px">
       <div><h2 style="font-size:16px;margin-bottom:3px">Your treatment plan, ${c.name.split(' ')[0]}</h2>
-      <p style="font-size:13px;color:var(--blue)">${sess.length} sessions completed · Started ${fmt(sess[0]?.date)}</p></div>
+      <p style="font-size:15px;color:var(--blue)">${sess.length} sessions completed · Started ${fmt(sess[0]?.date)}</p></div>
     </div>
 
     <h3 style="margin-bottom:4px">Your treatment goals</h3>
-    <p style="font-size:12px;margin-bottom:14px">These are the areas we are working on together. Each one connects to what brought you here and where you want to go.</p>
+    <p style="font-size:14px;margin-bottom:14px">These are the areas we are working on together. Each one connects to what brought you here and where you want to go.</p>
     <div style="margin-bottom:24px">
       ${c.goals.map((g, i) => {
         const curP = last?.goals?.[g.id]?.progress ?? 0;
         const st = status(curP);
         return `<div style="display:flex;gap:14px;align-items:flex-start;padding:14px 0;${i > 0 ? 'border-top:1px solid #eee' : ''}">
-          <div style="width:36px;height:36px;border-radius:50%;background:${g.color}18;border:2px solid ${g.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:${g.color}">${i + 1}</div>
+          <div style="width:36px;height:36px;border-radius:50%;background:${g.color}18;border:2px solid ${g.color};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;font-weight:700;color:${g.color}">${i + 1}</div>
           <div style="flex:1">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
               <span style="font-size:14px;font-weight:600">${g.cname}</span>
               <span class="badge ${st.c}">${st.l}</span>
             </div>
-            <p style="font-size:12px;line-height:1.65;margin-bottom:8px">${g.desc || ''}</p>
+            <p style="font-size:14px;line-height:1.65;margin-bottom:8px">${g.desc || ''}</p>
             <div style="display:flex;align-items:center;gap:8px">
               <div class="pb" style="flex:1;height:7px"><div class="pbf" style="height:100%;width:${curP}%;background:${g.color}"></div></div>
-              <span style="font-size:13px;font-weight:700;min-width:36px">${curP}%</span>
+              <span style="font-size:15px;font-weight:700;min-width:36px">${curP}%</span>
             </div>
           </div>
         </div>`;
@@ -683,10 +683,10 @@ function rCView(c) {
         const curP = last?.goals?.[g.id]?.progress ?? 0;
         const gain = curP - startP;
         return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;border-top:3px solid ${g.color}">
-          <div style="font-size:11px;font-weight:500;margin-bottom:6px">${g.cname}</div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:6px">${g.cname}</div>
           <div style="display:flex;align-items:baseline;gap:6px">
             <span style="font-size:22px;font-weight:700;color:${g.color}">${curP}%</span>
-            ${gain > 0 ? `<span style="font-size:11px;color:#3B6D11;font-weight:600">+${gain} since start</span>` : `<span style="font-size:11px;color:#aaa">getting started</span>`}
+            ${gain > 0 ? `<span style="font-size:13px;color:#3B6D11;font-weight:600">+${gain} since start</span>` : `<span style="font-size:13px;color:#aaa">getting started</span>`}
           </div>
         </div>`;
       }).join('')}
@@ -695,8 +695,8 @@ function rCView(c) {
     ${rec.length ? `<div class="card" style="background:var(--blueBg);border-color:rgba(24,95,165,.2)">
       <h3 style="margin-bottom:8px;color:var(--blue)">What we are focusing on right now</h3>
       ${rec.map((r, i) => `<div style="${i > 0 ? 'border-top:1px solid rgba(24,95,165,.12);padding-top:8px;margin-top:8px' : ''}">
-        <p style="font-size:13px;font-weight:500;color:var(--t1)">${r.goal.cname}</p>
-        <p style="font-size:12px;color:var(--t2)">${r.goal.desc || ''}</p>
+        <p style="font-size:15px;font-weight:500;color:var(--t1)">${r.goal.cname}</p>
+        <p style="font-size:14px;color:var(--t2)">${r.goal.desc || ''}</p>
       </div>`).join('')}
     </div>` : ''}
   </div>`;
@@ -718,11 +718,11 @@ function rAddClient() {
       <div class="field"><label>Status</label><select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
     </div>
     <div class="card" style="margin-bottom:18px"><h3 style="margin-bottom:6px">Treatment goals</h3>
-      <p style="font-size:12px;color:#aaa;margin-bottom:12px">Standard 6-goal framework. Goals can be customized after creating the client.</p>
+      <p style="font-size:14px;color:#aaa;margin-bottom:12px">Standard 6-goal framework. Goals can be customized after creating the client.</p>
       ${DEFAULT_GOALS.map(g => `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #eee">
         <div style="width:10px;height:10px;border-radius:50%;background:${g.color};flex-shrink:0"></div>
-        <div><div style="font-size:13px;font-weight:500">${g.name}</div>
-        <div style="font-size:10px;color:#aaa">Client label: "${g.cname}"</div></div>
+        <div><div style="font-size:15px;font-weight:500">${g.name}</div>
+        <div style="font-size:12px;color:#aaa">Client label: "${g.cname}"</div></div>
       </div>`).join('')}
     </div>
     <button type="submit" class="btn primary" style="width:100%;justify-content:center;padding:11px;font-size:14px">Create Client</button>
@@ -734,20 +734,20 @@ function rSettings() {
   return `<div class="nav"><div class="nav-l"><button class="btn sm" data-nv="clients">&#8592;</button><span class="ntitle">Settings</span></div></div>
   <div class="content" style="max-width:480px">
     <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Cloud sync</h3>
-      <p style="font-size:12px;color:#888;margin-bottom:8px">All client data syncs in real time via Firebase. Access from any device, any browser — same data everywhere.</p>
-      <div style="display:flex;align-items:center;gap:8px">${syncBadge()}<span style="font-size:11px;color:#aaa">${S.clients.length} client${S.clients.length !== 1 ? 's' : ''} synced</span></div>
+      <p style="font-size:14px;color:#888;margin-bottom:8px">All client data syncs in real time via Firebase. Access from any device, any browser — same data everywhere.</p>
+      <div style="display:flex;align-items:center;gap:8px">${syncBadge()}<span style="font-size:13px;color:#aaa">${S.clients.length} client${S.clients.length !== 1 ? 's' : ''} synced</span></div>
     </div>
     <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Export backup</h3>
-      <p style="font-size:12px;color:#888;margin-bottom:12px">Download all client data as a JSON file. Store on an encrypted drive or HIPAA-compliant cloud folder.</p>
+      <p style="font-size:14px;color:#888;margin-bottom:12px">Download all client data as a JSON file. Store on an encrypted drive or HIPAA-compliant cloud folder.</p>
       <button class="btn" id="exportBtn">Export all data (.json)</button>
     </div>
     <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Restore from backup</h3>
-      <p style="font-size:12px;color:#888;margin-bottom:12px">Load a previously exported JSON backup. This replaces all current data in Firebase.</p>
+      <p style="font-size:14px;color:#888;margin-bottom:12px">Load a previously exported JSON backup. This replaces all current data in Firebase.</p>
       <input type="file" id="importFile" accept=".json" style="display:none">
       <button class="btn" id="importBtn">Import from backup</button>
     </div>
     <div class="card" style="border-color:rgba(163,45,45,.2)"><h3 style="margin-bottom:8px;color:var(--red)">Danger zone</h3>
-      <p style="font-size:12px;color:#888;margin-bottom:12px">Permanently clear all data from Firebase and this device. Export a backup first. Cannot be undone.</p>
+      <p style="font-size:14px;color:#888;margin-bottom:12px">Permanently clear all data from Firebase and this device. Export a backup first. Cannot be undone.</p>
       <button class="btn danger" id="clearBtn">Clear all data</button>
     </div>
   </div>`;
@@ -760,6 +760,33 @@ function bindEvents() {
   document.querySelectorAll('[data-nc]').forEach(el => el.addEventListener('click', () => nav('client', { cid: el.dataset.nc, tab: 'dashboard' })));
   document.querySelectorAll('[data-tab]').forEach(el => el.addEventListener('click', () => { S.ctab = el.dataset.tab; render() }));
   document.querySelectorAll('[data-toggle]').forEach(el => el.addEventListener('click', () => { S.expanded = S.expanded === el.dataset.toggle ? null : el.dataset.toggle; render() }));
+
+  // Import treatment plan JSON
+  const importPlan = document.getElementById('importPlanFile');
+  if (importPlan) {
+    importPlan.addEventListener('change', e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const plan = JSON.parse(ev.target.result);
+          if (!plan.name || !plan.goals) { alert('Invalid treatment plan file.'); return; }
+          const existing = S.clients.findIndex(c => c.name === plan.name);
+          if (existing !== -1) {
+            if (!confirm(plan.name + ' already exists. Replace with imported data?')) return;
+            S.clients[existing] = plan;
+          } else {
+            S.clients.push(plan);
+          }
+          saveClient(plan);
+          alert(plan.name + ' imported — ' + (plan.sessions?.length || 0) + ' sessions.');
+          nav('client', { cid: plan.id, tab: 'dashboard' });
+        } catch (err) { alert('Could not read file: ' + err.message); }
+      };
+      reader.readAsText(file);
+      importPlan.value = '';
+    });
+  }
 
   // PIN pad
   document.querySelectorAll('[data-pk]').forEach(btn => btn.addEventListener('click', async () => {
