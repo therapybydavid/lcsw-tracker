@@ -7,176 +7,43 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-:root {
-  --bg: #0f1117;
-  --surface: #181c27;
-  --surface2: #1e2333;
-  --border: #2a3045;
-  --accent: #4f8ef7;
-  --green: #38c98e;
-  --amber: #f7a44f;
-  --red: #f75f5f;
-  --pink: #e879a0;
-  --text: #e8eaf2;
-  --text2: #8892a8;
-  --text3: #5a6278;
-  --serif: 'DM Serif Display', serif;
-  --mono: 'DM Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
-  --radius: 12px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
-
-/* LAYOUT */
-.app { display: flex; min-height: 100vh; }
-.sidebar { width: 220px; min-width: 220px; background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: 0; left: 0; bottom: 0; display: flex; flex-direction: column; z-index: 100; overflow-y: auto; }
-.main { margin-left: 220px; flex: 1; padding: 32px; max-width: 1100px; }
-
-/* SIDEBAR */
-.sidebar-logo { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
-.sidebar-logo .name { font-family: var(--serif); font-size: 17px; }
-.sidebar-logo .title { font-size: 11px; color: var(--text3); margin-top: 3px; letter-spacing: 0.05em; text-transform: uppercase; }
-.sidebar-logo .sync-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-.sync-btn { background: rgba(79,142,247,0.12); border: 1px solid rgba(79,142,247,0.3); border-radius: 6px; padding: 4px 10px; color: var(--accent); font-family: var(--sans); font-size: 11px; cursor: pointer; }
-.sync-btn:hover { background: rgba(79,142,247,0.2); }
-#sync-status { font-size: 10px; color: var(--text3); transition: opacity 0.5s; opacity: 0; }
-.nav { padding: 12px; flex: 1; }
-.nav-section { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); padding: 10px 8px 4px; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 13px; border: none; background: none; width: 100%; text-align: left; transition: all 0.15s; margin-bottom: 1px; }
-.nav-item:hover { background: var(--surface2); color: var(--text); }
-.nav-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 500; }
-.nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
-
-/* PAGE */
-.page { display: none; }
-.page.active { display: block; }
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-family: var(--serif); font-size: 26px; font-weight: 400; }
-.page-header p { color: var(--text2); margin-top: 4px; font-size: 13px; }
-
-/* CARDS */
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 18px; }
-.card-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 14px; }
-
-/* STAT BOX */
-.stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
-.stat-box .label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.stat-box .value { font-family: var(--mono); font-size: 28px; }
-.stat-box .sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
-
-/* PROGRESS */
-.progress-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.progress-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
-.progress-nums { display: flex; align-items: baseline; gap: 6px; margin: 8px 0 12px; }
-.progress-nums .current { font-family: var(--mono); font-size: 34px; }
-.progress-nums .total { font-family: var(--mono); font-size: 15px; color: var(--text3); }
-.progress-bar { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s; }
-.progress-pct { font-size: 11px; color: var(--text3); margin-top: 5px; font-family: var(--mono); }
-
-/* FORMS */
-.form-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-.form-grid.two { grid-template-columns: repeat(2,1fr); }
-.form-grid.four { grid-template-columns: repeat(4,1fr); }
-.full { grid-column: 1 / -1; }
-.field { display: flex; flex-direction: column; gap: 5px; }
-.field label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; }
-.field input, .field select, .field textarea { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text); font-family: var(--sans); font-size: 13.5px; outline: none; transition: border-color 0.15s; }
-.field input:focus, .field select:focus { border-color: var(--accent); }
-.field select option { background: var(--surface2); }
-.fee-wrap { position: relative; }
-.fee-wrap .dollar { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 13.5px; pointer-events: none; }
-.fee-wrap input { padding-left: 22px; width: 100%; }
-
-/* BUTTONS */
-.btn { padding: 8px 16px; border-radius: 8px; border: none; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: #3a7de8; }
-.btn-green { background: var(--green); color: #fff; }
-.btn-green:hover { background: #2db87d; }
-.btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
-.btn-ghost:hover { color: var(--text); }
-.btn-danger { background: transparent; border: 1px solid var(--red); color: var(--red); font-size: 12px; padding: 4px 9px; opacity: 0; transition: opacity 0.15s; }
-tr:hover .btn-danger { opacity: 1; }
-.btn-edit { background: transparent; border: 1px solid var(--border); color: var(--text2); font-size: 12px; padding: 4px 9px; opacity: 0; transition: opacity 0.15s; }
-tr:hover .btn-edit { opacity: 1; }
-.btn-row { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
-
-/* TABLES */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); font-weight: 500; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-td { padding: 9px 12px; border-bottom: 1px solid rgba(42,48,69,0.5); font-size: 13px; color: var(--text2); }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
-
-/* BADGES */
-.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 500; }
-.b-dc { background: rgba(79,142,247,0.15); color: var(--accent); }
-.b-sms { background: rgba(56,201,142,0.15); color: var(--green); }
-.b-emora { background: rgba(247,164,79,0.15); color: var(--amber); }
-.b-me { background: rgba(247,95,95,0.15); color: var(--red); }
-.b-ip { background: rgba(255,255,255,0.06); color: var(--text2); }
-.b-v { background: rgba(56,201,142,0.08); color: var(--green); }
-
-/* TABS */
-.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; width: fit-content; margin-bottom: 18px; }
-.tab { padding: 6px 14px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--text2); border: none; background: none; font-family: var(--sans); transition: all 0.15s; }
-.tab.active { background: var(--surface2); color: var(--text); font-weight: 500; }
-
-/* MODAL */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 500; align-items: center; justify-content: center; overflow-y: auto; }
-.modal-overlay.open { display: flex; }
-.modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; width: 520px; max-width: 95vw; margin: 20px auto; }
-.modal h2 { font-family: var(--serif); font-size: 20px; font-weight: 400; margin-bottom: 20px; }
-
-/* CLIENT DROPDOWN */
-.client-btn { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text2); font-family: var(--sans); font-size: 13.5px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.15s; text-align: left; }
-.client-btn.selected { border-color: var(--accent); color: var(--text); }
-.dropdown-wrap { position: relative; }
-.dropdown-menu { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--accent); border-radius: 10px; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.4); overflow: hidden; }
-.dropdown-search { padding: 8px; border-bottom: 1px solid var(--border); }
-.dropdown-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; color: var(--text); font-family: var(--sans); font-size: 13px; outline: none; }
-.dropdown-list { max-height: 220px; overflow-y: auto; }
-.dropdown-item { padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text); transition: background 0.1s; }
-.dropdown-item:last-child { border-bottom: none; }
-.dropdown-item:hover { background: var(--surface2); }
-
-/* STATUS TOGGLE */
-.status-toggle { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 6px; border: none; cursor: pointer; }
-
-/* EMPTY */
-.empty { text-align: center; padding: 36px; color: var(--text3); font-size: 13px; }
-.empty-icon { font-size: 28px; margin-bottom: 8px; }
-
-/* TOAST */
-.toast { position: fixed; bottom: 20px; right: 20px; background: var(--green); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; z-index: 999; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; }
-.toast.show { opacity: 1; transform: translateY(0); }
-
-/* GRID HELPERS */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-.grid-2-fill { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
-
-/* INVOICE */
-.invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.invoice-title { font-family: var(--serif); font-size: 22px; }
-.invoice-total { font-family: var(--mono); font-size: 26px; color: var(--green); margin-top: 6px; }
+:root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--border:#2a3045;--accent:#4f8ef7;--green:#38c98e;--amber:#f7a44f;--red:#f75f5f;--pink:#e879a0;--text:#e8eaf2;--text2:#8892a8;--text3:#5a6278;--serif:'DM Serif Display',serif;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+.app{display:flex;min-height:100vh}.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
+.sidebar-logo{padding:24px 20px 16px;border-bottom:1px solid var(--border)}.sidebar-logo .name{font-family:var(--serif);font-size:17px}.sidebar-logo .title{font-size:11px;color:var(--text3);margin-top:3px;letter-spacing:.05em;text-transform:uppercase}.sidebar-logo .sync-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.sync-btn{background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);border-radius:6px;padding:4px 10px;color:var(--accent);font-family:var(--sans);font-size:11px;cursor:pointer}.sync-btn:hover{background:rgba(79,142,247,.2)}#sync-status{font-size:10px;color:var(--text3);transition:opacity .5s;opacity:0}
+.nav{padding:12px;flex:1}.nav-section{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);padding:10px 8px 4px}.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;border:none;background:none;width:100%;text-align:left;transition:all .15s;margin-bottom:1px}.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:rgba(79,142,247,.12);color:var(--accent);font-weight:500}.nav-item .icon{font-size:15px;width:18px;text-align:center}
+.page{display:none}.page.active{display:block}.page-header{margin-bottom:24px}.page-header h1{font-family:var(--serif);font-size:26px;font-weight:400}.page-header p{color:var(--text2);margin-top:4px;font-size:13px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px}.card-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:500;margin-bottom:14px}
+.stat-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}.stat-box .label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}.stat-box .value{font-family:var(--mono);font-size:28px}.stat-box .sub{font-size:11px;color:var(--text3);margin-top:3px}
+.progress-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}.progress-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em}.progress-nums{display:flex;align-items:baseline;gap:6px;margin:8px 0 12px}.progress-nums .current{font-family:var(--mono);font-size:34px}.progress-nums .total{font-family:var(--mono);font-size:15px;color:var(--text3)}.progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}.progress-fill{height:100%;border-radius:3px;transition:width .6s}.progress-pct{font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.form-grid.two{grid-template-columns:repeat(2,1fr)}.form-grid.four{grid-template-columns:repeat(4,1fr)}.full{grid-column:1/-1}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500}.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13.5px;outline:none;transition:border-color .15s}.field input:focus,.field select:focus{border-color:var(--accent)}.field select option{background:var(--surface2)}.fee-wrap{position:relative}.fee-wrap .dollar{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:13.5px;pointer-events:none}.fee-wrap input{padding-left:22px;width:100%}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#3a7de8}.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#2db87d}.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text)}.btn-danger{background:transparent;border:1px solid var(--red);color:var(--red);font-size:12px;padding:4px 9px;opacity:0;transition:opacity .15s}tr:hover .btn-danger{opacity:1}.btn-edit{background:transparent;border:1px solid var(--border);color:var(--text2);font-size:12px;padding:4px 9px;opacity:0;transition:opacity .15s}tr:hover .btn-edit{opacity:1}.btn-row{display:flex;gap:10px;margin-top:16px;align-items:center}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse}th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}td{padding:9px 12px;border-bottom:1px solid rgba(42,48,69,.5);font-size:13px;color:var(--text2)}tr:last-child td{border-bottom:none}tr:hover td{background:rgba(255,255,255,.02);color:var(--text)}
+.badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-family:var(--mono);font-weight:500}.b-dc{background:rgba(79,142,247,.15);color:var(--accent)}.b-sms{background:rgba(56,201,142,.15);color:var(--green)}.b-emora{background:rgba(247,164,79,.15);color:var(--amber)}.b-me{background:rgba(247,95,95,.15);color:var(--red)}.b-ip{background:rgba(255,255,255,.06);color:var(--text2)}.b-v{background:rgba(56,201,142,.08);color:var(--green)}
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content;margin-bottom:18px}.tab{padding:6px 14px;border-radius:7px;cursor:pointer;font-size:13px;color:var(--text2);border:none;background:none;font-family:var(--sans);transition:all .15s}.tab.active{background:var(--surface2);color:var(--text);font-weight:500}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center;overflow-y:auto}.modal-overlay.open{display:flex}.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:520px;max-width:95vw;margin:20px auto}.modal h2{font-family:var(--serif);font-size:20px;font-weight:400;margin-bottom:20px}
+.client-btn{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text2);font-family:var(--sans);font-size:13.5px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .15s;text-align:left}.client-btn.selected{border-color:var(--accent);color:var(--text)}.dropdown-wrap{position:relative}.dropdown-menu{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:10px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden}.dropdown-search{padding:8px;border-bottom:1px solid var(--border)}.dropdown-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none}.dropdown-list{max-height:220px;overflow-y:auto}.dropdown-item{padding:10px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text);transition:background .1s}.dropdown-item:last-child{border-bottom:none}.dropdown-item:hover{background:var(--surface2)}
+.status-toggle{font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px;border:none;cursor:pointer}
+.empty{text-align:center;padding:36px;color:var(--text3);font-size:13px}.empty-icon{font-size:28px;margin-bottom:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid-2-fill{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}.invoice-title{font-family:var(--serif);font-size:22px}.invoice-total{font-family:var(--mono);font-size:26px;color:var(--green);margin-top:6px}
+.ql-wrap{max-width:480px;margin:0 auto;padding-bottom:40px}.ql-today-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--text3);margin-bottom:24px}.ql-step-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:500;margin-bottom:10px}.ql-step{margin-bottom:22px}.ql-step.locked{opacity:.35;pointer-events:none}.ql-client-btn{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;color:var(--text2);font-family:var(--sans);font-size:17px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .15s;text-align:left}.ql-client-btn.selected{border-color:var(--accent);color:var(--text);background:rgba(79,142,247,.07)}.ql-client-btn:active{transform:scale(.98)}.ql-dropdown-wrap{position:relative}.ql-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:16px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.6);overflow:hidden}.ql-dropdown-search{padding:12px;border-bottom:1px solid var(--border)}.ql-dropdown-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:16px;outline:none}.ql-dropdown-list{max-height:260px;overflow-y:auto}.ql-dropdown-item{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:15px;color:var(--text);transition:background .1s}.ql-dropdown-item:last-child{border-bottom:none}.ql-dropdown-item:active{background:var(--surface2)}.ql-big-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ql-big-btn{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:22px 14px;color:var(--text2);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;text-align:center;line-height:1.4;transition:all .15s}.ql-big-btn:active{transform:scale(.97)}.ql-big-btn.type-selected{border-color:var(--green);color:var(--green);background:rgba(56,201,142,.07)}.ql-big-btn.method-selected{border-color:var(--amber);color:var(--amber);background:rgba(247,164,79,.07)}.ql-big-btn-icon{font-size:26px;display:block;margin-bottom:8px}.ql-confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}.ql-confirm-row{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);font-size:14px}.ql-confirm-row:last-child{border-bottom:none}.ql-confirm-label{color:var(--text3)}.ql-confirm-value{color:var(--text);font-weight:500}.ql-log-btn{width:100%;background:var(--green);border:none;border-radius:16px;padding:22px;color:#fff;font-family:var(--sans);font-size:19px;font-weight:600;cursor:pointer;letter-spacing:.01em;transition:all .15s}.ql-log-btn:active{transform:scale(.98);background:#2db87d}.ql-success{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px}.ql-success-icon{font-size:72px;margin-bottom:20px}.ql-success-title{font-family:var(--serif);font-size:30px;margin-bottom:10px}.ql-success-sub{color:var(--text2);font-size:15px;margin-bottom:12px;line-height:1.6}.ql-success-time{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px}.ql-again-btn{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 32px;color:var(--text);font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;width:100%;transition:border-color .15s}
 </style>
 </head>
 <body>
 <div class="app">
-
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="name">David Robles</div>
     <div class="title">LCSW Tracker</div>
     <div class="sync-row">
-      <button class="sync-btn" onclick="fullBackup()" style="background:rgba(56,201,142,0.12);border-color:rgba(56,201,142,0.3);color:var(--green);">⬇ Backup</button>
-      <button class="sync-btn" onclick="document.getElementById('restore-input').click()" style="background:rgba(247,164,79,0.12);border-color:rgba(247,164,79,0.3);color:var(--amber);">⬆ Restore</button>
+      <button class="sync-btn" onclick="fullBackup()" style="background:rgba(56,201,142,.12);border-color:rgba(56,201,142,.3);color:var(--green);">⬇ Backup</button>
+      <button class="sync-btn" onclick="document.getElementById('restore-input').click()" style="background:rgba(247,164,79,.12);border-color:rgba(247,164,79,.3);color:var(--amber);">⬆ Restore</button>
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreFromBackup(this)">
       <span id="sync-status"></span>
     </div>
@@ -197,55 +64,26 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
     <button class="nav-item" onclick="showPage('statistics',this)"><span class="icon">◈</span> Statistics</button>
   </nav>
 </aside>
-
-<!-- MAIN -->
 <main class="main">
-
-<!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
   <div class="page-header"><h1>Dashboard</h1><p id="dash-date"></p></div>
   <div id="invoice-reminders" style="margin-bottom:16px;"></div>
   <div class="grid-2" style="margin-bottom:18px;">
-    <div class="progress-card">
-      <div class="progress-label">Hours toward LCSW</div>
-      <div class="progress-nums"><span class="current" id="d-clinical-hrs">0</span><span class="total">/ 3,000 hrs</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="d-clinical-bar" style="background:var(--accent);width:0%"></div></div>
-      <div class="progress-pct" id="d-clinical-pct">0.0% complete</div>
-    </div>
-    <div class="progress-card">
-      <div class="progress-label">Supervision Hours</div>
-      <div class="progress-nums"><span class="current" id="d-sup-hrs">0</span><span class="total">/ 100 hrs</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="d-sup-bar" style="background:var(--green);width:0%"></div></div>
-      <div class="progress-pct" id="d-sup-pct">0.0% complete</div>
-    </div>
+    <div class="progress-card"><div class="progress-label">Hours toward LCSW</div><div class="progress-nums"><span class="current" id="d-clinical-hrs">0</span><span class="total">/ 3,000 hrs</span></div><div class="progress-bar"><div class="progress-fill" id="d-clinical-bar" style="background:var(--accent);width:0%"></div></div><div class="progress-pct" id="d-clinical-pct">0.0% complete</div></div>
+    <div class="progress-card"><div class="progress-label">Supervision Hours</div><div class="progress-nums"><span class="current" id="d-sup-hrs">0</span><span class="total">/ 100 hrs</span></div><div class="progress-bar"><div class="progress-fill" id="d-sup-bar" style="background:var(--green);width:0%"></div></div><div class="progress-pct" id="d-sup-pct">0.0% complete</div></div>
   </div>
   <div class="grid-2-fill">
     <div class="stat-box"><div class="label">This Month Sessions</div><div class="value" id="d-month-sessions" style="color:var(--accent)">0</div><div class="sub" id="d-month-label">—</div></div>
     <div class="stat-box"><div class="label">This Month Income</div><div class="value" id="d-month-income" style="color:var(--green)">$0</div><div class="sub">billed this month</div></div>
   </div>
-  <div class="card">
-    <div class="card-title">Monthly Income — 2026</div>
-    <div class="table-wrap"><table><thead><tr><th>Month</th><th>In-Person</th><th>Virtual</th><th>Sessions</th><th>Income</th></tr></thead><tbody id="d-monthly-body"></tbody></table></div>
-  </div>
+  <div class="card"><div class="card-title">Monthly Income — 2026</div><div class="table-wrap"><table><thead><tr><th>Month</th><th>In-Person</th><th>Virtual</th><th>Sessions</th><th>Income</th></tr></thead><tbody id="d-monthly-body"></tbody></table></div></div>
 </div>
-
-<!-- LOG SESSION -->
 <div id="page-log-session" class="page">
   <div class="page-header"><h1>Log Session</h1><p>Add a session to your hour log</p></div>
   <div class="card">
     <div class="form-grid">
       <div class="field"><label>Date</label><input type="date" id="s-date"></div>
-      <div class="field">
-        <label>Client Name</label>
-        <div class="dropdown-wrap">
-          <button class="client-btn" id="s-client-btn" onclick="toggleSessionDropdown()"><span id="s-client-label">Select client</span><span style="opacity:0.4;font-size:11px;">▼</span></button>
-          <div class="dropdown-menu" id="s-client-dropdown">
-            <div class="dropdown-search"><input type="text" id="s-client-search" placeholder="Search..." oninput="filterSessionClients(this.value)" autocomplete="off"></div>
-            <div class="dropdown-list" id="s-client-list"></div>
-          </div>
-        </div>
-        <input type="hidden" id="s-name">
-      </div>
+      <div class="field"><label>Client Name</label><div class="dropdown-wrap"><button class="client-btn" id="s-client-btn" onclick="toggleSessionDropdown()"><span id="s-client-label">Select client</span><span style="opacity:.4;font-size:11px;">▼</span></button><div class="dropdown-menu" id="s-client-dropdown"><div class="dropdown-search"><input type="text" id="s-client-search" placeholder="Search..." oninput="filterSessionClients(this.value)" autocomplete="off"></div><div class="dropdown-list" id="s-client-list"></div></div></div><input type="hidden" id="s-name"></div>
       <input type="hidden" id="s-agency"><input type="hidden" id="s-agency-display">
       <div class="field"><label>Hours</label><input type="number" id="s-hours" value="2" min="0.5" step="0.5"></div>
       <div class="field"><label>Fee</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="s-fee" placeholder="0" min="0"></div></div>
@@ -253,1494 +91,333 @@ tr:hover td { background: rgba(255,255,255,0.02); color: var(--text); }
       <div class="field"><label>Activity</label><select id="s-desc-select" onchange="handleDescSelect()"><option value="">Select...</option><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other (custom)</option></select></div>
       <div class="field" id="s-desc-custom-wrap" style="display:none;"><label>Custom Description</label><input type="text" id="s-desc-custom" placeholder="Describe activity..."></div>
       <div class="field"><label>Session Type</label><select id="s-type"><option value="clinical">Clinical (toward 3,000)</option><option value="supervision">Supervision (toward 100)</option><option value="training">Training / CEU</option></select></div>
-
       <input type="hidden" id="s-desc">
     </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="logSession()">Save Session</button><button class="btn btn-ghost" onclick="clearSessionForm()">Clear</button></div>
   </div>
 </div>
-
-
-<!-- QUICK LOG -->
 <div id="page-quick-log" class="page">
-<style>
-.ql-wrap { max-width: 480px; margin: 0 auto; padding-bottom: 40px; }
-.ql-today-badge { display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--text3);margin-bottom:24px; }
-.ql-step-label { font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);font-weight:500;margin-bottom:10px; }
-.ql-step { margin-bottom:22px; }
-.ql-step.locked { opacity:0.35;pointer-events:none; }
-.ql-client-btn { width:100%;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;color:var(--text2);font-family:var(--sans);font-size:17px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color 0.15s;text-align:left; }
-.ql-client-btn.selected { border-color:var(--accent);color:var(--text);background:rgba(79,142,247,0.07); }
-.ql-client-btn:active { transform:scale(0.98); }
-.ql-dropdown-wrap { position:relative; }
-.ql-dropdown { display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:16px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,0.6);overflow:hidden; }
-.ql-dropdown-search { padding:12px;border-bottom:1px solid var(--border); }
-.ql-dropdown-search input { width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:16px;outline:none; }
-.ql-dropdown-list { max-height:260px;overflow-y:auto; }
-.ql-dropdown-item { padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:15px;color:var(--text);transition:background 0.1s; }
-.ql-dropdown-item:last-child { border-bottom:none; }
-.ql-dropdown-item:active { background:var(--surface2); }
-.ql-big-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
-.ql-big-btn { background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:22px 14px;color:var(--text2);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;text-align:center;line-height:1.4;transition:all 0.15s; }
-.ql-big-btn:active { transform:scale(0.97); }
-.ql-big-btn.type-selected { border-color:var(--green);color:var(--green);background:rgba(56,201,142,0.07); }
-.ql-big-btn.method-selected { border-color:var(--amber);color:var(--amber);background:rgba(247,164,79,0.07); }
-.ql-big-btn-icon { font-size:26px;display:block;margin-bottom:8px; }
-.ql-confirm-card { background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px; }
-.ql-confirm-row { display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);font-size:14px; }
-.ql-confirm-row:last-child { border-bottom:none; }
-.ql-confirm-label { color:var(--text3); }
-.ql-confirm-value { color:var(--text);font-weight:500; }
-.ql-log-btn { width:100%;background:var(--green);border:none;border-radius:16px;padding:22px;color:#fff;font-family:var(--sans);font-size:19px;font-weight:600;cursor:pointer;letter-spacing:0.01em;transition:all 0.15s; }
-.ql-log-btn:active { transform:scale(0.98);background:#2db87d; }
-.ql-success { display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px; }
-.ql-success-icon { font-size:72px;margin-bottom:20px; }
-.ql-success-title { font-family:var(--serif);font-size:30px;margin-bottom:10px; }
-.ql-success-sub { color:var(--text2);font-size:15px;margin-bottom:12px;line-height:1.6; }
-.ql-success-time { font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px; }
-.ql-again-btn { background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 32px;color:var(--text);font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;width:100%;transition:border-color 0.15s; }
-</style>
-
 <div class="ql-wrap">
   <div id="ql-form-inner">
     <div class="ql-today-badge" id="ql-today-label"></div>
-
-    <!-- Step 1 -->
-    <div class="ql-step" id="ql-step1">
-      <div class="ql-step-label">Step 1 — Who did you just see?</div>
-      <div class="ql-dropdown-wrap">
-        <button class="ql-client-btn" id="ql-client-btn" onclick="qlToggleDropdown()">
-          <span id="ql-client-label">Tap to select client</span>
-          <span style="opacity:0.4;font-size:13px;">▼</span>
-        </button>
-        <div class="ql-dropdown" id="ql-client-dropdown">
-          <div class="ql-dropdown-search">
-            <input type="text" id="ql-client-search" placeholder="Search by name..." oninput="qlFilterClients(this.value)" autocomplete="off">
-          </div>
-          <div class="ql-dropdown-list" id="ql-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="ql-step locked" id="ql-step2">
-      <div class="ql-step-label">Step 2 — Type of session?</div>
-      <div class="ql-big-grid">
-        <button class="ql-big-btn" onclick="qlSelectType('Intake session', this)">
-          <span class="ql-big-btn-icon">📋</span>Intake Session
-        </button>
-        <button class="ql-big-btn" onclick="qlSelectType('Psychotherapy session', this)">
-          <span class="ql-big-btn-icon">🧠</span>Psychotherapy Session
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 3 -->
-    <div class="ql-step locked" id="ql-step3">
-      <div class="ql-step-label">Step 3 — How did you meet?</div>
-      <div class="ql-big-grid">
-        <button class="ql-big-btn" onclick="qlSelectMethod('IP', this)">
-          <span class="ql-big-btn-icon">🏢</span>In-Person
-        </button>
-        <button class="ql-big-btn" onclick="qlSelectMethod('V', this)">
-          <span class="ql-big-btn-icon">💻</span>Virtual
-        </button>
-      </div>
-    </div>
-
-    <!-- Confirm -->
-    <div id="ql-confirm-section" style="display:none;">
-      <div class="ql-step-label">Confirm &amp; Log</div>
-      <div class="ql-confirm-card">
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Client</span><span class="ql-confirm-value" id="qlc-name">—</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Agency</span><span class="ql-confirm-value" id="qlc-agency">—</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Fee</span><span class="ql-confirm-value" id="qlc-fee">—</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Session Type</span><span class="ql-confirm-value" id="qlc-type">—</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Method</span><span class="ql-confirm-value" id="qlc-method">—</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Hours</span><span class="ql-confirm-value">2</span></div>
-        <div class="ql-confirm-row"><span class="ql-confirm-label">Date</span><span class="ql-confirm-value" id="qlc-date">—</span></div>
-      </div>
-      <button class="ql-log-btn" onclick="qlSubmitLog()">✓ Log Session</button>
-    </div>
+    <div class="ql-step" id="ql-step1"><div class="ql-step-label">Step 1 — Who did you just see?</div><div class="ql-dropdown-wrap"><button class="ql-client-btn" id="ql-client-btn" onclick="qlToggleDropdown()"><span id="ql-client-label">Tap to select client</span><span style="opacity:.4;font-size:13px;">▼</span></button><div class="ql-dropdown" id="ql-client-dropdown"><div class="ql-dropdown-search"><input type="text" id="ql-client-search" placeholder="Search by name..." oninput="qlFilterClients(this.value)" autocomplete="off"></div><div class="ql-dropdown-list" id="ql-list"></div></div></div></div>
+    <div class="ql-step locked" id="ql-step2"><div class="ql-step-label">Step 2 — Type of session?</div><div class="ql-big-grid"><button class="ql-big-btn" onclick="qlSelectType('Intake session',this)"><span class="ql-big-btn-icon">📋</span>Intake Session</button><button class="ql-big-btn" onclick="qlSelectType('Psychotherapy session',this)"><span class="ql-big-btn-icon">🧠</span>Psychotherapy Session</button></div></div>
+    <div class="ql-step locked" id="ql-step3"><div class="ql-step-label">Step 3 — How did you meet?</div><div class="ql-big-grid"><button class="ql-big-btn" onclick="qlSelectMethod('IP',this)"><span class="ql-big-btn-icon">🏢</span>In-Person</button><button class="ql-big-btn" onclick="qlSelectMethod('V',this)"><span class="ql-big-btn-icon">💻</span>Virtual</button></div></div>
+    <div id="ql-confirm-section" style="display:none;"><div class="ql-step-label">Confirm &amp; Log</div><div class="ql-confirm-card"><div class="ql-confirm-row"><span class="ql-confirm-label">Client</span><span class="ql-confirm-value" id="qlc-name">—</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Agency</span><span class="ql-confirm-value" id="qlc-agency">—</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Fee</span><span class="ql-confirm-value" id="qlc-fee">—</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Session Type</span><span class="ql-confirm-value" id="qlc-type">—</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Method</span><span class="ql-confirm-value" id="qlc-method">—</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Hours</span><span class="ql-confirm-value">2</span></div><div class="ql-confirm-row"><span class="ql-confirm-label">Date</span><span class="ql-confirm-value" id="qlc-date">—</span></div></div><button class="ql-log-btn" onclick="qlSubmitLog()">✓ Log Session</button></div>
   </div>
-
-  <!-- Success -->
-  <div class="ql-success" id="ql-success-screen">
-    <div class="ql-success-icon">✅</div>
-    <div class="ql-success-title">Session Logged</div>
-    <div class="ql-success-sub" id="ql-success-detail"></div>
-    <div class="ql-success-time" id="ql-success-time"></div>
-    <button class="ql-again-btn" onclick="qlResetForm()">+ Log Another Session</button>
-  </div>
+  <div class="ql-success" id="ql-success-screen"><div class="ql-success-icon">✅</div><div class="ql-success-title">Session Logged</div><div class="ql-success-sub" id="ql-success-detail"></div><div class="ql-success-time" id="ql-success-time"></div><button class="ql-again-btn" onclick="qlResetForm()">+ Log Another Session</button></div>
 </div>
 </div>
-
-<!-- SESSION LOG -->
 <div id="page-session-log" class="page">
-  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;">
-    <div><h1>Session Log</h1><p>Complete record of all hours</p></div>
-    <button class="btn btn-green" onclick="exportExcel()" style="margin-top:6px;">⬇ Export Master Log</button>
-  </div>
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;"><div><h1>Session Log</h1><p>Complete record of all hours</p></div><button class="btn btn-green" onclick="exportExcel()" style="margin-top:6px;">⬇ Export Master Log</button></div>
   <div class="card">
-    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
-      <input type="text" id="log-search" placeholder="Search..." oninput="renderLog()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;min-width:160px;">
-      <select id="log-agency" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;">
-        <option value="">All Agencies</option><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option>
-      </select>
-      <select id="log-month" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;">
-        <option value="">All Months</option><option value="2026-01">January</option><option value="2026-02">February</option><option value="2026-03">March</option><option value="2026-04">April</option><option value="2026-05">May</option><option value="2026-06">June</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>Date</th><th>Client</th><th>Agency</th><th>Hrs</th><th>Fee</th><th>Method</th><th>Description</th><th></th></tr></thead><tbody id="log-tbody"></tbody></table>
-    </div>
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="log-search" placeholder="Search..." oninput="renderLog()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;min-width:160px;"><select id="log-agency" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;"><option value="">All Agencies</option><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option></select><select id="log-month" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;"><option value="">All Months</option><option value="2026-01">January</option><option value="2026-02">February</option><option value="2026-03">March</option><option value="2026-04">April</option><option value="2026-05">May</option><option value="2026-06">June</option></select></div>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Client</th><th>Agency</th><th>Hrs</th><th>Fee</th><th>Method</th><th>Description</th><th></th></tr></thead><tbody id="log-tbody"></tbody></table></div>
     <div id="log-empty" class="empty" style="display:none;"><div class="empty-icon">📋</div>No sessions found.</div>
   </div>
 </div>
-
-<!-- INVOICES -->
 <div id="page-invoices" class="page">
   <div class="page-header"><h1>Invoices</h1><p>Generate agency invoices</p></div>
-  <div class="tabs">
-    <button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button>
-    <button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button>
-  </div>
+  <div class="tabs"><button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button><button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button></div>
   <div class="card">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;">
-      <div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03" selected>March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option></select></div>
-      <div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div>
-      <div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div>
-      <div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div>
-      <div><button class="btn btn-ghost" onclick="window.print()">🖨 Print</button></div>
-    </div>
-    <div class="invoice-header">
-      <div><div class="invoice-title">Invoice</div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div>
-      <div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div>
-    </div>
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03" selected>March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="window.print()">🖨 Print</button></div></div>
+    <div class="invoice-header"><div><div class="invoice-title">Invoice</div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
     <div class="table-wrap"><table id="inv-table"><thead id="inv-thead"></thead><tbody id="inv-tbody"></tbody></table></div>
     <div id="inv-empty" class="empty" style="display:none;"><div class="empty-icon">🧾</div>No sessions for this agency and month.</div>
   </div>
 </div>
-
-<!-- CLIENTS -->
 <div id="page-clients" class="page">
   <div class="page-header"><h1>Client Roster</h1><p>Manage your clients</p></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
-    <div class="stat-box"><div class="label">Active</div><div class="value" id="c-active-count" style="color:var(--green)">0</div><div class="sub">currently seeing</div></div>
-    <div class="stat-box"><div class="label">Inactive</div><div class="value" id="c-inactive-count" style="color:var(--text3)">0</div><div class="sub">paused or ended</div></div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Add Client</div>
-    <div class="form-grid">
-      <div class="field"><label>Full Name</label><input type="text" id="c-name" placeholder="Client name"></div>
-      <div class="field"><label>Agency</label><select id="c-agency"><option value="DC">District Counseling (DC)</option><option value="SMS">Safe Mind Space (SMS)</option><option value="Emora">Emora</option><option value="ME">Private (ME)</option></select></div>
-      <div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="c-rate" placeholder="0"></div></div>
-      <div class="field"><label>Method</label><select id="c-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div>
-
-      <div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="c-gender-male" onclick="selectGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s;">Male</button><button type="button" id="c-gender-female" onclick="selectGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all 0.15s;">Female</button></div><input type="hidden" id="c-gender" value=""></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="addClient()">Add Client</button></div>
-  </div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <div class="card-title" style="margin:0;">All Clients</div>
-      <div style="display:flex;gap:6px;">
-        <button onclick="filterClients('all',this)" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">All</button>
-        <button onclick="filterClients('active',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Active</button>
-        <button onclick="filterClients('inactive',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Inactive</button>
-      </div>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Last Seen</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div>
-    <div id="clients-empty" class="empty" style="display:none;"><div class="empty-icon">👤</div>No clients yet.</div>
-  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;"><div class="stat-box"><div class="label">Active</div><div class="value" id="c-active-count" style="color:var(--green)">0</div><div class="sub">currently seeing</div></div><div class="stat-box"><div class="label">Inactive</div><div class="value" id="c-inactive-count" style="color:var(--text3)">0</div><div class="sub">paused or ended</div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Add Client</div><div class="form-grid"><div class="field"><label>Full Name</label><input type="text" id="c-name" placeholder="Client name"></div><div class="field"><label>Agency</label><select id="c-agency"><option value="DC">District Counseling (DC)</option><option value="SMS">Safe Mind Space (SMS)</option><option value="Emora">Emora</option><option value="ME">Private (ME)</option></select></div><div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="c-rate" placeholder="0"></div></div><div class="field"><label>Method</label><select id="c-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div><div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="c-gender-male" onclick="selectGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Male</button><button type="button" id="c-gender-female" onclick="selectGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Female</button></div><input type="hidden" id="c-gender" value=""></div></div><div class="btn-row"><button class="btn btn-primary" onclick="addClient()">Add Client</button></div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="card-title" style="margin:0;">All Clients</div><div style="display:flex;gap:6px;"><button onclick="filterClients('all',this)" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">All</button><button onclick="filterClients('active',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Active</button><button onclick="filterClients('inactive',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Inactive</button></div></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Last Seen</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div><div id="clients-empty" class="empty" style="display:none;"><div class="empty-icon">👤</div>No clients yet.</div></div>
 </div>
-
-<!-- SUPERVISION -->
 <div id="page-supervision" class="page">
   <div class="page-header"><h1>Supervision</h1><p>Tracking toward 100-hour requirement</p></div>
-  <div class="grid-2" style="margin-bottom:18px;">
-    <div class="progress-card">
-      <div class="progress-label">Hours Completed</div>
-      <div class="progress-nums"><span class="current" id="sup-hrs">0</span><span class="total">/ 100 hrs</span></div>
-      <div class="progress-bar"><div class="progress-fill" id="sup-bar" style="background:var(--green);width:0%"></div></div>
-      <div class="progress-pct" id="sup-pct">0.0% complete</div>
-    </div>
-    <div class="progress-card" style="border-color:rgba(56,201,142,0.3);">
-      <div class="progress-label">Total Cost</div>
-      <div class="progress-nums"><span class="current" id="sup-cost" style="color:var(--green);">$0</span></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:6px;">spent on supervision in 2026</div>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Log Supervision</div>
-    <div class="form-grid">
-      <div class="field"><label>Date</label><input type="date" id="sup-date"></div>
-      <div class="field"><label>Type</label><select id="sup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div>
-      <div class="field"><label>Hours</label><input type="number" id="sup-hours" value="2" min="0.5" step="0.5"></div>
-      <div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="sup-cost-input" placeholder="0"></div></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="logSupervision()">Save</button></div>
-  </div>
-  <div class="card">
-    <div class="card-title">Supervision Log</div>
-    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Hours</th><th>Cost</th><th></th></tr></thead><tbody id="sup-tbody"></tbody></table></div>
-    <div id="sup-empty" class="empty" style="display:none;"><div class="empty-icon">📚</div>No supervision logged yet.</div>
-  </div>
+  <div class="grid-2" style="margin-bottom:18px;"><div class="progress-card"><div class="progress-label">Hours Completed</div><div class="progress-nums"><span class="current" id="sup-hrs">0</span><span class="total">/ 100 hrs</span></div><div class="progress-bar"><div class="progress-fill" id="sup-bar" style="background:var(--green);width:0%"></div></div><div class="progress-pct" id="sup-pct">0.0% complete</div></div><div class="progress-card" style="border-color:rgba(56,201,142,.3);"><div class="progress-label">Total Cost</div><div class="progress-nums"><span class="current" id="sup-cost" style="color:var(--green);">$0</span></div><div style="font-size:11px;color:var(--text3);margin-top:6px;">spent on supervision in 2026</div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Log Supervision</div><div class="form-grid"><div class="field"><label>Date</label><input type="date" id="sup-date"></div><div class="field"><label>Type</label><select id="sup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div><div class="field"><label>Hours</label><input type="number" id="sup-hours" value="2" min="0.5" step="0.5"></div><div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="sup-cost-input" placeholder="0"></div></div></div><div class="btn-row"><button class="btn btn-primary" onclick="logSupervision()">Save</button></div></div>
+  <div class="card"><div class="card-title">Supervision Log</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Hours</th><th>Cost</th><th></th></tr></thead><tbody id="sup-tbody"></tbody></table></div><div id="sup-empty" class="empty" style="display:none;"><div class="empty-icon">📚</div>No supervision logged yet.</div></div>
 </div>
-
-<!-- REFERRALS -->
 <div id="page-referrals" class="page">
   <div class="page-header"><h1>Referral Sources</h1><p>Track where your clients come from</p></div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Add Referral</div>
-    <div class="form-grid">
-      <div class="field"><label>Client Name</label><input type="text" id="ref-name" placeholder="Full name"></div>
-      <div class="field"><label>Source</label><select id="ref-source"><option value="Psychology Today">Psychology Today</option><option value="Therapist.com">Therapist.com</option><option value="Open Path">Open Path</option><option value="Mental Health Match">Mental Health Match</option><option value="Word of Mouth">Word of Mouth</option><option value="Other">Other</option></select></div>
-      <div class="field"><label>Status</label><select id="ref-status"><option value="converted">Converted</option><option value="pending">Pending</option><option value="declined">Declined</option></select></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="addReferral()">Add Referral</button></div>
-  </div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Add Referral</div><div class="form-grid"><div class="field"><label>Client Name</label><input type="text" id="ref-name" placeholder="Full name"></div><div class="field"><label>Source</label><select id="ref-source"><option value="Psychology Today">Psychology Today</option><option value="Therapist.com">Therapist.com</option><option value="Open Path">Open Path</option><option value="Mental Health Match">Mental Health Match</option><option value="Word of Mouth">Word of Mouth</option><option value="Other">Other</option></select></div><div class="field"><label>Status</label><select id="ref-status"><option value="converted">Converted</option><option value="pending">Pending</option><option value="declined">Declined</option></select></div></div><div class="btn-row"><button class="btn btn-primary" onclick="addReferral()">Add Referral</button></div></div>
   <div id="ref-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;"></div>
 </div>
-
-<!-- STATISTICS -->
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Session Stats</div>
-    <div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Sessions by Agency</div>
-    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;">
-      <div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div>
-      <div id="agency-legend" style="flex:1;min-width:160px;"></div>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">In-Person vs Virtual — This Month</div>
-    <div class="grid-2"><div class="stat-box"><div class="label">In-Person</div><div class="value" id="stat-ip" style="color:var(--accent)">0</div><div class="sub">this month</div></div><div class="stat-box"><div class="label">Virtual</div><div class="value" id="stat-v" style="color:var(--green)">0</div><div class="sub">this month</div></div></div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Caseload — Gender Breakdown</div>
-    <div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div>
-  </div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Sessions by Agency</div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">In-Person vs Virtual — This Month</div><div class="grid-2"><div class="stat-box"><div class="label">In-Person</div><div class="value" id="stat-ip" style="color:var(--accent)">0</div><div class="sub">this month</div></div><div class="stat-box"><div class="label">Virtual</div><div class="value" id="stat-v" style="color:var(--green)">0</div><div class="sub">this month</div></div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Caseload — Gender Breakdown</div><div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div></div>
 </div>
-
 </main>
 </div>
-
-<!-- MODALS -->
-<div class="modal-overlay" id="modal-edit-client">
-  <div class="modal">
-    <h2>Edit Client</h2>
-    <input type="hidden" id="ec-id">
-    <div class="form-grid two">
-      <div class="field full"><label>Full Name</label><input type="text" id="ec-name"></div>
-      <div class="field"><label>Agency</label><select id="ec-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option></select></div>
-      <div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="ec-rate"></div></div>
-      <div class="field"><label>Method</label><select id="ec-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div>
-
-      <div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="ec-gender-male" onclick="selectEditGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;">Male</button><button type="button" id="ec-gender-female" onclick="selectEditGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;">Female</button></div><input type="hidden" id="ec-gender"></div>
-      <div class="field"><label>Status</label><select id="ec-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="saveEditClient()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-client')">Cancel</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-edit-session">
-  <div class="modal">
-    <h2>Edit Session</h2>
-    <input type="hidden" id="es-id">
-    <div class="form-grid">
-      <div class="field"><label>Date</label><input type="date" id="es-date"></div>
-      <div class="field"><label>Client Name</label><input type="text" id="es-name"></div>
-      <div class="field"><label>Agency</label><select id="es-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option><option value="—">N/A</option></select></div>
-      <div class="field"><label>Hours</label><input type="number" id="es-hours" min="0.5" step="0.5"></div>
-      <div class="field"><label>Fee ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="es-fee" min="0"></div></div>
-      <div class="field"><label>Method</label><select id="es-method"><option value="IP">In-Person</option><option value="V">Virtual</option><option value="—">N/A</option></select></div>
-      <div class="field"><label>Description</label><select id="es-desc-sel" onchange="handleEditDescSel()"><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other</option></select></div>
-      <div class="field" id="es-custom-wrap" style="display:none;"><label>Custom</label><input type="text" id="es-custom"></div>
-      <div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option></select></div>
-      <div class="field"><label>Insurance</label><input type="text" id="es-insurance"></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="saveEditSession()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-session')">Cancel</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-edit-sup">
-  <div class="modal" style="max-width:400px;">
-    <h2>Edit Supervision</h2>
-    <input type="hidden" id="esup-id">
-    <div class="form-grid two">
-      <div class="field"><label>Date</label><input type="date" id="esup-date"></div>
-      <div class="field"><label>Type</label><select id="esup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div>
-      <div class="field"><label>Hours</label><input type="number" id="esup-hours" min="0.5" step="0.5"></div>
-      <div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="esup-cost"></div></div>
-    </div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="saveEditSup()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-sup')">Cancel</button></div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-client-profile">
-  <div class="modal" style="max-width:600px;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
-      <div><div style="font-family:var(--serif);font-size:22px;" id="cp-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="cp-meta">—</div></div>
-      <button class="btn btn-ghost" onclick="closeModal('modal-client-profile')">Close</button>
-    </div>
-    <div class="grid-4" style="margin-bottom:20px;">
-      <div class="stat-box"><div class="label">Sessions</div><div class="value" id="cp-sessions" style="color:var(--accent);font-size:22px;">0</div></div>
-      <div class="stat-box"><div class="label">Hours</div><div class="value" id="cp-hours" style="color:var(--green);font-size:22px;">0</div></div>
-      <div class="stat-box"><div class="label">Billed</div><div class="value" id="cp-billed" style="color:var(--amber);font-size:22px;">$0</div></div>
-      <div class="stat-box"><div class="label">Rate</div><div class="value" id="cp-rate" style="color:var(--text);font-size:22px;">$0</div></div>
-    </div>
-    <div class="card-title">Session History</div>
-    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Hrs</th><th>Fee</th></tr></thead><tbody id="cp-history"></tbody></table></div>
-  </div>
-</div>
-
+<div class="modal-overlay" id="modal-edit-client"><div class="modal"><h2>Edit Client</h2><input type="hidden" id="ec-id"><div class="form-grid two"><div class="field full"><label>Full Name</label><input type="text" id="ec-name"></div><div class="field"><label>Agency</label><select id="ec-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option></select></div><div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="ec-rate"></div></div><div class="field"><label>Method</label><select id="ec-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div><div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="ec-gender-male" onclick="selectEditGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;">Male</button><button type="button" id="ec-gender-female" onclick="selectEditGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;">Female</button></div><input type="hidden" id="ec-gender"></div><div class="field"><label>Status</label><select id="ec-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditClient()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-client')">Cancel</button></div></div></div>
+<div class="modal-overlay" id="modal-edit-session"><div class="modal"><h2>Edit Session</h2><input type="hidden" id="es-id"><div class="form-grid"><div class="field"><label>Date</label><input type="date" id="es-date"></div><div class="field"><label>Client Name</label><input type="text" id="es-name"></div><div class="field"><label>Agency</label><select id="es-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option><option value="—">N/A</option></select></div><div class="field"><label>Hours</label><input type="number" id="es-hours" min="0.5" step="0.5"></div><div class="field"><label>Fee ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="es-fee" min="0"></div></div><div class="field"><label>Method</label><select id="es-method"><option value="IP">In-Person</option><option value="V">Virtual</option><option value="—">N/A</option></select></div><div class="field"><label>Description</label><select id="es-desc-sel" onchange="handleEditDescSel()"><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other</option></select></div><div class="field" id="es-custom-wrap" style="display:none;"><label>Custom</label><input type="text" id="es-custom"></div><div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option></select></div><div class="field"><label>Insurance</label><input type="text" id="es-insurance"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSession()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-session')">Cancel</button></div></div></div>
+<div class="modal-overlay" id="modal-edit-sup"><div class="modal" style="max-width:400px;"><h2>Edit Supervision</h2><input type="hidden" id="esup-id"><div class="form-grid two"><div class="field"><label>Date</label><input type="date" id="esup-date"></div><div class="field"><label>Type</label><select id="esup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div><div class="field"><label>Hours</label><input type="number" id="esup-hours" min="0.5" step="0.5"></div><div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="esup-cost"></div></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSup()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-sup')">Cancel</button></div></div></div>
+<div class="modal-overlay" id="modal-client-profile"><div class="modal" style="max-width:600px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;"><div><div style="font-family:var(--serif);font-size:22px;" id="cp-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="cp-meta">—</div></div><button class="btn btn-ghost" onclick="closeModal('modal-client-profile')">Close</button></div><div class="grid-4" style="margin-bottom:20px;"><div class="stat-box"><div class="label">Sessions</div><div class="value" id="cp-sessions" style="color:var(--accent);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Hours</div><div class="value" id="cp-hours" style="color:var(--green);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Billed</div><div class="value" id="cp-billed" style="color:var(--amber);font-size:22px;">$0</div></div><div class="stat-box"><div class="label">Rate</div><div class="value" id="cp-rate" style="color:var(--text);font-size:22px;">$0</div></div></div><div class="card-title">Session History</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Hrs</th><th>Fee</th></tr></thead><tbody id="cp-history"></tbody></table></div></div></div>
 <div id="toast" class="toast"></div>
-
 <script>
 // ============================================================
-// DATA — Cloud storage via /api/data
+// FIREBASE CONFIG
 // ============================================================
-const KEYS = { sessions:'sessions', clients:'clients', supervision:'supervision', referrals:'referrals' };
-
-// In-memory cache — loaded once at startup, written back on every save
-let _db = { sessions:[], clients:[], supervision:[], referrals:[], inv_dates:{}, seeded:false };
-
-function load(key) { return _db[key] || []; }
-
-function save(key, data) {
-  _db[key] = data;
-  fetch('/api/data', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ [key]: data })
-  }).catch(err => console.warn('Save error:', err));
-}
-
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-function fmtDate(d) {
-  if (!d) return '—';
-  const s = String(d).split('T')[0];
-  const p = s.split('-');
-  if (p.length !== 3) return d;
-  return `${p[1]}/${p[2]}/${p[0]}`;
-}
+const firebaseConfig={apiKey:"AIzaSyARzjrwt_Asr-_ca5bBYUBoFUMKM8sRAFc",authDomain:"therapy-by-david.firebaseapp.com",databaseURL:"https://therapy-by-david-default-rtdb.firebaseio.com",projectId:"therapy-by-david",storageBucket:"therapy-by-david.firebasestorage.app",messagingSenderId:"45351635355",appId:"1:45351635355:web:034613da21afc66625793e"};
+firebase.initializeApp(firebaseConfig);
+const fbDb=firebase.database();
+const fbRef=fbDb.ref('lcsw_tracker');
 
 // ============================================================
-// SEED DATA (from LMSW_2026.xlsx)
+// DATA — Firebase Realtime Database
 // ============================================================
-function seedData() {
-  if (_db.seeded) {
-    // Add missing clients without overwriting existing
-    const existing = load(KEYS.clients);
-    const toAdd = [
-      {id:uid(),name:'Daniel Hall',agency:'DC',rate:40,method:'IP',insurance:'',gender:'',status:'inactive'},
-      {id:uid(),name:'Randy Ehresman',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-      {id:uid(),name:'Grant Rainety',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-      {id:uid(),name:'Azariah Peacock',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-      {id:uid(),name:'Oscar Garcia',agency:'ME',rate:0,method:'V',insurance:'',gender:'',status:'inactive'},
-    ];
-    let changed = false;
-    toAdd.forEach(c => { if (!existing.find(e => e.name === c.name)) { existing.push(c); changed = true; } });
-    if (changed) save(KEYS.clients, existing);
-    return;
-  }
+const KEYS={sessions:'sessions',clients:'clients',supervision:'supervision',referrals:'referrals'};
+let _db={sessions:[],clients:[],supervision:[],referrals:[],inv_dates:{},seeded:false};
 
-  const sessions = [
-    {id:uid(),date:'2026-01-15',name:'',agency:'DC',hours:3,fee:0,method:'—',desc:'Orientation + SimplePractice training',type:'admin',insurance:''},
-    {id:uid(),date:'2026-01-16',name:'',agency:'DC',hours:2,fee:0,method:'—',desc:'Office setup (Met Sarah)',type:'admin',insurance:''},
-    {id:uid(),date:'2026-01-19',name:'Daniel Hall',agency:'DC',hours:3,fee:40,method:'—',desc:'Intake assessments, documentation, treatment planning',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-01-29',name:'',agency:'Emora',hours:1,fee:0,method:'—',desc:'Orientation Zoom meeting',type:'admin',insurance:''},
-    {id:uid(),date:'2026-01-28',name:'Oscar Garcia',agency:'—',hours:1,fee:0,method:'—',desc:'Discovery Call',type:'admin',insurance:''},
-    {id:uid(),date:'2026-01-30',name:'Randy Ehresman',agency:'Emora',hours:2,fee:37,method:'—',desc:'Intake session, documentation',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-01',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'IP',desc:'Intake session, documentation',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-05',name:'Grant Rainety',agency:'Emora',hours:2,fee:19,method:'V',desc:'Intake session (No Show)',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-06',name:'Randy Ehresman',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-08',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-09',name:'Marcus Marquez',agency:'DC',hours:2,fee:52,method:'IP',desc:'Intake: Pornography (Court mandate)',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-12',name:'Corinne Lira',agency:'ME',hours:2,fee:60,method:'V',desc:'Intake ($60 per week)',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-13',name:'DBT Crash Course',agency:'—',hours:8,fee:0,method:'—',desc:'15 Core Techniques to Improve Emotional Regulation',type:'training',insurance:''},
-    {id:uid(),date:'2026-02-14',name:'Randy Ehresman',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-15',name:'Alex Villarreal',agency:'DC',hours:2,fee:45,method:'IP',desc:'Intake: (Court mandate)',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-15',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-15',name:'Azariah Peacock',agency:'Emora',hours:2,fee:37,method:'V',desc:'Intake (Mom and Son)',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-16',name:'Marcus Marquez',agency:'DC',hours:2,fee:52,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-16',name:'Khalid Hamad',agency:'DC',hours:2,fee:50,method:'V',desc:'Virtual Intake session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-18',name:'Grant Rainety',agency:'Emora',hours:2,fee:37,method:'V',desc:'Intake session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-18',name:'Corinne Lira',agency:'ME',hours:2,fee:60,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-21',name:'Randy Ehresman',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-22',name:'Alex Villarreal',agency:'DC',hours:2,fee:45,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-22',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-23',name:'Marcus Marquez',agency:'DC',hours:2,fee:52,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-23',name:'Khalid Hamad',agency:'DC',hours:2,fee:50,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-24',name:'Zane Koenig',agency:'Emora',hours:2,fee:37,method:'V',desc:'Intake session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-25',name:'Corinne Lira',agency:'ME',hours:2,fee:60,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-25',name:'Azariah Peacock',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-26',name:'Eric Rodriguez',agency:'DC',hours:2,fee:50,method:'IP',desc:'Intake session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-26',name:'Randy Ehresman',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-02-27',name:'Zachary Maiberger',agency:'SMS',hours:2,fee:40,method:'IP',desc:'Intake session',type:'clinical',insurance:'BCBS'},
-    {id:uid(),date:'2026-03-02',name:'Alex Villarreal',agency:'DC',hours:2,fee:45,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-02',name:'Khalid Hamad',agency:'DC',hours:2,fee:50,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-02',name:'Anthony Zamorano',agency:'ME',hours:2,fee:50,method:'V',desc:'Intake',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-03',name:'Zane Koenig',agency:'Emora',hours:2,fee:19,method:'V',desc:'NS',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-04',name:'Corinne Lira',agency:'ME',hours:2,fee:60,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-04',name:'Azariah Peacock',agency:'Emora',hours:2,fee:19,method:'V',desc:'NS',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-05',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-05',name:'Eric Rodriguez',agency:'DC',hours:2,fee:50,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-05',name:'Zane Koenig',agency:'Emora',hours:2,fee:37,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-06',name:'Zachary Maiberger',agency:'SMS',hours:2,fee:40,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:'BCBS'},
-    {id:uid(),date:'2026-03-06',name:'Jose Herbert',agency:'SMS',hours:2,fee:40,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-09',name:'CPT Training',agency:'—',hours:8,fee:0,method:'—',desc:'An Evidence-Based Approach to Treat PTSD',type:'training',insurance:''},
-    {id:uid(),date:'2026-03-09',name:'Khalid Hamad',agency:'DC',hours:2,fee:50,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-11',name:'Corinne Lira',agency:'ME',hours:2,fee:60,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-12',name:'Jarmonica Kershaw',agency:'DC',hours:2,fee:30,method:'V',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-12',name:'Eric Rodriguez',agency:'DC',hours:2,fee:50,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-12',name:'Alex Villarreal',agency:'DC',hours:2,fee:45,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-12',name:'Alexander Tribush',agency:'SMS',hours:2,fee:40,method:'V',desc:'Intake',type:'clinical',insurance:'BCBS'},
-    {id:uid(),date:'2026-03-12',name:'Zachary Maiberger',agency:'SMS',hours:2,fee:40,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:'BCBS'},
-    {id:uid(),date:'2026-03-12',name:'Camare Halrston',agency:'SMS',hours:2,fee:40,method:'V',desc:'Intake',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-13',name:'Zachary Maiberger',agency:'SMS',hours:2,fee:40,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:'BCBS'},
-    {id:uid(),date:'2026-03-14',name:'Camare Halrston',agency:'SMS',hours:2,fee:40,method:'V',desc:'Intake',type:'clinical',insurance:''},
-    {id:uid(),date:'2026-03-16',name:'Marcus Marquez',agency:'DC',hours:2,fee:52,method:'IP',desc:'Psychotherapy session',type:'clinical',insurance:''},
-  ];
-
-  const clients = [
-    {id:uid(),name:'Jarmonica Kershaw',agency:'DC',rate:30,method:'IP',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Marcus Marquez',agency:'DC',rate:52,method:'IP',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Corinne Lira',agency:'ME',rate:60,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Alex Villarreal',agency:'DC',rate:45,method:'IP',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Khalid Hamad',agency:'DC',rate:50,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Alexander Tribush',agency:'SMS',rate:40,method:'V',insurance:'BCBS',gender:'',status:'active'},
-    {id:uid(),name:'Zane Koenig',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Eric Rodriguez',agency:'DC',rate:50,method:'IP',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Zachary Maiberger',agency:'SMS',rate:40,method:'IP',insurance:'BCBS',gender:'',status:'active'},
-    {id:uid(),name:'Jose Herbert',agency:'SMS',rate:40,method:'IP',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Camare Halrston',agency:'SMS',rate:40,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Jennifer Corder',agency:'SMS',rate:40,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Fernan Alvarado',agency:'ME',rate:50,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Anthony Zamorano',agency:'ME',rate:50,method:'V',insurance:'',gender:'',status:'inactive'},
-    {id:uid(),name:'Jon Torres',agency:'DC',rate:40,method:'V',insurance:'',gender:'',status:'active'},
-    {id:uid(),name:'Daniel Hall',agency:'DC',rate:40,method:'IP',insurance:'',gender:'',status:'inactive'},
-    {id:uid(),name:'Randy Ehresman',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-    {id:uid(),name:'Grant Rainety',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-    {id:uid(),name:'Azariah Peacock',agency:'Emora',rate:37,method:'V',insurance:'',gender:'',status:'inactive'},
-    {id:uid(),name:'Oscar Garcia',agency:'ME',rate:0,method:'V',insurance:'',gender:'',status:'inactive'},
-  ];
-
-  const supervision = [
-    {id:uid(),date:'2026-02-23',type:'Individual',hours:2,cost:100},
-    {id:uid(),date:'2026-03-09',type:'Individual',hours:2,cost:0},
-  ];
-
-  const referrals = [
-    {id:uid(),name:'Daniel Hall',source:'Psychology Today',status:'converted'},
-    {id:uid(),name:'Alexander Tribush',source:'Psychology Today',status:'converted'},
-    {id:uid(),name:'Corinne Lira',source:'Therapist.com',status:'converted'},
-    {id:uid(),name:'Oscar Garcia',source:'Open Path',status:'declined'},
-    {id:uid(),name:'Anthony Zamorano',source:'Open Path',status:'converted'},
-    {id:uid(),name:'Fernan Alvarado',source:'Open Path',status:'pending'},
-  ];
-
-  save(KEYS.sessions, sessions);
-  save(KEYS.clients, clients);
-  save(KEYS.supervision, supervision);
-  save(KEYS.referrals, referrals);
-  // Write seeded flag in the same request as a final full sync
-  _db.seeded = true;
-  fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(_db) });
-}
-
-// ============================================================
-// NAV
-// ============================================================
-// showPage defined in Quick Log section below
+function load(key){return _db[key]||[]}
+function save(key,data){_db[key]=data;fbRef.child(key).set(data).catch(err=>console.warn('Firebase save error:',err))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function fmtDate(d){if(!d)return'\u2014';const s=String(d).split('T')[0];const p=s.split('-');if(p.length!==3)return d;return p[1]+'/'+p[2]+'/'+p[0]}
 
 // ============================================================
 // TOAST
 // ============================================================
-function toast(msg, err) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.background = err ? 'var(--red)' : 'var(--green)';
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
-}
+function toast(msg,err){const el=document.getElementById('toast');el.textContent=msg;el.style.background=err?'var(--red)':'var(--green)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
 
 // ============================================================
 // SYNC STATUS
 // ============================================================
-function showSyncStatus(msg, color) {
-  const el = document.getElementById('sync-status');
-  if (!el) return;
-  el.textContent = msg;
-  el.style.color = color;
-  el.style.opacity = '1';
-  setTimeout(() => { el.style.opacity = '0'; }, 3000);
+function showSyncStatus(msg,color){const el=document.getElementById('sync-status');if(!el)return;el.textContent=msg;el.style.color=color;el.style.opacity='1';setTimeout(()=>{el.style.opacity='0'},3000)}
+
+// ============================================================
+// BACKUP & RESTORE (Firebase)
+// ============================================================
+async function fullBackup(){
+  try{
+    const snap=await fbRef.once('value');const freshData=snap.val()||{};
+    const backup={exported:new Date().toISOString(),sessions:freshData.sessions||[],clients:freshData.clients||[],supervision:freshData.supervision||[],referrals:freshData.referrals||[],inv_dates:freshData.inv_dates||{}};
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='LCSW_Backup_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);toast('Full backup downloaded');
+  }catch(e){toast('Backup failed - try again',true)}
 }
 
-
-// ============================================================
-// FULL BACKUP
-// ============================================================
-
-async function restoreFromBackup(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async function(e) {
-    try {
-      const backup = JSON.parse(e.target.result);
-      if (!backup.sessions) { toast('Invalid backup file', true); return; }
-      if (!confirm('This will replace all your current data with the backup. Are you sure?')) return;
-      _db.sessions = backup.sessions || [];
-      _db.clients = backup.clients || [];
-      _db.supervision = backup.supervision || [];
-      _db.referrals = backup.referrals || [];
-      _db.inv_dates = backup.inv_dates || {};
-      _db.seeded = true;
-      const res = await fetch('/api/data', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(_db)
-      });
-      await res.json();
-      toast('Backup restored successfully');
-      renderDashboard();
-      renderSupervision();
-      populateClientLists();
-      input.value = '';
-    } catch(e) {
-      toast('Restore failed — invalid file', true);
-    }
+async function restoreFromBackup(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const backup=JSON.parse(e.target.result);
+      if(!backup.sessions){toast('Invalid backup file',true);return}
+      if(!confirm('This will replace all your current data with the backup. Are you sure?'))return;
+      _db.sessions=backup.sessions||[];_db.clients=backup.clients||[];_db.supervision=backup.supervision||[];_db.referrals=backup.referrals||[];_db.inv_dates=backup.inv_dates||{};_db.seeded=true;
+      await fbRef.set(_db);
+      toast('Backup restored and synced to Firebase');renderDashboard();renderSupervision();populateClientLists();input.value='';
+    }catch(e){toast('Restore failed \u2014 invalid file',true)}
   };
   reader.readAsText(file);
 }
 
-async function fullBackup() {
-  try {
-    // Always fetch fresh from server so backup reflects actual stored data
-    const res = await fetch('/api/data');
-    const freshData = await res.json();
-    const backup = {
-      exported: new Date().toISOString(),
-      sessions: freshData.sessions || [],
-      clients: freshData.clients || [],
-      supervision: freshData.supervision || [],
-      referrals: freshData.referrals || [],
-      inv_dates: freshData.inv_dates || {}
-    };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'LCSW_Backup_' + new Date().toISOString().slice(0,10) + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('Full backup downloaded');
-  } catch(e) {
-    toast('Backup failed - try again', true);
-  }
-}
-
-function doSync() {
-  fetch('/api/data', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(_db)
-  })
-  .then(r => r.json())
-  .then(() => { showSyncStatus('Synced \u2713', 'var(--green)'); toast('Data synced to cloud'); })
-  .catch(() => { showSyncStatus('Sync failed', 'var(--red)'); toast('Sync failed', true); });
-}
+function doSync(){fbRef.set(_db).then(()=>{showSyncStatus('Synced \u2713','var(--green)');toast('Data synced to Firebase')}).catch(()=>{showSyncStatus('Sync failed','var(--red)');toast('Sync failed',true)})}
 
 // ============================================================
 // MODALS
 // ============================================================
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
 
 // ============================================================
 // DASHBOARD
 // ============================================================
-function renderDashboard() {
-  const sessions = load(KEYS.sessions);
-  const supervision = load(KEYS.supervision);
-  const now = new Date();
-  const monthStr = now.toISOString().slice(0,7);
-  const monthName = now.toLocaleString('default',{month:'long',year:'numeric'});
-
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-  const clinHrs = sessions.reduce((a,s) => a + (parseFloat(s.hours)||0), 0);
-  const supHrs = supervision.reduce((a,s) => a + (parseFloat(s.hours)||0), 0);
-
-  document.getElementById('d-clinical-hrs').textContent = clinHrs;
-  document.getElementById('d-clinical-bar').style.width = Math.min(100,(clinHrs/3000)*100) + '%';
-  document.getElementById('d-clinical-pct').textContent = ((clinHrs/3000)*100).toFixed(1) + '% complete';
-  document.getElementById('d-sup-hrs').textContent = supHrs;
-  document.getElementById('d-sup-bar').style.width = Math.min(100,(supHrs/100)*100) + '%';
-  document.getElementById('d-sup-pct').textContent = ((supHrs/100)*100).toFixed(1) + '% complete';
-
-  const thisMonth = sessions.filter(s => s.date && s.date.startsWith(monthStr) && s.type === 'clinical');
-  document.getElementById('d-month-sessions').textContent = thisMonth.length;
-  document.getElementById('d-month-label').textContent = monthName;
-  document.getElementById('d-month-income').textContent = '$' + thisMonth.reduce((a,s)=>a+(parseFloat(s.fee)||0),0).toLocaleString();
-
-  // Monthly table
-  const months = ['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
-  const mnames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  let rows = '';
-  months.forEach((m,i) => {
-    const ms = sessions.filter(s => s.date && s.date.startsWith(m) && s.type === 'clinical');
-    if (!ms.length) return;
-    const ip = ms.filter(s => s.method==='IP').length;
-    const v = ms.filter(s => s.method==='V').length;
-    const inc = ms.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
-    rows += `<tr${m===monthStr?' style="background:rgba(79,142,247,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td>${ip||'—'}</td><td>${v||'—'}</td><td>${ms.length}</td><td style="font-family:var(--mono)">$${inc.toLocaleString()}</td></tr>`;
-  });
-  document.getElementById('d-monthly-body').innerHTML = rows;
-
-  // Invoice reminders
-  const invDates = (_db.inv_dates || {});
-  const remDiv = document.getElementById('invoice-reminders');
-  const today = new Date(); today.setHours(0,0,0,0);
-  let rems = '';
-  ['DC','SMS'].forEach(ag => {
-    const d = invDates[ag]?.due;
-    if (!d) return;
-    const due = new Date(d); due.setHours(0,0,0,0);
-    const diff = Math.ceil((due-today)/(1000*60*60*24));
-    if (diff < 0 || diff > 7) return;
-    const color = diff <= 2 ? 'var(--red)' : diff <= 4 ? 'var(--amber)' : 'var(--accent)';
-    const msg = diff === 0 ? 'due today' : diff === 1 ? 'due tomorrow' : `due in ${diff} days`;
-    rems += `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">🔔 ${ag==='DC'?'District Counseling':'Safe Mind Space'} Invoice — <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`;
-  });
-  remDiv.innerHTML = rems;
+function renderDashboard(){
+  const sessions=load(KEYS.sessions);const supervision=load(KEYS.supervision);const now=new Date();const monthStr=now.toISOString().slice(0,7);const monthName=now.toLocaleString('default',{month:'long',year:'numeric'});
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const clinHrs=sessions.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);const supHrs=supervision.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);
+  document.getElementById('d-clinical-hrs').textContent=clinHrs;document.getElementById('d-clinical-bar').style.width=Math.min(100,(clinHrs/3000)*100)+'%';document.getElementById('d-clinical-pct').textContent=((clinHrs/3000)*100).toFixed(1)+'% complete';
+  document.getElementById('d-sup-hrs').textContent=supHrs;document.getElementById('d-sup-bar').style.width=Math.min(100,(supHrs/100)*100)+'%';document.getElementById('d-sup-pct').textContent=((supHrs/100)*100).toFixed(1)+'% complete';
+  const thisMonth=sessions.filter(s=>s.date&&s.date.startsWith(monthStr)&&s.type==='clinical');
+  document.getElementById('d-month-sessions').textContent=thisMonth.length;document.getElementById('d-month-label').textContent=monthName;document.getElementById('d-month-income').textContent='$'+thisMonth.reduce((a,s)=>a+(parseFloat(s.fee)||0),0).toLocaleString();
+  const months=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let rows='';months.forEach((m,i)=>{const ms=sessions.filter(s=>s.date&&s.date.startsWith(m)&&s.type==='clinical');if(!ms.length)return;const ip=ms.filter(s=>s.method==='IP').length;const v=ms.filter(s=>s.method==='V').length;const inc=ms.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);rows+=`<tr${m===monthStr?' style="background:rgba(79,142,247,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td>${ip||'\u2014'}</td><td>${v||'\u2014'}</td><td>${ms.length}</td><td style="font-family:var(--mono)">$${inc.toLocaleString()}</td></tr>`});
+  document.getElementById('d-monthly-body').innerHTML=rows;
+  const invDates=(_db.inv_dates||{});const remDiv=document.getElementById('invoice-reminders');const today=new Date();today.setHours(0,0,0,0);let rems='';
+  ['DC','SMS'].forEach(ag=>{const d=invDates[ag]?.due;if(!d)return;const due=new Date(d);due.setHours(0,0,0,0);const diff=Math.ceil((due-today)/(1000*60*60*24));if(diff<0||diff>7)return;const color=diff<=2?'var(--red)':diff<=4?'var(--amber)':'var(--accent)';const msg=diff===0?'due today':diff===1?'due tomorrow':`due in ${diff} days`;rems+=`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">\uD83D\uDD14 ${ag==='DC'?'District Counseling':'Safe Mind Space'} Invoice \u2014 <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`});
+  remDiv.innerHTML=rems;
 }
 
 // ============================================================
 // SESSION LOG
 // ============================================================
-function logSession() {
-  const date = document.getElementById('s-date').value;
-  const name = document.getElementById('s-name').value.trim();
-  if (!date) { toast('Please enter a date', true); return; }
-  const descSel = document.getElementById('s-desc-select').value;
-  const desc = descSel === 'custom' ? document.getElementById('s-desc-custom').value.trim() : descSel;
-  const sessions = load(KEYS.sessions);
-  sessions.push({
-    id: uid(), date, name,
-    agency: document.getElementById('s-agency').value || '—',
-    hours: parseFloat(document.getElementById('s-hours').value) || 0,
-    fee: parseFloat(document.getElementById('s-fee').value) || 0,
-    method: document.getElementById('s-method').value,
-    desc, type: document.getElementById('s-type').value,
-  });
-  save(KEYS.sessions, sessions);
-  renderDashboard();
-  toast('Session saved');
-  clearSessionForm();
+function logSession(){
+  const date=document.getElementById('s-date').value;const name=document.getElementById('s-name').value.trim();if(!date){toast('Please enter a date',true);return}
+  const descSel=document.getElementById('s-desc-select').value;const desc=descSel==='custom'?document.getElementById('s-desc-custom').value.trim():descSel;
+  const sessions=load(KEYS.sessions);
+  sessions.push({id:uid(),date,name,agency:document.getElementById('s-agency').value||'\u2014',hours:parseFloat(document.getElementById('s-hours').value)||0,fee:parseFloat(document.getElementById('s-fee').value)||0,method:document.getElementById('s-method').value,desc,type:document.getElementById('s-type').value});
+  save(KEYS.sessions,sessions);renderDashboard();toast('Session saved');clearSessionForm();
 }
+function clearSessionForm(){document.getElementById('s-date').value=new Date().toISOString().split('T')[0];document.getElementById('s-name').value='';document.getElementById('s-client-label').textContent='Select client';document.getElementById('s-client-btn').classList.remove('selected');document.getElementById('s-agency').value='';document.getElementById('s-fee').value='';document.getElementById('s-hours').value='2';document.getElementById('s-desc-select').value='';document.getElementById('s-desc-custom').value='';document.getElementById('s-desc-custom-wrap').style.display='none'}
+function handleDescSelect(){const v=document.getElementById('s-desc-select').value;document.getElementById('s-desc-custom-wrap').style.display=v==='custom'?'block':'none';if(v!=='custom')document.getElementById('s-desc').value=v}
 
-function clearSessionForm() {
-  document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('s-name').value = '';
-  document.getElementById('s-client-label').textContent = 'Select client';
-  document.getElementById('s-client-btn').classList.remove('selected');
-  document.getElementById('s-agency').value = '';
-  document.getElementById('s-agency-display').textContent = 'Auto-fills';
-  document.getElementById('s-agency-display').style.color = 'var(--text3)';
-  document.getElementById('s-fee').value = '';
-  document.getElementById('s-hours').value = '2';
-  document.getElementById('s-insurance').value = '';
-  document.getElementById('s-desc-select').value = '';
-  document.getElementById('s-desc-custom').value = '';
-  document.getElementById('s-desc-custom-wrap').style.display = 'none';
+function renderLog(){
+  const sessions=load(KEYS.sessions);const search=(document.getElementById('log-search')?.value||'').toLowerCase();const agency=document.getElementById('log-agency')?.value||'';const month=document.getElementById('log-month')?.value||'';
+  let filtered=sessions.filter(s=>{if(agency&&s.agency!==agency)return false;if(month&&!(s.date||'').startsWith(month))return false;if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;return true}).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const tbody=document.getElementById('log-tbody');const empty=document.getElementById('log-empty');
+  if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';
+  tbody.innerHTML=filtered.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${(s.name||'').replace(/'/g,"&#39;")}')">${s.name||'\u2014'}</td><td><span class="badge b-${(s.agency||'').toLowerCase()}">${s.agency||'\u2014'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.fee?'$'+s.fee:'\u2014'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'\u2014'}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc||''}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSession('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSession('${s.id}')">✕</button></td></tr>`).join('');
 }
-
-function handleDescSelect() {
-  const v = document.getElementById('s-desc-select').value;
-  document.getElementById('s-desc-custom-wrap').style.display = v === 'custom' ? 'block' : 'none';
-  if (v !== 'custom') document.getElementById('s-desc').value = v;
-}
-
-function renderLog() {
-  const sessions = load(KEYS.sessions);
-  const search = (document.getElementById('log-search')?.value||'').toLowerCase();
-  const agency = document.getElementById('log-agency')?.value||'';
-  const month = document.getElementById('log-month')?.value||'';
-  let filtered = sessions.filter(s => {
-    if (agency && s.agency !== agency) return false;
-    if (month && !(s.date||'').startsWith(month)) return false;
-    if (search && !`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search)) return false;
-    return true;
-  }).sort((a,b) => (b.date||'').localeCompare(a.date||''));
-  const tbody = document.getElementById('log-tbody');
-  const empty = document.getElementById('log-empty');
-  if (!filtered.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  tbody.innerHTML = filtered.map(s => `<tr>
-    <td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td>
-    <td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${(s.name||'').replace(/'/g,"&#39;")}')">${s.name||'—'}</td>
-    <td><span class="badge b-${(s.agency||'').toLowerCase()}">${s.agency||'—'}</span></td>
-    <td style="font-family:var(--mono)">${s.hours}</td>
-    <td style="font-family:var(--mono)">${s.fee?'$'+s.fee:'—'}</td>
-    <td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'—'}</span></td>
-    <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc||''}</td>
-    <td style="display:flex;gap:4px;">
-      <button class="btn-edit" onclick="openEditSession('${s.id}')">Edit</button>
-      <button class="btn-danger" onclick="deleteSession('${s.id}')">✕</button>
-    </td>
-  </tr>`).join('');
-}
-
-function deleteSession(id) {
-  let s = load(KEYS.sessions); s = s.filter(x => x.id !== id); save(KEYS.sessions, s);
-  renderLog(); renderDashboard(); toast('Deleted');
-}
-
-function openEditSession(id) {
-  const s = load(KEYS.sessions).find(x => x.id === id); if (!s) return;
-  document.getElementById('es-id').value = s.id;
-  document.getElementById('es-date').value = s.date||'';
-  document.getElementById('es-name').value = s.name||'';
-  document.getElementById('es-agency').value = s.agency||'—';
-  document.getElementById('es-hours').value = s.hours;
-  document.getElementById('es-fee').value = s.fee;
-  document.getElementById('es-method').value = s.method||'—';
-  document.getElementById('es-type').value = s.type||'clinical';
-  document.getElementById('es-insurance').value = s.insurance||'';
-  const known = ['Intake session','Psychotherapy session'];
-  if (known.includes(s.desc)) { document.getElementById('es-desc-sel').value = s.desc; document.getElementById('es-custom-wrap').style.display='none'; }
-  else { document.getElementById('es-desc-sel').value = 'custom'; document.getElementById('es-custom').value = s.desc||''; document.getElementById('es-custom-wrap').style.display='block'; }
-  openModal('modal-edit-session');
-}
-
-function handleEditDescSel() {
-  document.getElementById('es-custom-wrap').style.display = document.getElementById('es-desc-sel').value === 'custom' ? 'block' : 'none';
-}
-
-function saveEditSession() {
-  const id = document.getElementById('es-id').value;
-  const descSel = document.getElementById('es-desc-sel').value;
-  const desc = descSel === 'custom' ? document.getElementById('es-custom').value.trim() : descSel;
-  let sessions = load(KEYS.sessions);
-  const idx = sessions.findIndex(s => s.id === id); if (idx === -1) return;
-  sessions[idx] = { ...sessions[idx],
-    date: document.getElementById('es-date').value,
-    name: document.getElementById('es-name').value.trim(),
-    agency: document.getElementById('es-agency').value,
-    hours: parseFloat(document.getElementById('es-hours').value)||0,
-    fee: parseFloat(document.getElementById('es-fee').value)||0,
-    method: document.getElementById('es-method').value,
-    desc, type: document.getElementById('es-type').value,
-    insurance: document.getElementById('es-insurance').value.trim()
-  };
-  save(KEYS.sessions, sessions);
-  closeModal('modal-edit-session'); renderLog(); renderDashboard(); toast('Session updated');
-}
+function deleteSession(id){let s=load(KEYS.sessions);s=s.filter(x=>x.id!==id);save(KEYS.sessions,s);renderLog();renderDashboard();toast('Deleted')}
+function openEditSession(id){const s=load(KEYS.sessions).find(x=>x.id===id);if(!s)return;document.getElementById('es-id').value=s.id;document.getElementById('es-date').value=s.date||'';document.getElementById('es-name').value=s.name||'';document.getElementById('es-agency').value=s.agency||'\u2014';document.getElementById('es-hours').value=s.hours;document.getElementById('es-fee').value=s.fee;document.getElementById('es-method').value=s.method||'\u2014';document.getElementById('es-type').value=s.type||'clinical';document.getElementById('es-insurance').value=s.insurance||'';const known=['Intake session','Psychotherapy session'];if(known.includes(s.desc)){document.getElementById('es-desc-sel').value=s.desc;document.getElementById('es-custom-wrap').style.display='none'}else{document.getElementById('es-desc-sel').value='custom';document.getElementById('es-custom').value=s.desc||'';document.getElementById('es-custom-wrap').style.display='block'}openModal('modal-edit-session')}
+function handleEditDescSel(){document.getElementById('es-custom-wrap').style.display=document.getElementById('es-desc-sel').value==='custom'?'block':'none'}
+function saveEditSession(){const id=document.getElementById('es-id').value;const descSel=document.getElementById('es-desc-sel').value;const desc=descSel==='custom'?document.getElementById('es-custom').value.trim():descSel;let sessions=load(KEYS.sessions);const idx=sessions.findIndex(s=>s.id===id);if(idx===-1)return;sessions[idx]={...sessions[idx],date:document.getElementById('es-date').value,name:document.getElementById('es-name').value.trim(),agency:document.getElementById('es-agency').value,hours:parseFloat(document.getElementById('es-hours').value)||0,fee:parseFloat(document.getElementById('es-fee').value)||0,method:document.getElementById('es-method').value,desc,type:document.getElementById('es-type').value,insurance:document.getElementById('es-insurance').value.trim()};save(KEYS.sessions,sessions);closeModal('modal-edit-session');renderLog();renderDashboard();toast('Session updated')}
 
 // ============================================================
 // EXPORT
 // ============================================================
-function exportExcel() {
-  const sessions = load(KEYS.sessions).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
-  if (!sessions.length) { toast('No sessions to export', true); return; }
-  const wb = XLSX.utils.book_new();
-  const masterRows = sessions.map(s => ({Date:fmtDate(s.date),Client:s.name||'',Agency:s.agency||'',Hours:parseFloat(s.hours)||0,Fee:parseFloat(s.fee)||0,Method:s.method||'',Type:s.type||'',Insurance:s.insurance||'',Description:s.desc||''}));
-  const totalHrs = sessions.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);
-  const totalFee = sessions.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
-  masterRows.push({});
-  masterRows.push({Date:'TOTALS',Client:'',Agency:'',Hours:totalHrs,Fee:totalFee,Method:'',Type:'',Insurance:'',Description:''});
-  const ws = XLSX.utils.json_to_sheet(masterRows);
-  ws['!cols'] = [{wch:12},{wch:22},{wch:10},{wch:7},{wch:9},{wch:8},{wch:12},{wch:10},{wch:32}];
-  XLSX.utils.book_append_sheet(wb, ws, 'Master Log');
-  const months = [...new Set(sessions.map(s=>(s.date||'').slice(0,7)))].sort();
-  const mnames = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};
-  months.forEach(m => {
-    const ms = sessions.filter(s=>(s.date||'').startsWith(m));
-    if (!ms.length) return;
-    const [y,mo] = m.split('-');
-    const rows = ms.map(s=>({Date:fmtDate(s.date),Client:s.name||'',Agency:s.agency||'',Hours:parseFloat(s.hours)||0,Fee:parseFloat(s.fee)||0,Method:s.method||'',Description:s.desc||''}));
-    rows.push({}); rows.push({Date:'TOTALS',Hours:ms.reduce((a,s)=>a+(parseFloat(s.hours)||0),0),Fee:ms.reduce((a,s)=>a+(parseFloat(s.fee)||0),0)});
-    const wm = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(wb, wm, (mnames[mo]||mo)+' '+y);
-  });
-  XLSX.writeFile(wb, 'LCSW_Master_Log_2026.xlsx');
-  toast('Downloaded');
-}
+function exportExcel(){const sessions=load(KEYS.sessions).sort((a,b)=>(a.date||'').localeCompare(b.date||''));if(!sessions.length){toast('No sessions to export',true);return}const wb=XLSX.utils.book_new();const masterRows=sessions.map(s=>({Date:fmtDate(s.date),Client:s.name||'',Agency:s.agency||'',Hours:parseFloat(s.hours)||0,Fee:parseFloat(s.fee)||0,Method:s.method||'',Type:s.type||'',Insurance:s.insurance||'',Description:s.desc||''}));const totalHrs=sessions.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);const totalFee=sessions.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);masterRows.push({});masterRows.push({Date:'TOTALS',Client:'',Agency:'',Hours:totalHrs,Fee:totalFee,Method:'',Type:'',Insurance:'',Description:''});const ws=XLSX.utils.json_to_sheet(masterRows);ws['!cols']=[{wch:12},{wch:22},{wch:10},{wch:7},{wch:9},{wch:8},{wch:12},{wch:10},{wch:32}];XLSX.utils.book_append_sheet(wb,ws,'Master Log');const months=[...new Set(sessions.map(s=>(s.date||'').slice(0,7)))].sort();const mnames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};months.forEach(m=>{const ms=sessions.filter(s=>(s.date||'').startsWith(m));if(!ms.length)return;const[y,mo]=m.split('-');const rows=ms.map(s=>({Date:fmtDate(s.date),Client:s.name||'',Agency:s.agency||'',Hours:parseFloat(s.hours)||0,Fee:parseFloat(s.fee)||0,Method:s.method||'',Description:s.desc||''}));rows.push({});rows.push({Date:'TOTALS',Hours:ms.reduce((a,s)=>a+(parseFloat(s.hours)||0),0),Fee:ms.reduce((a,s)=>a+(parseFloat(s.fee)||0),0)});const wm=XLSX.utils.json_to_sheet(rows);XLSX.utils.book_append_sheet(wb,wm,(mnames[mo]||mo)+' '+y)});XLSX.writeFile(wb,'LCSW_Master_Log_2026.xlsx');toast('Downloaded')}
 
 // ============================================================
-// CLIENT DROPDOWN (session form)
+// CLIENT DROPDOWN
 // ============================================================
-function toggleSessionDropdown() {
-  const dd = document.getElementById('s-client-dropdown');
-  const open = dd.style.display === 'block';
-  dd.style.display = open ? 'none' : 'block';
-  if (!open) { document.getElementById('s-client-search').value=''; filterSessionClients(''); setTimeout(()=>document.getElementById('s-client-search').focus(),50); }
-}
-
-function filterSessionClients(val) {
-  const clients = load(KEYS.clients).filter(c => c.status==='active');
-  const filtered = val ? clients.filter(c=>c.name.toLowerCase().includes(val.toLowerCase())) : clients;
-  const sorted = filtered.sort((a,b)=>a.name.localeCompare(b.name));
-  const list = document.getElementById('s-client-list');
-  list.innerHTML = '';
-  sorted.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'dropdown-item';
-    div.innerHTML = `<span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>`;
-    div.addEventListener('click', () => selectSessionClient(c));
-    list.appendChild(div);
-  });
-  if (!sorted.length) list.innerHTML = '<div style="padding:12px 14px;color:var(--text3);font-size:13px;">No clients found</div>';
-}
-
-function selectSessionClient(c) {
-  document.getElementById('s-name').value = c.name;
-  document.getElementById('s-client-label').textContent = c.name;
-  document.getElementById('s-client-btn').classList.add('selected');
-  document.getElementById('s-client-dropdown').style.display = 'none';
-  document.getElementById('s-agency').value = c.agency;
-  document.getElementById('s-fee').value = c.rate;
-  document.getElementById('s-method').value = c.method;
-  document.getElementById('s-insurance').value = c.insurance||'';
-  const names = {DC:'District Counseling (DC)',SMS:'Safe Mind Space (SMS)',Emora:'Emora',ME:'Private (ME)'};
-  document.getElementById('s-agency-display').textContent = names[c.agency]||c.agency;
-  document.getElementById('s-agency-display').style.color = 'var(--text)';
-}
+function toggleSessionDropdown(){const dd=document.getElementById('s-client-dropdown');const open=dd.style.display==='block';dd.style.display=open?'none':'block';if(!open){document.getElementById('s-client-search').value='';filterSessionClients('');setTimeout(()=>document.getElementById('s-client-search').focus(),50)}}
+function filterSessionClients(val){const clients=load(KEYS.clients).filter(c=>c.status==='active');const filtered=val?clients.filter(c=>c.name.toLowerCase().includes(val.toLowerCase())):clients;const sorted=filtered.sort((a,b)=>a.name.localeCompare(b.name));const list=document.getElementById('s-client-list');list.innerHTML='';sorted.forEach(c=>{const div=document.createElement('div');div.className='dropdown-item';div.innerHTML=`<span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>`;div.addEventListener('click',()=>selectSessionClient(c));list.appendChild(div)});if(!sorted.length)list.innerHTML='<div style="padding:12px 14px;color:var(--text3);font-size:13px;">No clients found</div>'}
+function selectSessionClient(c){document.getElementById('s-name').value=c.name;document.getElementById('s-client-label').textContent=c.name;document.getElementById('s-client-btn').classList.add('selected');document.getElementById('s-client-dropdown').style.display='none';document.getElementById('s-agency').value=c.agency;document.getElementById('s-fee').value=c.rate;document.getElementById('s-method').value=c.method;const names={DC:'District Counseling (DC)',SMS:'Safe Mind Space (SMS)',Emora:'Emora',ME:'Private (ME)'}}
 
 // ============================================================
 // INVOICES
 // ============================================================
-let currentInvAgency = 'DC';
+let currentInvAgency='DC';
+function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderInvoice()}
+function saveInvDates(){const agency=currentInvAgency;const due=document.getElementById('inv-due').value;const start=document.getElementById('inv-start').value;const saved=(_db.inv_dates||{});saved[agency]={due,start};_db.inv_dates=saved;fbRef.child('inv_dates').set(saved);toast('Dates saved');renderInvoice()}
 
-function switchInvoice(agency, el) {
-  currentInvAgency = agency;
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  renderInvoice();
-}
-
-function saveInvDates() {
-  const agency = currentInvAgency;
-  const due = document.getElementById('inv-due').value;
-  const start = document.getElementById('inv-start').value;
-  const saved = (_db.inv_dates || {});
-  saved[agency] = {due, start};
-  _db.inv_dates = saved;
-  fetch('/api/data', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ inv_dates: saved }) });
-  toast('Dates saved');
-  renderInvoice();
-}
-
-function renderInvoice() {
-  const agency = currentInvAgency;
-  const month = document.getElementById('inv-month')?.value||'2026-03';
-  const saved = (_db.inv_dates || {});
-  const agDates = saved[agency]||{};
-  const dueInput = document.getElementById('inv-due');
-  const startInput = document.getElementById('inv-start');
-  const dueLabel = document.getElementById('inv-due-label');
-  const startLabel = document.getElementById('inv-start-label');
-  if (dueInput) dueInput.value = agDates.due||'';
-  if (startInput) startInput.value = agDates.start||'';
-  if (dueLabel) dueLabel.textContent = (agency==='DC'?'DC':'SMS') + ' Due Date';
-  if (startLabel) startLabel.textContent = 'Billing Start';
-
-  const agNames = {DC:'District Counseling',SMS:'Safe Mind Space'};
-  document.getElementById('inv-agency-name').textContent = agNames[agency]||agency;
-
-  const fmt = v => { if (!v) return ''; const [y,m,d]=v.split('-'); return `${m}/${d}/${y}`; };
-  const periodText = agDates.start && agDates.due ? `Billing: ${fmt(agDates.start)} — ${fmt(agDates.due)}` : agDates.due ? `Due: ${fmt(agDates.due)}` : 'Due date not set';
-  document.getElementById('inv-period').textContent = periodText;
-
-  // Filter by billing date range if set, otherwise fall back to month
-  const allSessions = load(KEYS.sessions).filter(s => s.agency===agency);
-  let sessions;
-  if (agDates.start && agDates.due) {
-    sessions = allSessions.filter(s => s.date && s.date >= agDates.start && s.date <= agDates.due).sort((a,b)=>a.date.localeCompare(b.date));
-  } else {
-    sessions = allSessions.filter(s => (s.date||'').startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));
-  }
-  const empty = document.getElementById('inv-empty');
-  const table = document.getElementById('inv-table');
-
-  if (!sessions.length) { empty.style.display='block'; table.style.display='none'; document.getElementById('inv-total').textContent='$0'; return; }
-  empty.style.display='none'; table.style.display='table';
-
-  if (agency === 'DC') {
-    document.getElementById('inv-thead').innerHTML = '<tr><th>Date</th><th>Client</th><th>Fee</th><th>50%</th><th>Total</th></tr>';
-    let total = 0;
-    document.getElementById('inv-tbody').innerHTML = sessions.map(s => {
-      const half = (s.fee/2).toFixed(2); total += parseFloat(half);
-      return `<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono)">$${s.fee}</td><td style="color:var(--text3)">0.5</td><td style="font-family:var(--mono);color:var(--green)">$${half}</td></tr>`;
-    }).join('');
-    document.getElementById('inv-total').textContent = '$' + total.toFixed(2);
-  } else {
-    document.getElementById('inv-thead').innerHTML = '<tr><th>Date</th><th>Client</th><th>Insurance</th><th>Fee</th></tr>';
-    let total = 0;
-    document.getElementById('inv-tbody').innerHTML = sessions.map(s => {
-      total += parseFloat(s.fee)||0;
-      return `<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td>${s.insurance||'—'}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`;
-    }).join('');
-    document.getElementById('inv-total').textContent = '$' + total.toFixed(2);
-  }
+function renderInvoice(){
+  const agency=currentInvAgency;const month=document.getElementById('inv-month')?.value||'2026-03';const saved=(_db.inv_dates||{});const agDates=saved[agency]||{};
+  const dueInput=document.getElementById('inv-due');const startInput=document.getElementById('inv-start');const dueLabel=document.getElementById('inv-due-label');const startLabel=document.getElementById('inv-start-label');
+  if(dueInput)dueInput.value=agDates.due||'';if(startInput)startInput.value=agDates.start||'';if(dueLabel)dueLabel.textContent=(agency==='DC'?'DC':'SMS')+' Due Date';if(startLabel)startLabel.textContent='Billing Start';
+  const agNames={DC:'District Counseling',SMS:'Safe Mind Space'};document.getElementById('inv-agency-name').textContent=agNames[agency]||agency;
+  const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return`${m}/${d}/${y}`};
+  const periodText=agDates.start&&agDates.due?`Billing: ${fmt(agDates.start)} \u2014 ${fmt(agDates.due)}`:agDates.due?`Due: ${fmt(agDates.due)}`:'Due date not set';document.getElementById('inv-period').textContent=periodText;
+  const allSessions=load(KEYS.sessions).filter(s=>s.agency===agency);let sessions;
+  if(agDates.start&&agDates.due){sessions=allSessions.filter(s=>s.date&&s.date>=agDates.start&&s.date<=agDates.due).sort((a,b)=>a.date.localeCompare(b.date))}else{sessions=allSessions.filter(s=>(s.date||'').startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date))}
+  const empty=document.getElementById('inv-empty');const table=document.getElementById('inv-table');
+  if(!sessions.length){empty.style.display='block';table.style.display='none';document.getElementById('inv-total').textContent='$0';return}empty.style.display='none';table.style.display='table';
+  if(agency==='DC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th><th>50%</th><th>Total</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{const half=(s.fee/2).toFixed(2);total+=parseFloat(half);return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono)">$${s.fee}</td><td style="color:var(--text3)">0.5</td><td style="font-family:var(--mono);color:var(--green)">$${half}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
+  else{document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Insurance</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td>${s.insurance||'\u2014'}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
 }
 
 // ============================================================
 // CLIENTS
 // ============================================================
-let clientFilter = 'all';
+let clientFilter='all';
+function selectGender(val){document.getElementById('c-gender').value=val;document.getElementById('c-gender-male').style.borderColor=val==='male'?'var(--accent)':'var(--border)';document.getElementById('c-gender-male').style.color=val==='male'?'var(--accent)':'var(--text2)';document.getElementById('c-gender-female').style.borderColor=val==='female'?'var(--pink)':'var(--border)';document.getElementById('c-gender-female').style.color=val==='female'?'var(--pink)':'var(--text2)'}
+function selectEditGender(val){document.getElementById('ec-gender').value=val;document.getElementById('ec-gender-male').style.borderColor=val==='male'?'var(--accent)':'var(--border)';document.getElementById('ec-gender-male').style.color=val==='male'?'var(--accent)':'var(--text2)';document.getElementById('ec-gender-female').style.borderColor=val==='female'?'var(--pink)':'var(--border)';document.getElementById('ec-gender-female').style.color=val==='female'?'var(--pink)':'var(--text2)'}
+function filterClients(f,el){clientFilter=f;document.querySelectorAll('[onclick*="filterClients"]').forEach(b=>{b.className='btn btn-ghost';b.style.fontSize='11px';b.style.padding='4px 10px'});if(el){el.className='btn btn-primary';el.style.fontSize='11px';el.style.padding='4px 10px'}renderClients()}
+function addClient(){const name=document.getElementById('c-name').value.trim();if(!name){toast('Please enter a name',true);return}const clients=load(KEYS.clients);if(clients.find(c=>c.name.toLowerCase()===name.toLowerCase())){toast('Client already exists',true);return}clients.push({id:uid(),name,agency:document.getElementById('c-agency').value,rate:parseFloat(document.getElementById('c-rate').value)||0,method:document.getElementById('c-method').value,gender:document.getElementById('c-gender').value,status:'active'});save(KEYS.clients,clients);document.getElementById('c-name').value='';document.getElementById('c-rate').value='';document.getElementById('c-gender').value='';selectGender('');toast('Client added');renderClients();populateClientLists()}
 
-function selectGender(val) {
-  document.getElementById('c-gender').value = val;
-  document.getElementById('c-gender-male').style.borderColor = val==='male'?'var(--accent)':'var(--border)';
-  document.getElementById('c-gender-male').style.color = val==='male'?'var(--accent)':'var(--text2)';
-  document.getElementById('c-gender-female').style.borderColor = val==='female'?'var(--pink)':'var(--border)';
-  document.getElementById('c-gender-female').style.color = val==='female'?'var(--pink)':'var(--text2)';
+function renderClients(){
+  const clients=load(KEYS.clients);const active=clients.filter(c=>c.status==='active');const inactive=clients.filter(c=>c.status!=='active');
+  document.getElementById('c-active-count').textContent=active.length;document.getElementById('c-inactive-count').textContent=inactive.length;
+  const filtered=clientFilter==='all'?clients:clients.filter(c=>(c.status||'active')===clientFilter);const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
+  const tbody=document.getElementById('clients-tbody');const empty=document.getElementById('clients-empty');if(!sorted.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';
+  const allSessions=load(KEYS.sessions);
+  tbody.innerHTML=sorted.map(c=>{const clientSessions=allSessions.filter(s=>s.name===c.name&&s.date).sort((a,b)=>b.date.localeCompare(a.date));const lastDate=clientSessions.length?fmtDate(clientSessions[0].date):'\u2014';return`<tr><td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${c.name.replace(/'/g,"&#39;")}')">${c.name}</td><td><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></td><td style="font-family:var(--mono)">$${c.rate}</td><td><span class="badge b-${c.method.toLowerCase()}">${c.method}</span></td><td style="font-size:12px;color:var(--text2)">${c.gender?c.gender.charAt(0).toUpperCase()+c.gender.slice(1):'\u2014'}</td><td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${lastDate}</td><td><button onclick="toggleClientStatus('${c.id}')" class="status-toggle" style="background:${c.status==='active'?'rgba(56,201,142,0.15)':'rgba(90,98,120,0.2)'};color:${c.status==='active'?'var(--green)':'var(--text3)'}">${c.status==='active'?'Active':'Inactive'}</button></td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditClient('${c.id}')">Edit</button><button class="btn-danger" onclick="deleteClient('${c.id}')">✕</button></td></tr>`}).join('');
 }
+function toggleClientStatus(id){let clients=load(KEYS.clients);const idx=clients.findIndex(c=>c.id===id);if(idx===-1)return;clients[idx].status=clients[idx].status==='active'?'inactive':'active';save(KEYS.clients,clients);renderClients();populateClientLists();toast('Status updated')}
+function deleteClient(id){if(!confirm('Delete this client?'))return;let clients=load(KEYS.clients);clients=clients.filter(c=>c.id!==id);save(KEYS.clients,clients);renderClients();populateClientLists();toast('Client removed')}
+function openEditClient(id){const c=load(KEYS.clients).find(x=>x.id===id);if(!c)return;document.getElementById('ec-id').value=c.id;document.getElementById('ec-name').value=c.name;document.getElementById('ec-agency').value=c.agency;document.getElementById('ec-rate').value=c.rate;document.getElementById('ec-method').value=c.method;document.getElementById('ec-gender').value=c.gender||'';selectEditGender(c.gender||'');document.getElementById('ec-status').value=c.status||'active';openModal('modal-edit-client')}
+function saveEditClient(){const id=document.getElementById('ec-id').value;let clients=load(KEYS.clients);const idx=clients.findIndex(c=>c.id===id);if(idx===-1)return;clients[idx]={...clients[idx],name:document.getElementById('ec-name').value.trim(),agency:document.getElementById('ec-agency').value,rate:parseFloat(document.getElementById('ec-rate').value)||0,method:document.getElementById('ec-method').value,gender:document.getElementById('ec-gender').value,status:document.getElementById('ec-status').value};save(KEYS.clients,clients);closeModal('modal-edit-client');renderClients();populateClientLists();toast('Client updated')}
 
-function selectEditGender(val) {
-  document.getElementById('ec-gender').value = val;
-  document.getElementById('ec-gender-male').style.borderColor = val==='male'?'var(--accent)':'var(--border)';
-  document.getElementById('ec-gender-male').style.color = val==='male'?'var(--accent)':'var(--text2)';
-  document.getElementById('ec-gender-female').style.borderColor = val==='female'?'var(--pink)':'var(--border)';
-  document.getElementById('ec-gender-female').style.color = val==='female'?'var(--pink)':'var(--text2)';
-}
-
-function filterClients(f, el) {
-  clientFilter = f;
-  document.querySelectorAll('[onclick*="filterClients"]').forEach(b => { b.className='btn btn-ghost'; b.style.fontSize='11px'; b.style.padding='4px 10px'; });
-  if (el) { el.className='btn btn-primary'; el.style.fontSize='11px'; el.style.padding='4px 10px'; }
-  renderClients();
-}
-
-function addClient() {
-  const name = document.getElementById('c-name').value.trim();
-  if (!name) { toast('Please enter a name', true); return; }
-  const clients = load(KEYS.clients);
-  if (clients.find(c => c.name.toLowerCase()===name.toLowerCase())) { toast('Client already exists', true); return; }
-  clients.push({id:uid(), name, agency:document.getElementById('c-agency').value, rate:parseFloat(document.getElementById('c-rate').value)||0, method:document.getElementById('c-method').value, gender:document.getElementById('c-gender').value, status:'active'});
-  save(KEYS.clients, clients);
-  document.getElementById('c-name').value=''; document.getElementById('c-rate').value=''; document.getElementById('c-gender').value=''; selectGender('');
-  toast('Client added'); renderClients(); populateClientLists();
-}
-
-function renderClients() {
-  const clients = load(KEYS.clients);
-  const active = clients.filter(c=>c.status==='active');
-  const inactive = clients.filter(c=>c.status!=='active');
-  document.getElementById('c-active-count').textContent = active.length;
-  document.getElementById('c-inactive-count').textContent = inactive.length;
-  const filtered = clientFilter==='all' ? clients : clients.filter(c=>(c.status||'active')===clientFilter);
-  const sorted = [...filtered].sort((a,b)=>a.name.localeCompare(b.name));
-  const tbody = document.getElementById('clients-tbody');
-  const empty = document.getElementById('clients-empty');
-  if (!sorted.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  const allSessions = load(KEYS.sessions);
-  tbody.innerHTML = sorted.map(c => {
-    const clientSessions = allSessions.filter(s => s.name === c.name && s.date).sort((a,b) => b.date.localeCompare(a.date));
-    const lastDate = clientSessions.length ? fmtDate(clientSessions[0].date) : '—';
-    return `<tr>
-    <td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${c.name.replace(/'/g,"&#39;")}')">${c.name}</td>
-    <td><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></td>
-    <td style="font-family:var(--mono)">$${c.rate}</td>
-    <td><span class="badge b-${c.method.toLowerCase()}">${c.method}</span></td>
-    <td style="font-size:12px;color:var(--text2)">${c.gender?c.gender.charAt(0).toUpperCase()+c.gender.slice(1):'—'}</td>
-    <td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${lastDate}</td>
-    <td><button onclick="toggleClientStatus('${c.id}')" class="status-toggle" style="background:${c.status==='active'?'rgba(56,201,142,0.15)':'rgba(90,98,120,0.2)'};color:${c.status==='active'?'var(--green)':'var(--text3)'}">${c.status==='active'?'Active':'Inactive'}</button></td>
-    <td style="display:flex;gap:4px;">
-      <button class="btn-edit" onclick="openEditClient('${c.id}')">Edit</button>
-      <button class="btn-danger" onclick="deleteClient('${c.id}')">✕</button>
-    </td>
-  </tr>`;}).join('');
-}
-
-function toggleClientStatus(id) {
-  let clients = load(KEYS.clients);
-  const idx = clients.findIndex(c=>c.id===id); if (idx===-1) return;
-  clients[idx].status = clients[idx].status==='active'?'inactive':'active';
-  save(KEYS.clients, clients); renderClients(); populateClientLists(); toast('Status updated');
-}
-
-function deleteClient(id) {
-  if (!confirm('Delete this client?')) return;
-  let clients = load(KEYS.clients); clients = clients.filter(c=>c.id!==id);
-  save(KEYS.clients, clients); renderClients(); populateClientLists(); toast('Client removed');
-}
-
-function openEditClient(id) {
-  const c = load(KEYS.clients).find(x=>x.id===id); if (!c) return;
-  document.getElementById('ec-id').value = c.id;
-  document.getElementById('ec-name').value = c.name;
-  document.getElementById('ec-agency').value = c.agency;
-  document.getElementById('ec-rate').value = c.rate;
-  document.getElementById('ec-method').value = c.method;
-  document.getElementById('ec-gender').value = c.gender||'';
-  selectEditGender(c.gender||'');
-  document.getElementById('ec-status').value = c.status||'active';
-  openModal('modal-edit-client');
-}
-
-function saveEditClient() {
-  const id = document.getElementById('ec-id').value;
-  let clients = load(KEYS.clients);
-  const idx = clients.findIndex(c=>c.id===id); if (idx===-1) return;
-  clients[idx] = {...clients[idx], name:document.getElementById('ec-name').value.trim(), agency:document.getElementById('ec-agency').value, rate:parseFloat(document.getElementById('ec-rate').value)||0, method:document.getElementById('ec-method').value, gender:document.getElementById('ec-gender').value, status:document.getElementById('ec-status').value};
-  save(KEYS.clients, clients); closeModal('modal-edit-client'); renderClients(); populateClientLists(); toast('Client updated');
-}
-
-function openClientProfile(name) {
-  const sessions = load(KEYS.sessions).filter(s=>s.name===name).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  const client = load(KEYS.clients).find(c=>c.name===name);
-  document.getElementById('cp-name').textContent = name;
-  const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
-  document.getElementById('cp-meta').textContent = client ? `${agNames[client.agency]||client.agency} · ${(client.status||'active').charAt(0).toUpperCase()+(client.status||'active').slice(1)}${client.gender?' · '+client.gender.charAt(0).toUpperCase()+client.gender.slice(1):''}` : '—';
-  document.getElementById('cp-sessions').textContent = sessions.length;
-  document.getElementById('cp-hours').textContent = sessions.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);
-  document.getElementById('cp-billed').textContent = '$' + sessions.reduce((a,s)=>a+(parseFloat(s.fee)||0),0).toLocaleString();
-  document.getElementById('cp-rate').textContent = client ? '$'+client.rate : '—';
-  document.getElementById('cp-history').innerHTML = sessions.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td>${s.desc||'—'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'—'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono);color:var(--green)">${s.fee?'$'+s.fee:'—'}</td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px;">No sessions logged</td></tr>';
+function openClientProfile(name){
+  const sessions=load(KEYS.sessions).filter(s=>s.name===name).sort((a,b)=>(b.date||'').localeCompare(a.date||''));const client=load(KEYS.clients).find(c=>c.name===name);
+  document.getElementById('cp-name').textContent=name;const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
+  document.getElementById('cp-meta').textContent=client?`${agNames[client.agency]||client.agency} \u00b7 ${(client.status||'active').charAt(0).toUpperCase()+(client.status||'active').slice(1)}${client.gender?' \u00b7 '+client.gender.charAt(0).toUpperCase()+client.gender.slice(1):''}`:'\u2014';
+  document.getElementById('cp-sessions').textContent=sessions.length;document.getElementById('cp-hours').textContent=sessions.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);document.getElementById('cp-billed').textContent='$'+sessions.reduce((a,s)=>a+(parseFloat(s.fee)||0),0).toLocaleString();document.getElementById('cp-rate').textContent=client?'$'+client.rate:'\u2014';
+  document.getElementById('cp-history').innerHTML=sessions.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td>${s.desc||'\u2014'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'\u2014'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono);color:var(--green)">${s.fee?'$'+s.fee:'\u2014'}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px;">No sessions logged</td></tr>';
   openModal('modal-client-profile');
 }
 
-function populateClientLists() {
-  const clients = load(KEYS.clients).filter(c=>c.status==='active').sort((a,b)=>a.name.localeCompare(b.name));
-  // Session form dropdown
-  const sList = document.getElementById('s-client-list');
-  if (sList) {
-    sList.innerHTML = '';
-    clients.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'dropdown-item';
-      div.innerHTML = `<span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>`;
-      div.addEventListener('click', () => selectSessionClient(c));
-      sList.appendChild(div);
-    });
-  }
-  // Quick log cards
-  const qList = document.getElementById('ql-list');
-  if (qList) {
-    qList.innerHTML = '';
-    clients.forEach(c => {
-      const div = document.createElement('div');
-      div.className = 'ql-client-card';
-      div.dataset.name = c.name;
-      div.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;';
-      div.innerHTML = `<div style="font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px;">${c.name}</div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span><span style="font-family:var(--mono);font-size:12px;color:var(--green);">$${c.rate}</span></div>`;
-      div.addEventListener('mouseenter', () => div.style.borderColor = 'var(--accent)');
-      div.addEventListener('mouseleave', () => div.style.borderColor = 'var(--border)');
-      div.addEventListener('click', () => selectQlClient(c));
-      qList.appendChild(div);
-    });
-  }
+function populateClientLists(){
+  const clients=load(KEYS.clients).filter(c=>c.status==='active').sort((a,b)=>a.name.localeCompare(b.name));
+  const sList=document.getElementById('s-client-list');if(sList){sList.innerHTML='';clients.forEach(c=>{const div=document.createElement('div');div.className='dropdown-item';div.innerHTML=`<span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>`;div.addEventListener('click',()=>selectSessionClient(c));sList.appendChild(div)})}
+  const qList=document.getElementById('ql-list');if(qList){qList.innerHTML='';clients.forEach(c=>{const div=document.createElement('div');div.className='ql-dropdown-item';div.innerHTML=`<span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>`;div.addEventListener('click',()=>qlSelectClient(c));qList.appendChild(div)})}
 }
-
 
 // ============================================================
 // QUICK LOG
 // ============================================================
-let _qlState = { client: null, type: null, method: null };
-
-function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  if (el) el.classList.add('active');
-  if (id === 'dashboard') renderDashboard();
-  if (id === 'session-log') renderLog();
-  if (id === 'clients') renderClients();
-  if (id === 'supervision') renderSupervision();
-  if (id === 'referrals') renderReferrals();
-  if (id === 'statistics') renderStatistics();
-  if (id === 'invoices') renderInvoice();
-  if (id === 'quick-log') initQuickLog();
-}
-
-function initQuickLog() {
-  const now = new Date();
-  const [y,m,d] = now.toISOString().split('T')[0].split('-');
-  document.getElementById('ql-today-label').textContent =
-    now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-  document.getElementById('qlc-date').textContent = m+'/'+d+'/'+y;
-  qlResetForm();
-  qlPopulateClients();
-}
-
-function qlPopulateClients() {
-  const clients = load(KEYS.clients).filter(c => c.status === 'active').sort((a,b) => a.name.localeCompare(b.name));
-  const list = document.getElementById('ql-list');
-  if (!list) return;
-  list.innerHTML = clients.map(c => `
-    <div class="ql-dropdown-item" onclick="qlSelectClient(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-      <span>${c.name}</span>
-      <span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>
-    </div>
-  `).join('');
-}
-
-function qlToggleDropdown() {
-  const dd = document.getElementById('ql-client-dropdown');
-  const isOpen = dd.style.display === 'block';
-  if (isOpen) { dd.style.display = 'none'; return; }
-  dd.style.display = 'block';
-  document.getElementById('ql-client-search').value = '';
-  qlFilterClients('');
-  setTimeout(() => document.getElementById('ql-client-search').focus(), 100);
-}
-
-function qlFilterClients(val) {
-  const clients = load(KEYS.clients).filter(c => c.status === 'active');
-  const filtered = val ? clients.filter(c => c.name.toLowerCase().includes(val.toLowerCase())) : clients;
-  const sorted = filtered.sort((a,b) => a.name.localeCompare(b.name));
-  const list = document.getElementById('ql-list');
-  list.innerHTML = sorted.map(c => `
-    <div class="ql-dropdown-item" onclick="qlSelectClient(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-      <span>${c.name}</span>
-      <span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span>
-    </div>
-  `).join('');
-}
-
-function qlSelectClient(c) {
-  _qlState.client = c;
-  document.getElementById('ql-client-label').textContent = c.name;
-  document.getElementById('ql-client-btn').classList.add('selected');
-  document.getElementById('ql-client-dropdown').style.display = 'none';
-  document.getElementById('ql-step2').classList.remove('locked');
-  _qlState.method = c.method;
-  qlUpdateConfirm();
-}
-
-function qlSelectType(type, el) {
-  _qlState.type = type;
-  document.querySelectorAll('#ql-step2 .ql-big-btn').forEach(b => b.classList.remove('type-selected'));
-  el.classList.add('type-selected');
-  document.getElementById('ql-step3').classList.remove('locked');
-  const defaultMethod = _qlState.client?.method;
-  document.querySelectorAll('#ql-step3 .ql-big-btn').forEach(b => {
-    b.classList.remove('method-selected');
-    if ((b.textContent.includes('In-Person') && defaultMethod === 'IP') ||
-        (b.textContent.includes('Virtual') && defaultMethod === 'V')) {
-      b.classList.add('method-selected');
-    }
-  });
-  qlUpdateConfirm();
-}
-
-function qlSelectMethod(method, el) {
-  _qlState.method = method;
-  document.querySelectorAll('#ql-step3 .ql-big-btn').forEach(b => b.classList.remove('method-selected'));
-  el.classList.add('method-selected');
-  qlUpdateConfirm();
-}
-
-function qlUpdateConfirm() {
-  if (!_qlState.client || !_qlState.type || !_qlState.method) {
-    document.getElementById('ql-confirm-section').style.display = 'none';
-    return;
-  }
-  const c = _qlState.client;
-  const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
-  document.getElementById('qlc-name').textContent = c.name;
-  document.getElementById('qlc-agency').textContent = agNames[c.agency] || c.agency;
-  document.getElementById('qlc-fee').textContent = '$' + c.rate;
-  document.getElementById('qlc-type').textContent = _qlState.type;
-  document.getElementById('qlc-method').textContent = _qlState.method === 'IP' ? 'In-Person' : 'Virtual';
-  document.getElementById('ql-confirm-section').style.display = 'block';
-  setTimeout(() => document.getElementById('ql-confirm-section').scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
-}
-
-function qlSubmitLog() {
-  if (!_qlState.client || !_qlState.type || !_qlState.method) return;
-  const c = _qlState.client;
-  const today = new Date().toISOString().split('T')[0];
-  const sessions = load(KEYS.sessions);
-  sessions.push({
-    id: uid(), date: today, name: c.name, agency: c.agency,
-    hours: 2, fee: c.rate, method: _qlState.method,
-    desc: _qlState.type, type: 'clinical', insurance: c.insurance || ''
-  });
-  save(KEYS.sessions, sessions);
-
-  const now = new Date();
-  document.getElementById('ql-success-detail').textContent = c.name + ' · ' + _qlState.type + ' · $' + c.rate;
-  document.getElementById('ql-success-time').textContent =
-    now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' }) + ' · ' +
-    now.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-  document.getElementById('ql-form-inner').style.display = 'none';
-  const s = document.getElementById('ql-success-screen');
-  s.style.display = 'flex';
-  s.scrollIntoView();
-  renderDashboard();
-  toast(c.name + ' — session saved');
-}
-
-function qlResetForm() {
-  _qlState = { client: null, type: null, method: null };
-  const lbl = document.getElementById('ql-client-label');
-  if (lbl) lbl.textContent = 'Tap to select client';
-  const btn = document.getElementById('ql-client-btn');
-  if (btn) btn.classList.remove('selected');
-  const dd = document.getElementById('ql-client-dropdown');
-  if (dd) dd.style.display = 'none';
-  document.querySelectorAll('.ql-big-btn').forEach(b => b.classList.remove('type-selected','method-selected'));
-  const s2 = document.getElementById('ql-step2'); if (s2) s2.classList.add('locked');
-  const s3 = document.getElementById('ql-step3'); if (s3) s3.classList.add('locked');
-  const cs = document.getElementById('ql-confirm-section'); if (cs) cs.style.display = 'none';
-  const fi = document.getElementById('ql-form-inner'); if (fi) fi.style.display = 'block';
-  const ss = document.getElementById('ql-success-screen'); if (ss) ss.style.display = 'none';
-}
-
-// Close QL dropdown on outside click handled in main click listener
+let _qlState={client:null,type:null,method:null};
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+function initQuickLog(){const now=new Date();const[y,m,d]=now.toISOString().split('T')[0].split('-');document.getElementById('ql-today-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});document.getElementById('qlc-date').textContent=m+'/'+d+'/'+y;qlResetForm();qlPopulateClients()}
+function qlPopulateClients(){const clients=load(KEYS.clients).filter(c=>c.status==='active').sort((a,b)=>a.name.localeCompare(b.name));const list=document.getElementById('ql-list');if(!list)return;list.innerHTML=clients.map(c=>`<div class="ql-dropdown-item" onclick='qlSelectClient(${JSON.stringify(c).replace(/'/g,"&#39;")})'><span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></div>`).join('')}
+function qlToggleDropdown(){const dd=document.getElementById('ql-client-dropdown');const isOpen=dd.style.display==='block';if(isOpen){dd.style.display='none';return}dd.style.display='block';document.getElementById('ql-client-search').value='';qlFilterClients('');setTimeout(()=>document.getElementById('ql-client-search').focus(),100)}
+function qlFilterClients(val){const clients=load(KEYS.clients).filter(c=>c.status==='active');const filtered=val?clients.filter(c=>c.name.toLowerCase().includes(val.toLowerCase())):clients;const sorted=filtered.sort((a,b)=>a.name.localeCompare(b.name));const list=document.getElementById('ql-list');list.innerHTML=sorted.map(c=>`<div class="ql-dropdown-item" onclick='qlSelectClient(${JSON.stringify(c).replace(/'/g,"&#39;")})'><span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></div>`).join('')}
+function qlSelectClient(c){_qlState.client=c;document.getElementById('ql-client-label').textContent=c.name;document.getElementById('ql-client-btn').classList.add('selected');document.getElementById('ql-client-dropdown').style.display='none';document.getElementById('ql-step2').classList.remove('locked');_qlState.method=c.method;qlUpdateConfirm()}
+function qlSelectType(type,el){_qlState.type=type;document.querySelectorAll('#ql-step2 .ql-big-btn').forEach(b=>b.classList.remove('type-selected'));el.classList.add('type-selected');document.getElementById('ql-step3').classList.remove('locked');const defaultMethod=_qlState.client?.method;document.querySelectorAll('#ql-step3 .ql-big-btn').forEach(b=>{b.classList.remove('method-selected');if((b.textContent.includes('In-Person')&&defaultMethod==='IP')||(b.textContent.includes('Virtual')&&defaultMethod==='V'))b.classList.add('method-selected')});qlUpdateConfirm()}
+function qlSelectMethod(method,el){_qlState.method=method;document.querySelectorAll('#ql-step3 .ql-big-btn').forEach(b=>b.classList.remove('method-selected'));el.classList.add('method-selected');qlUpdateConfirm()}
+function qlUpdateConfirm(){if(!_qlState.client||!_qlState.type||!_qlState.method){document.getElementById('ql-confirm-section').style.display='none';return}const c=_qlState.client;const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};document.getElementById('qlc-name').textContent=c.name;document.getElementById('qlc-agency').textContent=agNames[c.agency]||c.agency;document.getElementById('qlc-fee').textContent='$'+c.rate;document.getElementById('qlc-type').textContent=_qlState.type;document.getElementById('qlc-method').textContent=_qlState.method==='IP'?'In-Person':'Virtual';document.getElementById('ql-confirm-section').style.display='block';setTimeout(()=>document.getElementById('ql-confirm-section').scrollIntoView({behavior:'smooth',block:'nearest'}),100)}
+function qlSubmitLog(){if(!_qlState.client||!_qlState.type||!_qlState.method)return;const c=_qlState.client;const today=new Date().toISOString().split('T')[0];const sessions=load(KEYS.sessions);sessions.push({id:uid(),date:today,name:c.name,agency:c.agency,hours:2,fee:c.rate,method:_qlState.method,desc:_qlState.type,type:'clinical',insurance:c.insurance||''});save(KEYS.sessions,sessions);const now=new Date();document.getElementById('ql-success-detail').textContent=c.name+' \u00b7 '+_qlState.type+' \u00b7 $'+c.rate;document.getElementById('ql-success-time').textContent=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})+' \u00b7 '+now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});document.getElementById('ql-form-inner').style.display='none';const s=document.getElementById('ql-success-screen');s.style.display='flex';s.scrollIntoView();renderDashboard();toast(c.name+' \u2014 session saved')}
+function qlResetForm(){_qlState={client:null,type:null,method:null};const lbl=document.getElementById('ql-client-label');if(lbl)lbl.textContent='Tap to select client';const btn=document.getElementById('ql-client-btn');if(btn)btn.classList.remove('selected');const dd=document.getElementById('ql-client-dropdown');if(dd)dd.style.display='none';document.querySelectorAll('.ql-big-btn').forEach(b=>b.classList.remove('type-selected','method-selected'));const s2=document.getElementById('ql-step2');if(s2)s2.classList.add('locked');const s3=document.getElementById('ql-step3');if(s3)s3.classList.add('locked');const cs=document.getElementById('ql-confirm-section');if(cs)cs.style.display='none';const fi=document.getElementById('ql-form-inner');if(fi)fi.style.display='block';const ss=document.getElementById('ql-success-screen');if(ss)ss.style.display='none'}
 
 // ============================================================
 // SUPERVISION
 // ============================================================
-function logSupervision() {
-  const date = document.getElementById('sup-date').value;
-  if (!date) { toast('Please enter a date', true); return; }
-  const sup = load(KEYS.supervision);
-  sup.push({id:uid(), date, type:document.getElementById('sup-type').value, hours:parseFloat(document.getElementById('sup-hours').value)||0, cost:parseFloat(document.getElementById('sup-cost-input').value)||0});
-  save(KEYS.supervision, sup); renderSupervision(); toast('Supervision saved');
-}
-
-function renderSupervision() {
-  const sup = load(KEYS.supervision);
-  const totalHrs = sup.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);
-  const totalCost = sup.reduce((a,s)=>a+(parseFloat(s.cost)||0),0);
-  const pct = Math.min(100,(totalHrs/100)*100);
-  document.getElementById('sup-hrs').textContent = totalHrs;
-  document.getElementById('sup-bar').style.width = pct+'%';
-  document.getElementById('sup-pct').textContent = pct.toFixed(1)+'% complete';
-  document.getElementById('sup-cost').textContent = '$'+totalCost.toLocaleString();
-  document.getElementById('d-sup-hrs').textContent = totalHrs;
-  document.getElementById('d-sup-bar').style.width = pct+'%';
-  document.getElementById('d-sup-pct').textContent = pct.toFixed(1)+'% complete';
-  const tbody = document.getElementById('sup-tbody');
-  const empty = document.getElementById('sup-empty');
-  if (!sup.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display='none';
-  tbody.innerHTML = [...sup].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td>${s.type}</td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.cost?'$'+s.cost:'—'}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSup('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSup('${s.id}')">✕</button></td></tr>`).join('');
-}
-
-function deleteSup(id) { let s=load(KEYS.supervision); s=s.filter(x=>x.id!==id); save(KEYS.supervision,s); renderSupervision(); toast('Deleted'); }
-
-function openEditSup(id) {
-  const s = load(KEYS.supervision).find(x=>x.id===id); if (!s) return;
-  document.getElementById('esup-id').value=s.id; document.getElementById('esup-date').value=s.date||''; document.getElementById('esup-type').value=s.type||'Individual'; document.getElementById('esup-hours').value=s.hours; document.getElementById('esup-cost').value=s.cost||0;
-  openModal('modal-edit-sup');
-}
-
-function saveEditSup() {
-  const id=document.getElementById('esup-id').value;
-  let sup=load(KEYS.supervision);
-  const idx=sup.findIndex(s=>s.id===id); if(idx===-1) return;
-  sup[idx]={...sup[idx],date:document.getElementById('esup-date').value,type:document.getElementById('esup-type').value,hours:parseFloat(document.getElementById('esup-hours').value)||0,cost:parseFloat(document.getElementById('esup-cost').value)||0};
-  save(KEYS.supervision,sup); closeModal('modal-edit-sup'); renderSupervision(); toast('Updated');
-}
+function logSupervision(){const date=document.getElementById('sup-date').value;if(!date){toast('Please enter a date',true);return}const sup=load(KEYS.supervision);sup.push({id:uid(),date,type:document.getElementById('sup-type').value,hours:parseFloat(document.getElementById('sup-hours').value)||0,cost:parseFloat(document.getElementById('sup-cost-input').value)||0});save(KEYS.supervision,sup);renderSupervision();toast('Supervision saved')}
+function renderSupervision(){const sup=load(KEYS.supervision);const totalHrs=sup.reduce((a,s)=>a+(parseFloat(s.hours)||0),0);const totalCost=sup.reduce((a,s)=>a+(parseFloat(s.cost)||0),0);const pct=Math.min(100,(totalHrs/100)*100);document.getElementById('sup-hrs').textContent=totalHrs;document.getElementById('sup-bar').style.width=pct+'%';document.getElementById('sup-pct').textContent=pct.toFixed(1)+'% complete';document.getElementById('sup-cost').textContent='$'+totalCost.toLocaleString();document.getElementById('d-sup-hrs').textContent=totalHrs;document.getElementById('d-sup-bar').style.width=pct+'%';document.getElementById('d-sup-pct').textContent=pct.toFixed(1)+'% complete';const tbody=document.getElementById('sup-tbody');const empty=document.getElementById('sup-empty');if(!sup.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';tbody.innerHTML=[...sup].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td>${s.type}</td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.cost?'$'+s.cost:'\u2014'}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSup('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSup('${s.id}')">✕</button></td></tr>`).join('')}
+function deleteSup(id){let s=load(KEYS.supervision);s=s.filter(x=>x.id!==id);save(KEYS.supervision,s);renderSupervision();toast('Deleted')}
+function openEditSup(id){const s=load(KEYS.supervision).find(x=>x.id===id);if(!s)return;document.getElementById('esup-id').value=s.id;document.getElementById('esup-date').value=s.date||'';document.getElementById('esup-type').value=s.type||'Individual';document.getElementById('esup-hours').value=s.hours;document.getElementById('esup-cost').value=s.cost||0;openModal('modal-edit-sup')}
+function saveEditSup(){const id=document.getElementById('esup-id').value;let sup=load(KEYS.supervision);const idx=sup.findIndex(s=>s.id===id);if(idx===-1)return;sup[idx]={...sup[idx],date:document.getElementById('esup-date').value,type:document.getElementById('esup-type').value,hours:parseFloat(document.getElementById('esup-hours').value)||0,cost:parseFloat(document.getElementById('esup-cost').value)||0};save(KEYS.supervision,sup);closeModal('modal-edit-sup');renderSupervision();toast('Updated')}
 
 // ============================================================
 // REFERRALS
 // ============================================================
-function addReferral() {
-  const name = document.getElementById('ref-name').value.trim();
-  if (!name) { toast('Please enter a name', true); return; }
-  const refs = load(KEYS.referrals);
-  refs.push({id:uid(), name, source:document.getElementById('ref-source').value, status:document.getElementById('ref-status').value});
-  save(KEYS.referrals, refs); document.getElementById('ref-name').value=''; toast('Referral added'); renderReferrals();
-}
+function addReferral(){const name=document.getElementById('ref-name').value.trim();if(!name){toast('Please enter a name',true);return}const refs=load(KEYS.referrals);refs.push({id:uid(),name,source:document.getElementById('ref-source').value,status:document.getElementById('ref-status').value});save(KEYS.referrals,refs);document.getElementById('ref-name').value='';toast('Referral added');renderReferrals()}
+function updateReferralStatus(id,status){let refs=load(KEYS.referrals);const idx=refs.findIndex(r=>r.id===id);if(idx===-1)return;refs[idx].status=status;save(KEYS.referrals,refs);renderReferrals();toast('Status updated')}
+function deleteReferral(id){if(!confirm('Delete this referral?'))return;let refs=load(KEYS.referrals);refs=refs.filter(r=>r.id!==id);save(KEYS.referrals,refs);renderReferrals();toast('Referral deleted')}
 
-
-function updateReferralStatus(id, status) {
-  let refs = load(KEYS.referrals);
-  const idx = refs.findIndex(r => r.id === id);
-  if (idx === -1) return;
-  refs[idx].status = status;
-  save(KEYS.referrals, refs);
-  renderReferrals();
-  toast('Status updated');
-}
-
-function deleteReferral(id) {
-  if (!confirm('Delete this referral?')) return;
-  let refs = load(KEYS.referrals);
-  refs = refs.filter(r => r.id !== id);
-  save(KEYS.referrals, refs);
-  renderReferrals();
-  toast('Referral deleted');
-}
-
-function renderReferrals() {
-  const refs = load(KEYS.referrals);
-  const sources = ['Psychology Today','Therapist.com','Open Path','Mental Health Match','Word of Mouth','Other'];
-  const dotColor = {converted:'var(--green)',pending:'var(--amber)',declined:'var(--red)'};
-  const allCounts = sources.map(s=>({s, count:refs.filter(r=>r.source===s&&r.status==='converted').length}));
-  const maxConv = Math.max(...allCounts.map(x=>x.count),1);
-  const topSource = allCounts.find(x=>x.count===maxConv&&maxConv>0)?.s;
-  const grid = document.getElementById('ref-grid');
-  grid.innerHTML = sources.map(src => {
-    const all = refs.filter(r=>r.source===src);
-    if (!all.length) return '';
-    const conv = all.filter(r=>r.status==='converted').length;
-    const pend = all.filter(r=>r.status==='pending').length;
-    const decl = all.filter(r=>r.status==='declined').length;
-    const total = all.length;
-    const rate = total ? Math.round((conv/total)*100) : 0;
-    const isTop = src===topSource;
-    return `<div style="background:var(--surface);border:1px solid ${isTop?'var(--green)':'var(--border)'};border-radius:12px;padding:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <div style="font-size:13px;font-weight:600;">${src}</div>
-        ${isTop?'<span style="font-size:10px;color:var(--green);background:rgba(56,201,142,0.1);padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:0.05em;">Most Fruitful</span>':''}
-      </div>
-      ${[['Converted',conv,'var(--green)'],['Pending',pend,'var(--amber)'],['Declined',decl,'var(--red)']].map(([label,count,color])=>`
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
-          <div style="font-size:11px;color:var(--text3);width:60px;">${label}</div>
-          <div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${total?(count/total)*100:0}%;height:100%;background:${color};border-radius:3px;"></div></div>
-          <div style="font-family:var(--mono);font-size:11px;color:var(--text2);width:14px;text-align:right;">${count}</div>
-        </div>`).join('')}
-      <div style="font-family:var(--mono);font-size:22px;color:var(--text);margin-top:12px;">${rate}%</div>
-      <div style="font-size:11px;color:var(--text3);">conversion · ${total} referral${total!==1?'s':''}</div>
-      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
-        ${all.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12.5px;color:var(--text2);border-bottom:1px solid rgba(42,48,69,0.3);">
-          <span>${c.name}</span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <select onchange="updateReferralStatus('${c.id}',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text2);font-family:var(--sans);font-size:11px;outline:none;cursor:pointer;">
-              <option value="converted" ${c.status==='converted'?'selected':''}>Converted</option>
-              <option value="pending" ${c.status==='pending'?'selected':''}>Pending</option>
-              <option value="declined" ${c.status==='declined'?'selected':''}>Declined</option>
-            </select>
-            <span style="width:7px;height:7px;border-radius:50%;background:${dotColor[c.status]||'var(--text3)'};flex-shrink:0;display:inline-block;"></span>
-            <button onclick="deleteReferral('${c.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;opacity:0.6;" title="Delete">✕</button>
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
+function renderReferrals(){
+  const refs=load(KEYS.referrals);const sources=['Psychology Today','Therapist.com','Open Path','Mental Health Match','Word of Mouth','Other'];const dotColor={converted:'var(--green)',pending:'var(--amber)',declined:'var(--red)'};
+  const allCounts=sources.map(s=>({s,count:refs.filter(r=>r.source===s&&r.status==='converted').length}));const maxConv=Math.max(...allCounts.map(x=>x.count),1);const topSource=allCounts.find(x=>x.count===maxConv&&maxConv>0)?.s;
+  const grid=document.getElementById('ref-grid');
+  grid.innerHTML=sources.map(src=>{const all=refs.filter(r=>r.source===src);if(!all.length)return'';const conv=all.filter(r=>r.status==='converted').length;const pend=all.filter(r=>r.status==='pending').length;const decl=all.filter(r=>r.status==='declined').length;const total=all.length;const rate=total?Math.round((conv/total)*100):0;const isTop=src===topSource;
+    return`<div style="background:var(--surface);border:1px solid ${isTop?'var(--green)':'var(--border)'};border-radius:12px;padding:16px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-size:13px;font-weight:600;">${src}</div>${isTop?'<span style="font-size:10px;color:var(--green);background:rgba(56,201,142,0.1);padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:0.05em;">Most Fruitful</span>':''}</div>${[['Converted',conv,'var(--green)'],['Pending',pend,'var(--amber)'],['Declined',decl,'var(--red)']].map(([label,count,color])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><div style="font-size:11px;color:var(--text3);width:60px;">${label}</div><div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${total?(count/total)*100:0}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-family:var(--mono);font-size:11px;color:var(--text2);width:14px;text-align:right;">${count}</div></div>`).join('')}<div style="font-family:var(--mono);font-size:22px;color:var(--text);margin-top:12px;">${rate}%</div><div style="font-size:11px;color:var(--text3);">conversion \u00b7 ${total} referral${total!==1?'s':''}</div><div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">${all.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12.5px;color:var(--text2);border-bottom:1px solid rgba(42,48,69,0.3);"><span>${c.name}</span><div style="display:flex;align-items:center;gap:6px;"><select onchange="updateReferralStatus('${c.id}',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text2);font-family:var(--sans);font-size:11px;outline:none;cursor:pointer;"><option value="converted" ${c.status==='converted'?'selected':''}>Converted</option><option value="pending" ${c.status==='pending'?'selected':''}>Pending</option><option value="declined" ${c.status==='declined'?'selected':''}>Declined</option></select><span style="width:7px;height:7px;border-radius:50%;background:${dotColor[c.status]||'var(--text3)'};flex-shrink:0;display:inline-block;"></span><button onclick="deleteReferral('${c.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;opacity:0.6;" title="Delete">✕</button></div></div>`).join('')}</div></div>`}).join('');
 }
 
 // ============================================================
 // STATISTICS
 // ============================================================
-function renderStatistics() {
-  const sessions = load(KEYS.sessions);
-  const clients = load(KEYS.clients);
-  const now = new Date();
-  const monthStr = now.toISOString().slice(0,7);
-
-  // Week boundaries
-  const day = now.getDay();
-  const diff = day===0?-6:1-day;
-  const mon = new Date(now); mon.setDate(now.getDate()+diff); mon.setHours(0,0,0,0);
-  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
-  const monStr = mon.toISOString().split('T')[0];
-  const sunStr = sun.toISOString().split('T')[0];
-
-  const totalYTD = sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical').length;
-  const earnedYTD = sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical'&&parseFloat(s.fee)>0).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
-  const weekSessions = sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;
-  const weekEarned = sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
-
-  document.getElementById('stats-boxes').innerHTML = `
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="stat-box"><div class="label">Sessions YTD</div><div class="value" style="color:var(--accent)">${totalYTD}</div><div class="sub">in 2026</div></div>
-      <div class="stat-box"><div class="label">Earned YTD</div><div class="value" style="color:var(--green)">$${earnedYTD.toLocaleString()}</div><div class="sub">in 2026</div></div>
-    </div>
-    <div style="grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;"></div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="stat-box"><div class="label">Sessions This Week</div><div class="value" style="color:var(--accent)">${weekSessions}</div><div class="sub">Mon — Sun</div></div>
-      <div class="stat-box"><div class="label">Earned This Week</div><div class="value" style="color:var(--green)">$${weekEarned.toLocaleString()}</div><div class="sub">Mon — Sun</div></div>
-    </div>`;
-
-  // Agency pie
-  const agencies = ['DC','SMS','Emora','ME'];
-  const agNames = {DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};
-  const agColors = {DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
-  const clinicalSessions = sessions.filter(s=>s.type==='clinical');
-  const total = clinicalSessions.length;
-  const agData = agencies.map(a=>({a,label:agNames[a],count:clinicalSessions.filter(s=>s.agency===a).length,income:clinicalSessions.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
-  const canvas = document.getElementById('agency-chart');
-  if (canvas && typeof Chart !== 'undefined') {
-    if (window._agencyChart) window._agencyChart.destroy();
-    window._agencyChart = new Chart(canvas, {type:'doughnut',data:{labels:agData.map(d=>d.label),datasets:[{data:agData.map(d=>d.count),backgroundColor:agData.map(d=>d.color),borderWidth:2,borderColor:'#181c27'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} sessions (${Math.round((ctx.parsed/total)*100)}%)`}}}}});
-  }
-  document.getElementById('agency-legend').innerHTML = agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:18px;">${d.count} · <span style="font-size:17px;">${total?Math.round((d.count/total)*100):0}%</span></div><div style="font-family:var(--mono);font-size:15px;color:var(--green);">$${d.income.toLocaleString()}</div></div></div>`).join('');
-
-  // IP vs V
-  const monthSessions = sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');
-  document.getElementById('stat-ip').textContent = monthSessions.filter(s=>s.method==='IP').length;
-  document.getElementById('stat-v').textContent = monthSessions.filter(s=>s.method==='V').length;
-
-  // Gender
-  const active = clients.filter(c=>c.status==='active');
-  const male = active.filter(c=>c.gender==='male').length;
-  const female = active.filter(c=>c.gender==='female').length;
-  const unknown = active.filter(c=>!c.gender||c.gender==='unknown').length;
-  const tc = active.length;
-  const gBar = (label,count,color) => {
-    if (!count) return '';
-    const pct = tc?Math.round((count/tc)*100):0;
-    return `<div style="flex:1;min-width:100px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">${label}</div><div style="font-family:var(--mono);font-size:28px;color:var(--text);margin-bottom:8px;">${count}</div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)">${pct}%</div></div>`;
-  };
-  document.getElementById('gender-stats').innerHTML = gBar('Male',male,'var(--accent)')+gBar('Female',female,'var(--pink)')+(unknown?gBar('Unknown',unknown,'var(--text3)'):'');
+function renderStatistics(){
+  const sessions=load(KEYS.sessions);const clients=load(KEYS.clients);const now=new Date();const monthStr=now.toISOString().slice(0,7);
+  const day=now.getDay();const diff=day===0?-6:1-day;const mon=new Date(now);mon.setDate(now.getDate()+diff);mon.setHours(0,0,0,0);const sun=new Date(mon);sun.setDate(mon.getDate()+6);const monStr=mon.toISOString().split('T')[0];const sunStr=sun.toISOString().split('T')[0];
+  const totalYTD=sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical').length;const earnedYTD=sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical'&&parseFloat(s.fee)>0).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  const weekSessions=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;const weekEarned=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  document.getElementById('stats-boxes').innerHTML=`<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions YTD</div><div class="value" style="color:var(--accent)">${totalYTD}</div><div class="sub">in 2026</div></div><div class="stat-box"><div class="label">Earned YTD</div><div class="value" style="color:var(--green)">$${earnedYTD.toLocaleString()}</div><div class="sub">in 2026</div></div></div><div style="grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;"></div><div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions This Week</div><div class="value" style="color:var(--accent)">${weekSessions}</div><div class="sub">Mon \u2014 Sun</div></div><div class="stat-box"><div class="label">Earned This Week</div><div class="value" style="color:var(--green)">$${weekEarned.toLocaleString()}</div><div class="sub">Mon \u2014 Sun</div></div></div>`;
+  const agencies=['DC','SMS','Emora','ME'];const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};const agColors={DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
+  const clinicalSessions=sessions.filter(s=>s.type==='clinical');const total=clinicalSessions.length;const agData=agencies.map(a=>({a,label:agNames[a],count:clinicalSessions.filter(s=>s.agency===a).length,income:clinicalSessions.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
+  const canvas=document.getElementById('agency-chart');if(canvas&&typeof Chart!=='undefined'){if(window._agencyChart)window._agencyChart.destroy();window._agencyChart=new Chart(canvas,{type:'doughnut',data:{labels:agData.map(d=>d.label),datasets:[{data:agData.map(d=>d.count),backgroundColor:agData.map(d=>d.color),borderWidth:2,borderColor:'#181c27'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} sessions (${Math.round((ctx.parsed/total)*100)}%)`}}}}})}
+  document.getElementById('agency-legend').innerHTML=agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:18px;">${d.count} \u00b7 <span style="font-size:17px;">${total?Math.round((d.count/total)*100):0}%</span></div><div style="font-family:var(--mono);font-size:15px;color:var(--green);">$${d.income.toLocaleString()}</div></div></div>`).join('');
+  const monthSessions=sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');document.getElementById('stat-ip').textContent=monthSessions.filter(s=>s.method==='IP').length;document.getElementById('stat-v').textContent=monthSessions.filter(s=>s.method==='V').length;
+  const active=clients.filter(c=>c.status==='active');const male=active.filter(c=>c.gender==='male').length;const female=active.filter(c=>c.gender==='female').length;const unknown=active.filter(c=>!c.gender||c.gender==='unknown').length;const tc=active.length;
+  const gBar=(label,count,color)=>{if(!count)return'';const pct=tc?Math.round((count/tc)*100):0;return`<div style="flex:1;min-width:100px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">${label}</div><div style="font-family:var(--mono);font-size:28px;color:var(--text);margin-bottom:8px;">${count}</div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)">${pct}%</div></div>`};
+  document.getElementById('gender-stats').innerHTML=gBar('Male',male,'var(--accent)')+gBar('Female',female,'var(--pink)')+(unknown?gBar('Unknown',unknown,'var(--text3)'):'');
 }
 
 // ============================================================
 // CLOSE DROPDOWNS ON OUTSIDE CLICK
 // ============================================================
-document.addEventListener('click', e => {
-  ['s-client-dropdown'].forEach(id => {
-    const dd=document.getElementById(id); const btn=document.getElementById('s-client-btn');
-    if (dd&&btn&&!dd.contains(e.target)&&!btn.contains(e.target)) dd.style.display='none';
-  });
-  const qldd=document.getElementById('ql-client-dropdown'); const qlbtn=document.getElementById('ql-client-btn');
-  if (qldd&&qlbtn&&!qldd.contains(e.target)&&!qlbtn.contains(e.target)) qldd.style.display='none';
-  document.querySelectorAll('.modal-overlay').forEach(m => { if (e.target===m) m.classList.remove('open'); });
-});
+document.addEventListener('click',e=>{['s-client-dropdown'].forEach(id=>{const dd=document.getElementById(id);const btn=document.getElementById('s-client-btn');if(dd&&btn&&!dd.contains(e.target)&&!btn.contains(e.target))dd.style.display='none'});const qldd=document.getElementById('ql-client-dropdown');const qlbtn=document.getElementById('ql-client-btn');if(qldd&&qlbtn&&!qldd.contains(e.target)&&!qlbtn.contains(e.target))qldd.style.display='none';document.querySelectorAll('.modal-overlay').forEach(m=>{if(e.target===m)m.classList.remove('open')})});
 
 // ============================================================
-// INIT — boot from cloud, seed only on first run
+// INIT — boot from Firebase
 // ============================================================
-async function boot() {
-  // Show a subtle loading indicator
-  document.getElementById('sync-status').textContent = 'Loading...';
-  document.getElementById('sync-status').style.opacity = '1';
-  document.getElementById('sync-status').style.color = 'var(--text3)';
-
-  try {
-    const res = await fetch('/api/data');
-    const data = await res.json();
-    _db = data;
-
-    // Seed if there are no sessions — regardless of seeded flag
-    // This handles Railway wiping the .data folder on redeploy
-    if (!_db.sessions || _db.sessions.length === 0) {
-      _db.seeded = false;
-      seedData();
-    }
-  } catch (e) {
-    console.warn('Could not load from server, starting fresh:', e);
-    _db.seeded = false;
-    seedData();
-  }
-
-  document.getElementById('sync-status').style.opacity = '0';
-  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('sup-date').value = new Date().toISOString().split('T')[0];
-  renderDashboard();
-  renderSupervision();
-  populateClientLists();
+async function boot(){
+  document.getElementById('sync-status').textContent='Loading...';document.getElementById('sync-status').style.opacity='1';document.getElementById('sync-status').style.color='var(--text3)';
+  try{
+    const snap=await fbRef.once('value');const data=snap.val();
+    if(data){_db=data;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={}}
+    // Listen for real-time updates from other devices
+    fbRef.on('value',snap=>{const fresh=snap.val();if(fresh){_db=fresh;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={}}});
+  }catch(e){console.warn('Could not load from Firebase:',e)}
+  document.getElementById('sync-status').style.opacity='0';
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('sup-date').value=new Date().toISOString().split('T')[0];
+  renderDashboard();renderSupervision();populateClientLists();
 }
-
 boot();
 </script>
 </body>
