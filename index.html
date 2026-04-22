@@ -373,10 +373,15 @@ function renderNewClients(){
   const year=now.getFullYear();
   const currentMonth=now.getMonth();
 
-  // Build first-session-date map per client (track session id too)
+  // Build first-session-date map per client (track session id too).
+  // Only count true client-facing sessions: exclude type 'training' and anything
+  // whose description is not 'Intake session' or 'Psychotherapy session'.
   const firstSeen={};
   sessions.forEach(s=>{
     if(!s.name||!s.date)return;
+    if(s.type==='training')return;
+    const desc=(s.desc||'').trim();
+    if(desc!=='Intake session'&&desc!=='Psychotherapy session')return;
     if(!firstSeen[s.name]||s.date<firstSeen[s.name].date){
       firstSeen[s.name]={date:s.date,agency:s.agency||'—',sessionId:s.id};
     }
