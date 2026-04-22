@@ -136,6 +136,10 @@
 </div>
 <div id="page-new-clients" class="page">
   <div class="page-header"><h1>New Clients</h1><p>Clients grouped by the month of their first session</p></div>
+  <div class="card" style="margin-bottom:18px;display:flex;align-items:baseline;gap:14px;">
+    <span id="nc-ytd-count" style="font-family:var(--mono);font-size:42px;color:var(--accent);line-height:1;">0</span>
+    <span style="font-size:13px;color:var(--text2);"><span id="nc-ytd-year">2026</span> total number of new clients</span>
+  </div>
   <div class="card">
     <div id="nc-months"></div>
     <div id="nc-empty" class="empty" style="display:none;"><div class="empty-icon">◐</div>No new clients yet this year.</div>
@@ -405,6 +409,8 @@ function renderNewClients(){
 
   // Render rows
   const ytd=byMonth.reduce((s,m)=>s+m.length,0);
+  document.getElementById('nc-ytd-count').textContent=ytd;
+  document.getElementById('nc-ytd-year').textContent=year;
   const container=document.getElementById('nc-months');
   const empty=document.getElementById('nc-empty');
   if(ytd===0){container.innerHTML='';empty.style.display='block';return}
