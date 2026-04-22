@@ -31,6 +31,7 @@
 .empty{text-align:center;padding:36px;color:var(--text3);font-size:13px}.empty-icon{font-size:28px;margin-bottom:8px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid-2-fill{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.nc-row{border-bottom:1px solid var(--border)}.nc-row:last-child{border-bottom:none}.nc-head{display:flex;align-items:center;gap:16px;padding:14px 4px;cursor:pointer;user-select:none;transition:background .15s}.nc-head:hover{background:rgba(255,255,255,.02)}.nc-month{font-size:14px;color:var(--text);font-weight:500;flex-shrink:0;width:110px}.nc-month.current{color:var(--accent)}.nc-middle{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}.nc-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}.nc-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6ba3ff);border-radius:2px;transition:width .6s}.nc-dots{display:flex;gap:4px;flex-wrap:wrap;min-height:8px}.nc-client-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.nc-client-dot.dc{background:var(--accent)}.nc-client-dot.sms{background:var(--green)}.nc-client-dot.emora{background:var(--amber)}.nc-client-dot.me{background:var(--red)}.nc-right{display:flex;align-items:center;gap:10px;flex-shrink:0}.nc-count{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text3);background:transparent;border:none;padding:2px 4px;min-width:32px;text-align:right}.nc-count.has{color:var(--accent)}.nc-chevron{font-size:11px;color:var(--text3);transition:transform .2s}.nc-row.open .nc-chevron{transform:rotate(90deg)}.nc-body{display:none;padding:4px 8px 14px 18px}.nc-row.open .nc-body{display:block}.nc-client{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--text2);border-radius:4px;transition:background .15s}.nc-client:hover{background:rgba(255,255,255,.03)}.nc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.nc-dot.dc{background:var(--accent)}.nc-dot.sms{background:var(--green)}.nc-dot.emora{background:var(--amber)}.nc-dot.me{background:var(--red)}.nc-client-name{color:var(--text)}.nc-client-meta{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto}
 .invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}.invoice-title{font-family:var(--serif);font-size:22px}.invoice-total{font-family:var(--mono);font-size:26px;color:var(--green);margin-top:6px}
 .ql-wrap{max-width:480px;margin:0 auto;padding-bottom:40px}.ql-today-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--text3);margin-bottom:24px}.ql-step-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:500;margin-bottom:10px}.ql-step{margin-bottom:22px}.ql-step.locked{opacity:.35;pointer-events:none}.ql-client-btn{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;color:var(--text2);font-family:var(--sans);font-size:17px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .15s;text-align:left}.ql-client-btn.selected{border-color:var(--accent);color:var(--text);background:rgba(79,142,247,.07)}.ql-client-btn:active{transform:scale(.98)}.ql-dropdown-wrap{position:relative}.ql-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:16px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.6);overflow:hidden}.ql-dropdown-search{padding:12px;border-bottom:1px solid var(--border)}.ql-dropdown-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:16px;outline:none}.ql-dropdown-list{max-height:260px;overflow-y:auto}.ql-dropdown-item{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:15px;color:var(--text);transition:background .1s}.ql-dropdown-item:last-child{border-bottom:none}.ql-dropdown-item:active{background:var(--surface2)}.ql-big-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ql-big-btn{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:22px 14px;color:var(--text2);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;text-align:center;line-height:1.4;transition:all .15s}.ql-big-btn:active{transform:scale(.97)}.ql-big-btn.type-selected{border-color:var(--green);color:var(--green);background:rgba(56,201,142,.07)}.ql-big-btn.method-selected{border-color:var(--amber);color:var(--amber);background:rgba(247,164,79,.07)}.ql-big-btn-icon{font-size:26px;display:block;margin-bottom:8px}.ql-confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}.ql-confirm-row{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);font-size:14px}.ql-confirm-row:last-child{border-bottom:none}.ql-confirm-label{color:var(--text3)}.ql-confirm-value{color:var(--text);font-weight:500}.ql-log-btn{width:100%;background:var(--green);border:none;border-radius:16px;padding:22px;color:#fff;font-family:var(--sans);font-size:19px;font-weight:600;cursor:pointer;letter-spacing:.01em;transition:all .15s}.ql-log-btn:active{transform:scale(.98);background:#2db87d}.ql-success{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px}.ql-success-icon{font-size:72px;margin-bottom:20px}.ql-success-title{font-family:var(--serif);font-size:30px;margin-bottom:10px}.ql-success-sub{color:var(--text2);font-size:15px;margin-bottom:12px;line-height:1.6}.ql-success-time{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px}.ql-again-btn{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 32px;color:var(--text);font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;width:100%;transition:border-color .15s}
 </style>
@@ -59,6 +60,7 @@
     <button class="nav-item" onclick="showPage('invoices',this)"><span class="icon">◷</span> Invoices</button>
     <div class="nav-section">Practice</div>
     <button class="nav-item" onclick="showPage('clients',this)"><span class="icon">◑</span> Clients</button>
+    <button class="nav-item" onclick="showPage('new-clients',this)"><span class="icon">◐</span> New Clients</button>
     <button class="nav-item" onclick="showPage('supervision',this)"><span class="icon">◉</span> Supervision</button>
     <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Referrals</button>
     <button class="nav-item" onclick="showPage('statistics',this)"><span class="icon">◈</span> Statistics</button>
@@ -132,6 +134,13 @@
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Add Client</div><div class="form-grid"><div class="field"><label>Full Name</label><input type="text" id="c-name" placeholder="Client name"></div><div class="field"><label>Agency</label><select id="c-agency"><option value="DC">District Counseling (DC)</option><option value="SMS">Safe Mind Space (SMS)</option><option value="Emora">Emora</option><option value="ME">Private (ME)</option></select></div><div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="c-rate" placeholder="0"></div></div><div class="field"><label>Method</label><select id="c-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div><div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="c-gender-male" onclick="selectGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Male</button><button type="button" id="c-gender-female" onclick="selectGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Female</button></div><input type="hidden" id="c-gender" value=""></div></div><div class="btn-row"><button class="btn btn-primary" onclick="addClient()">Add Client</button></div></div>
   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="card-title" style="margin:0;">All Clients</div><div style="display:flex;gap:6px;"><button onclick="filterClients('all',this)" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">All</button><button onclick="filterClients('active',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Active</button><button onclick="filterClients('inactive',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Inactive</button></div></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Last Seen</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div><div id="clients-empty" class="empty" style="display:none;"><div class="empty-icon">👤</div>No clients yet.</div></div>
 </div>
+<div id="page-new-clients" class="page">
+  <div class="page-header"><h1>New Clients</h1><p>Clients grouped by the month of their first session</p></div>
+  <div class="card">
+    <div id="nc-months"></div>
+    <div id="nc-empty" class="empty" style="display:none;"><div class="empty-icon">◐</div>No new clients yet this year.</div>
+  </div>
+</div>
 <div id="page-supervision" class="page">
   <div class="page-header"><h1>Supervision</h1><p>Tracking toward 100-hour requirement</p></div>
   <div class="grid-2" style="margin-bottom:18px;"><div class="progress-card"><div class="progress-label">Hours Completed</div><div class="progress-nums"><span class="current" id="sup-hrs">0</span><span class="total">/ 100 hrs</span></div><div class="progress-bar"><div class="progress-fill" id="sup-bar" style="background:var(--green);width:0%"></div></div><div class="progress-pct" id="sup-pct">0.0% complete</div></div><div class="progress-card" style="border-color:rgba(56,201,142,.3);"><div class="progress-label">Total Cost</div><div class="progress-nums"><span class="current" id="sup-cost" style="color:var(--green);">$0</span></div><div style="font-size:11px;color:var(--text3);margin-top:6px;">spent on supervision in 2026</div></div></div>
@@ -156,6 +165,7 @@
 <div class="modal-overlay" id="modal-edit-session"><div class="modal"><h2>Edit Session</h2><input type="hidden" id="es-id"><div class="form-grid"><div class="field"><label>Date</label><input type="date" id="es-date"></div><div class="field"><label>Client Name</label><input type="text" id="es-name"></div><div class="field"><label>Agency</label><select id="es-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option><option value="—">N/A</option></select></div><div class="field"><label>Hours</label><input type="number" id="es-hours" min="0.5" step="0.5"></div><div class="field"><label>Fee ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="es-fee" min="0"></div></div><div class="field"><label>Method</label><select id="es-method"><option value="IP">In-Person</option><option value="V">Virtual</option><option value="—">N/A</option></select></div><div class="field"><label>Description</label><select id="es-desc-sel" onchange="handleEditDescSel()"><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other</option></select></div><div class="field" id="es-custom-wrap" style="display:none;"><label>Custom</label><input type="text" id="es-custom"></div><div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option></select></div><div class="field"><label>Insurance</label><input type="text" id="es-insurance"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSession()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-session')">Cancel</button></div></div></div>
 <div class="modal-overlay" id="modal-edit-sup"><div class="modal" style="max-width:400px;"><h2>Edit Supervision</h2><input type="hidden" id="esup-id"><div class="form-grid two"><div class="field"><label>Date</label><input type="date" id="esup-date"></div><div class="field"><label>Type</label><select id="esup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div><div class="field"><label>Hours</label><input type="number" id="esup-hours" min="0.5" step="0.5"></div><div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="esup-cost"></div></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSup()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-sup')">Cancel</button></div></div></div>
 <div class="modal-overlay" id="modal-client-profile"><div class="modal" style="max-width:600px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;"><div><div style="font-family:var(--serif);font-size:22px;" id="cp-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="cp-meta">—</div></div><button class="btn btn-ghost" onclick="closeModal('modal-client-profile')">Close</button></div><div class="grid-4" style="margin-bottom:20px;"><div class="stat-box"><div class="label">Sessions</div><div class="value" id="cp-sessions" style="color:var(--accent);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Hours</div><div class="value" id="cp-hours" style="color:var(--green);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Billed</div><div class="value" id="cp-billed" style="color:var(--amber);font-size:22px;">$0</div></div><div class="stat-box"><div class="label">Rate</div><div class="value" id="cp-rate" style="color:var(--text);font-size:22px;">$0</div></div></div><div class="card-title">Session History</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Hrs</th><th>Fee</th></tr></thead><tbody id="cp-history"></tbody></table></div></div></div>
+<div class="modal-overlay" id="modal-edit-nc"><div class="modal" style="max-width:440px;"><h2>Edit New Client</h2><input type="hidden" id="enc-sid"><input type="hidden" id="enc-orig-name"><div class="form-grid two"><div class="field full"><label>Client Name</label><input type="text" id="enc-name"></div><div class="field full"><label>First Session Date</label><input type="date" id="enc-date"></div></div><div class="btn-row" style="justify-content:space-between;"><div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="saveEditNC()">Save</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-nc')">Cancel</button></div><button class="btn" onclick="deleteNC()" style="background:transparent;border:1px solid var(--red);color:var(--red);">Delete…</button></div></div></div>
 <div id="toast" class="toast"></div>
 <script>
 // ============================================================
@@ -354,7 +364,137 @@ function populateClientLists(){
 // QUICK LOG
 // ============================================================
 let _qlState={client:null,type:null,method:null};
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='new-clients')renderNewClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+
+function renderNewClients(){
+  const sessions=load(KEYS.sessions);
+  const clients=load(KEYS.clients);
+  const now=new Date();
+  const year=now.getFullYear();
+  const currentMonth=now.getMonth();
+
+  // Build first-session-date map per client (track session id too)
+  const firstSeen={};
+  sessions.forEach(s=>{
+    if(!s.name||!s.date)return;
+    if(!firstSeen[s.name]||s.date<firstSeen[s.name].date){
+      firstSeen[s.name]={date:s.date,agency:s.agency||'—',sessionId:s.id};
+    }
+  });
+
+  // Group by month for the current year
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const byMonth=monthNames.map(()=>[]);
+  Object.keys(firstSeen).forEach(name=>{
+    const f=firstSeen[name];
+    const d=new Date(f.date+'T00:00:00');
+    if(d.getFullYear()!==year)return;
+    // Prefer the agency saved on the client record; fall back to first-session agency
+    const clientRec=clients.find(c=>c.name===name);
+    const agency=(clientRec&&clientRec.agency)||f.agency;
+    byMonth[d.getMonth()].push({name,date:f.date,agency,sessionId:f.sessionId});
+  });
+
+  // Sort each month by date
+  byMonth.forEach(arr=>arr.sort((a,b)=>a.date.localeCompare(b.date)));
+
+  // Render rows
+  const ytd=byMonth.reduce((s,m)=>s+m.length,0);
+  const container=document.getElementById('nc-months');
+  const empty=document.getElementById('nc-empty');
+  if(ytd===0){container.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+
+  // Find the busiest month for proportional bar scaling
+  const maxCount=Math.max(...byMonth.map(m=>m.length),1);
+
+  container.innerHTML=monthNames.map((mName,idx)=>{
+    const clientsInMonth=byMonth[idx];
+    const count=clientsInMonth.length;
+    const isCurrent=idx===currentMonth;
+    const hasClients=count>0;
+    // Progress bar width relative to the busiest month
+    const barPct=hasClients?(count/maxCount)*100:0;
+    const body=hasClients?clientsInMonth.map(c=>{
+      const agencyKey=(c.agency||'').toLowerCase();
+      const validDot=['dc','sms','emora','me'].includes(agencyKey)?agencyKey:'me';
+      return `<div class="nc-client" onclick="openEditNC('${(c.name||'').replace(/'/g,"&#39;")}','${c.sessionId}')" style="cursor:pointer;"><span class="nc-dot ${validDot}"></span><span class="nc-client-name">${c.name}</span><span class="nc-client-meta">${fmtDate(c.date)} · ${c.agency||'—'}</span></div>`;
+    }).join(''):`<div style="color:var(--text3);font-size:12px;padding:4px 0;">No new clients this month.</div>`;
+    return `<div class="nc-row${hasClients?'':' empty-row'}" data-idx="${idx}"><div class="nc-head" onclick="ncToggle(${idx})"><span class="nc-month${isCurrent?' current':''}">${mName}${isCurrent?' · Current':''}</span><div class="nc-middle"><div class="nc-bar"><div class="nc-bar-fill" style="width:${barPct}%"></div></div></div><div class="nc-right"><span class="nc-count${hasClients?' has':''}">${count}</span><span class="nc-chevron">▸</span></div></div><div class="nc-body">${body}</div></div>`;
+  }).join('');
+
+  // Auto-expand the current month on first render
+  const currentRow=container.querySelector(`.nc-row[data-idx="${currentMonth}"]`);
+  if(currentRow&&byMonth[currentMonth].length)currentRow.classList.add('open');
+}
+
+function ncToggle(idx){
+  const row=document.querySelector(`#nc-months .nc-row[data-idx="${idx}"]`);
+  if(row)row.classList.toggle('open');
+}
+
+function openEditNC(name,sessionId){
+  // Decode any HTML-escaped apostrophes from the onclick attribute
+  const decoded=name.replace(/&#39;/g,"'");
+  document.getElementById('enc-sid').value=sessionId;
+  document.getElementById('enc-orig-name').value=decoded;
+  document.getElementById('enc-name').value=decoded;
+  const sessions=load(KEYS.sessions);
+  const s=sessions.find(x=>x.id===sessionId);
+  document.getElementById('enc-date').value=(s&&s.date)||'';
+  openModal('modal-edit-nc');
+}
+
+function saveEditNC(){
+  const sessionId=document.getElementById('enc-sid').value;
+  const origName=document.getElementById('enc-orig-name').value;
+  const newName=document.getElementById('enc-name').value.trim();
+  const newDate=document.getElementById('enc-date').value;
+  if(!newName){toast('Name cannot be empty',true);return}
+  if(!newDate){toast('Date cannot be empty',true);return}
+  // Update the first session's date
+  let sessions=load(KEYS.sessions);
+  const idx=sessions.findIndex(s=>s.id===sessionId);
+  if(idx===-1){toast('Session not found',true);return}
+  sessions[idx]={...sessions[idx],date:newDate};
+  // If name changed, rename across ALL sessions and the client roster
+  if(newName!==origName){
+    sessions=sessions.map(s=>s.name===origName?{...s,name:newName}:s);
+    let clients=load(KEYS.clients);
+    const cIdx=clients.findIndex(c=>c.name===origName);
+    if(cIdx!==-1){clients[cIdx]={...clients[cIdx],name:newName};save(KEYS.clients,clients);populateClientLists();}
+  }
+  // Also update the edited session's name if needed (covered by map above)
+  save(KEYS.sessions,sessions);
+  closeModal('modal-edit-nc');
+  renderNewClients();
+  renderDashboard();
+  toast('Updated');
+}
+
+function deleteNC(){
+  const sessionId=document.getElementById('enc-sid').value;
+  const name=document.getElementById('enc-orig-name').value;
+  const choice=prompt(`Delete options for "${name}":\n\n1 = Remove just the first session (client may move to a different month, or disappear if no other sessions)\n2 = Remove the client completely (all sessions + roster entry)\n\nType 1 or 2, or cancel:`);
+  if(choice!=='1'&&choice!=='2')return;
+  let sessions=load(KEYS.sessions);
+  if(choice==='1'){
+    sessions=sessions.filter(s=>s.id!==sessionId);
+    save(KEYS.sessions,sessions);
+    toast('First session removed');
+  }else{
+    sessions=sessions.filter(s=>s.name!==name);
+    save(KEYS.sessions,sessions);
+    let clients=load(KEYS.clients);
+    clients=clients.filter(c=>c.name!==name);
+    save(KEYS.clients,clients);
+    populateClientLists();
+    toast(name+' removed');
+  }
+  closeModal('modal-edit-nc');
+  renderNewClients();
+  renderDashboard();
+}
 function initQuickLog(){const now=new Date();const[y,m,d]=now.toISOString().split('T')[0].split('-');document.getElementById('ql-today-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});document.getElementById('qlc-date').textContent=m+'/'+d+'/'+y;qlResetForm();qlPopulateClients()}
 function qlPopulateClients(){const clients=load(KEYS.clients).filter(c=>c.status==='active').sort((a,b)=>a.name.localeCompare(b.name));const list=document.getElementById('ql-list');if(!list)return;list.innerHTML=clients.map(c=>`<div class="ql-dropdown-item" onclick='qlSelectClient(${JSON.stringify(c).replace(/'/g,"&#39;")})'><span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></div>`).join('')}
 function qlToggleDropdown(){const dd=document.getElementById('ql-client-dropdown');const isOpen=dd.style.display==='block';if(isOpen){dd.style.display='none';return}dd.style.display='block';document.getElementById('ql-client-search').value='';qlFilterClients('');setTimeout(()=>document.getElementById('ql-client-search').focus(),100)}
