@@ -53,8 +53,8 @@
     <div class="nav-section">Overview</div>
     <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="icon">◈</span> Dashboard</button>
     <div class="nav-section">Logging</div>
-    <button class="nav-item" onclick="showPage('log-session',this)"><span class="icon">＋</span> Log Session</button>
     <button class="nav-item" onclick="showPage('quick-log',this)"><span class="icon">⚡</span> Quick Log</button>
+    <button class="nav-item" onclick="showPage('log-session',this)"><span class="icon">＋</span> Log Session</button>
     <button class="nav-item" onclick="showPage('session-log',this)"><span class="icon">≡</span> Session Log</button>
     <div class="nav-section">Billing</div>
     <button class="nav-item" onclick="showPage('invoices',this)"><span class="icon">◷</span> Invoices</button>
@@ -64,6 +64,7 @@
     <button class="nav-item" onclick="showPage('supervision',this)"><span class="icon">◉</span> Supervision</button>
     <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Referrals</button>
     <button class="nav-item" onclick="showPage('statistics',this)"><span class="icon">◈</span> Statistics</button>
+    <button class="nav-item" onclick="showPage('private-pay',this)"><span class="icon">◆</span> Private Pay</button>
   </nav>
 </aside>
 <main class="main">
@@ -160,8 +161,56 @@
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div></div>
   <div class="card" style="margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="card-title" style="margin:0;">Sessions by Agency</div><select id="agency-month-select" onchange="setAgencyView(this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer;"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03">March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option><option value="2026-07">July 2026</option><option value="2026-08">August 2026</option><option value="2026-09">September 2026</option><option value="2026-10">October 2026</option><option value="2026-11">November 2026</option><option value="2026-12">December 2026</option><option value="all">All Time</option></select></div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
-  <div class="card" style="margin-bottom:18px;"><div class="card-title">In-Person vs Virtual — This Month</div><div class="grid-2"><div class="stat-box"><div class="label">In-Person</div><div class="value" id="stat-ip" style="color:var(--accent)">0</div><div class="sub">this month</div></div><div class="stat-box"><div class="label">Virtual</div><div class="value" id="stat-v" style="color:var(--green)">0</div><div class="sub">this month</div></div></div></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Caseload — Gender Breakdown</div><div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div></div>
+</div>
+
+<div id="page-private-pay" class="page">
+  <div class="page-header"><h1>Private Pay</h1><p>Your independent income — ME clients only</p></div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Client Goal</div>
+    <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:14px;">
+      <div style="flex:1;min-width:200px;">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;">
+          <span id="pp-active-count" style="font-family:var(--mono);font-size:42px;color:var(--red);line-height:1;">0</span>
+          <span style="font-family:var(--mono);font-size:18px;color:var(--text3);">/ <span id="pp-goal-display">10</span> clients</span>
+        </div>
+        <div class="progress-bar" style="margin-bottom:6px;"><div id="pp-goal-bar" class="progress-fill" style="background:var(--red);width:0%;"></div></div>
+        <div id="pp-goal-pct" style="font-size:11px;color:var(--text3);font-family:var(--mono);">0% of goal</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;">Set Target</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="number" id="pp-goal-input" min="1" max="30" value="10" style="width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;text-align:center;">
+          <button class="btn btn-ghost" onclick="savePPGoal()" style="font-size:12px;">Save</button>
+        </div>
+      </div>
+    </div>
+    <div id="pp-client-list" style="border-top:1px solid var(--border);padding-top:12px;"></div>
+  </div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Income Breakdown</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+      <div class="stat-box"><div class="label">This Week</div><div class="value" id="pp-week-income" style="color:var(--red);">$0</div><div class="sub" id="pp-week-sessions">0 sessions</div></div>
+      <div class="stat-box"><div class="label">This Month</div><div class="value" id="pp-month-income" style="color:var(--red);">$0</div><div class="sub" id="pp-month-sessions">0 sessions</div></div>
+      <div class="stat-box"><div class="label">YTD 2026</div><div class="value" id="pp-ytd-income" style="color:var(--red);">$0</div><div class="sub" id="pp-ytd-sessions">0 sessions</div></div>
+    </div>
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline;">
+      <span style="font-size:12px;color:var(--text2);">Private pay as % of total YTD income</span>
+      <span id="pp-pct-label" style="font-family:var(--mono);font-size:20px;color:var(--red);">0%</span>
+    </div>
+    <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:6px;">
+      <div id="pp-income-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--amber));width:0%;transition:width .6s;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:var(--mono);">
+      <span>ME: $<span id="pp-bar-me">0</span></span>
+      <span>Agencies: $<span id="pp-bar-agency">0</span></span>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Month by Month</div>
+    <div class="table-wrap"><table><thead><tr><th>Month</th><th>Sessions</th><th>Income</th><th>Avg / Session</th></tr></thead><tbody id="pp-monthly-body"></tbody></table></div>
+    <div id="pp-monthly-empty" class="empty" style="display:none;"><div class="empty-icon">◆</div>No private pay sessions yet.</div>
+  </div>
 </div>
 </main>
 </div>
@@ -281,7 +330,7 @@ function handleDescSelect(){const v=document.getElementById('s-desc-select').val
 
 function renderLog(){
   const sessions=load(KEYS.sessions);const search=(document.getElementById('log-search')?.value||'').toLowerCase();const agency=document.getElementById('log-agency')?.value||'';const month=document.getElementById('log-month')?.value||'';
-  let filtered=sessions.filter(s=>{if(agency&&s.agency!==agency)return false;if(month&&!(s.date||'').startsWith(month))return false;if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;return true}).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  let filtered=sessions.filter(s=>{if(agency&&s.agency!==agency)return false;if(month&&!(s.date||'').startsWith(month))return false;if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;return true}).reverse().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const tbody=document.getElementById('log-tbody');const empty=document.getElementById('log-empty');
   if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';
   tbody.innerHTML=filtered.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${(s.name||'').replace(/'/g,"&#39;")}')">${s.name||'\u2014'}</td><td><span class="badge b-${(s.agency||'').toLowerCase()}">${s.agency||'\u2014'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.fee?'$'+s.fee:'\u2014'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'\u2014'}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc||''}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSession('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSession('${s.id}')">✕</button></td></tr>`).join('');
@@ -368,7 +417,7 @@ function populateClientLists(){
 // QUICK LOG
 // ============================================================
 let _qlState={client:null,type:null,method:null};
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='new-clients')renderNewClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='new-clients')renderNewClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog();if(id==='private-pay')renderPrivatePay()}
 
 function renderNewClients(){
   const sessions=load(KEYS.sessions);
@@ -554,7 +603,6 @@ function renderStatistics(){
   const sel=document.getElementById('agency-month-select');if(sel&&!sel._initialized){sel.value=monthStr;sel._initialized=true;}
   const selectedVal=(sel&&sel.value)||monthStr;
   renderAgencyChart(sessions,selectedVal);
-  const monthSessions=sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');document.getElementById('stat-ip').textContent=monthSessions.filter(s=>s.method==='IP').length;document.getElementById('stat-v').textContent=monthSessions.filter(s=>s.method==='V').length;
   const active=clients.filter(c=>c.status==='active');const male=active.filter(c=>c.gender==='male').length;const female=active.filter(c=>c.gender==='female').length;const unknown=active.filter(c=>!c.gender||c.gender==='unknown').length;const tc=active.length;
   const gBar=(label,count,color)=>{if(!count)return'';const pct=tc?Math.round((count/tc)*100):0;return`<div style="flex:1;min-width:100px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">${label}</div><div style="font-family:var(--mono);font-size:28px;color:var(--text);margin-bottom:8px;">${count}</div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)">${pct}%</div></div>`};
   document.getElementById('gender-stats').innerHTML=gBar('Male',male,'var(--accent)')+gBar('Female',female,'var(--pink)')+(unknown?gBar('Unknown',unknown,'var(--text3)'):'');
@@ -589,9 +637,9 @@ async function boot(){
   document.getElementById('sync-status').textContent='Loading...';document.getElementById('sync-status').style.opacity='1';document.getElementById('sync-status').style.color='var(--text3)';
   try{
     const snap=await fbRef.once('value');const data=snap.val();
-    if(data){_db=data;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={}}
+    if(data){_db=data;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={};if(!_db.pp_goal)_db.pp_goal=10;}
     // Listen for real-time updates from other devices
-    fbRef.on('value',snap=>{const fresh=snap.val();if(fresh){_db=fresh;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={}}});
+    fbRef.on('value',snap=>{const fresh=snap.val();if(fresh){_db=fresh;if(!_db.sessions)_db.sessions=[];if(!_db.clients)_db.clients=[];if(!_db.supervision)_db.supervision=[];if(!_db.referrals)_db.referrals=[];if(!_db.inv_dates)_db.inv_dates={};if(!_db.pp_goal)_db.pp_goal=10;}});
   }catch(e){console.warn('Could not load from Firebase:',e)}
   document.getElementById('sync-status').style.opacity='0';
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -599,6 +647,53 @@ async function boot(){
   document.getElementById('sup-date').value=new Date().toISOString().split('T')[0];
   renderDashboard();renderSupervision();populateClientLists();
 }
+
+// ============================================================
+// PRIVATE PAY
+// ============================================================
+function savePPGoal(){const goal=parseInt(document.getElementById('pp-goal-input').value)||10;_db.pp_goal=goal;fbRef.child('pp_goal').set(goal);toast('Goal saved');renderPrivatePay()}
+
+function renderPrivatePay(){
+  const sessions=load(KEYS.sessions);const clients=load(KEYS.clients);
+  const now=new Date();const monthStr=now.toISOString().slice(0,7);
+  const day=now.getDay();const diff=day===0?-6:1-day;const mon=new Date(now);mon.setDate(now.getDate()+diff);mon.setHours(0,0,0,0);const sun=new Date(mon);sun.setDate(mon.getDate()+6);const monStr=mon.toISOString().split('T')[0];const sunStr=sun.toISOString().split('T')[0];
+
+  // Goal
+  const goal=_db.pp_goal||10;const meClients=clients.filter(c=>c.agency==='ME'&&c.status==='active');const activeCount=meClients.length;
+  document.getElementById('pp-goal-input').value=goal;document.getElementById('pp-goal-display').textContent=goal;document.getElementById('pp-active-count').textContent=activeCount;
+  const goalPct=Math.min(100,Math.round((activeCount/goal)*100));document.getElementById('pp-goal-bar').style.width=goalPct+'%';document.getElementById('pp-goal-pct').textContent=goalPct+'% of goal ('+activeCount+' of '+goal+')';
+
+  // Active ME client list
+  const allSessions=sessions.filter(s=>s.agency==='ME');
+  const clientListEl=document.getElementById('pp-client-list');
+  if(meClients.length){
+    clientListEl.innerHTML=meClients.map(c=>{const cs=allSessions.filter(s=>s.name===c.name);const last=cs.sort((a,b)=>(b.date||'').localeCompare(a.date||''))[0];return`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(42,48,69,.4);font-size:13px;"><span style="color:var(--text);">${c.name}</span><div style="display:flex;gap:16px;"><span style="font-family:var(--mono);font-size:11px;color:var(--text3);">${cs.length} session${cs.length!==1?'s':''}</span><span style="font-family:var(--mono);font-size:11px;color:var(--green);">$${c.rate}/session</span><span style="font-family:var(--mono);font-size:11px;color:var(--text3);">${last?'Last: '+fmtDate(last.date):'—'}</span></div></div>`}).join('');
+  }else{clientListEl.innerHTML='<div style="color:var(--text3);font-size:13px;padding:8px 0;">No active ME clients yet.</div>';}
+
+  // Income stats
+  const meSessions=sessions.filter(s=>s.agency==='ME'&&s.type==='clinical');
+  const weekMe=meSessions.filter(s=>s.date&&s.date>=monStr&&s.date<=sunStr);
+  const monthMe=meSessions.filter(s=>(s.date||'').startsWith(monthStr));
+  const ytdMe=meSessions.filter(s=>(s.date||'').startsWith('2026'));
+  const sum=arr=>arr.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  document.getElementById('pp-week-income').textContent='$'+sum(weekMe).toLocaleString();document.getElementById('pp-week-sessions').textContent=weekMe.length+' session'+(weekMe.length!==1?'s':'');
+  document.getElementById('pp-month-income').textContent='$'+sum(monthMe).toLocaleString();document.getElementById('pp-month-sessions').textContent=monthMe.length+' session'+(monthMe.length!==1?'s':'');
+  document.getElementById('pp-ytd-income').textContent='$'+sum(ytdMe).toLocaleString();document.getElementById('pp-ytd-sessions').textContent=ytdMe.length+' session'+(ytdMe.length!==1?'s':'');
+
+  // % of total income bar
+  const totalYTD=sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical').reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
+  const meYTD=sum(ytdMe);const agencyYTD=totalYTD-meYTD;const incPct=totalYTD?Math.round((meYTD/totalYTD)*100):0;
+  document.getElementById('pp-pct-label').textContent=incPct+'%';document.getElementById('pp-income-bar').style.width=incPct+'%';document.getElementById('pp-bar-me').textContent=meYTD.toLocaleString();document.getElementById('pp-bar-agency').textContent=agencyYTD.toLocaleString();
+
+  // Monthly breakdown
+  const months=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
+  const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let rows='';let hasAny=false;
+  months.forEach((m,i)=>{const ms=meSessions.filter(s=>(s.date||'').startsWith(m));if(!ms.length)return;hasAny=true;const inc=sum(ms);const avg=ms.length?Math.round(inc/ms.length):0;rows+=`<tr${m===monthStr?' style="background:rgba(247,95,95,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td style="font-family:var(--mono)">${ms.length}</td><td style="font-family:var(--mono);color:var(--green)">$${inc.toLocaleString()}</td><td style="font-family:var(--mono);color:var(--text2)">$${avg}</td></tr>`;});
+  const tbody=document.getElementById('pp-monthly-body');const empty=document.getElementById('pp-monthly-empty');
+  if(hasAny){tbody.innerHTML=rows;empty.style.display='none';}else{tbody.innerHTML='';empty.style.display='block';}
+}
+
 boot();
 </script>
 </body>
