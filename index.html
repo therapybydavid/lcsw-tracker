@@ -31,6 +31,7 @@
 .empty{text-align:center;padding:36px;color:var(--text3);font-size:13px}.empty-icon{font-size:28px;margin-bottom:8px}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--green);color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.grid-2-fill{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.nc-row{border-bottom:1px solid var(--border)}.nc-row:last-child{border-bottom:none}.nc-head{display:flex;align-items:center;gap:16px;padding:14px 4px;cursor:pointer;user-select:none;transition:background .15s}.nc-head:hover{background:rgba(255,255,255,.02)}.nc-month{font-size:14px;color:var(--text);font-weight:500;flex-shrink:0;width:110px}.nc-month.current{color:var(--accent)}.nc-middle{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}.nc-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}.nc-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),#6ba3ff);border-radius:2px;transition:width .6s}.nc-dots{display:flex;gap:4px;flex-wrap:wrap;min-height:8px}.nc-client-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.nc-client-dot.dc{background:var(--accent)}.nc-client-dot.sms{background:var(--green)}.nc-client-dot.emora{background:var(--amber)}.nc-client-dot.me{background:var(--red)}.nc-right{display:flex;align-items:center;gap:10px;flex-shrink:0}.nc-count{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text3);background:transparent;border:none;padding:2px 4px;min-width:32px;text-align:right}.nc-count.has{color:var(--accent)}.nc-chevron{font-size:11px;color:var(--text3);transition:transform .2s}.nc-row.open .nc-chevron{transform:rotate(90deg)}.nc-body{display:none;padding:4px 8px 14px 18px}.nc-row.open .nc-body{display:block}.nc-client{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;color:var(--text2);border-radius:4px;transition:background .15s}.nc-client:hover{background:rgba(255,255,255,.03)}.nc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}.nc-dot.dc{background:var(--accent)}.nc-dot.sms{background:var(--green)}.nc-dot.emora{background:var(--amber)}.nc-dot.me{background:var(--red)}.nc-client-name{color:var(--text)}.nc-client-meta{font-family:var(--mono);font-size:11px;color:var(--text3);margin-left:auto}
 .invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}.invoice-title{font-family:var(--serif);font-size:22px}.invoice-total{font-family:var(--mono);font-size:26px;color:var(--green);margin-top:6px}
 .ql-wrap{max-width:480px;margin:0 auto;padding-bottom:40px}.ql-today-badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-family:var(--mono);color:var(--text3);margin-bottom:24px}.ql-step-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:500;margin-bottom:10px}.ql-step{margin-bottom:22px}.ql-step.locked{opacity:.35;pointer-events:none}.ql-client-btn{width:100%;background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:20px;color:var(--text2);font-family:var(--sans);font-size:17px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .15s;text-align:left}.ql-client-btn.selected{border-color:var(--accent);color:var(--text);background:rgba(79,142,247,.07)}.ql-client-btn:active{transform:scale(.98)}.ql-dropdown-wrap{position:relative}.ql-dropdown{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--accent);border-radius:16px;z-index:200;box-shadow:0 16px 48px rgba(0,0,0,.6);overflow:hidden}.ql-dropdown-search{padding:12px;border-bottom:1px solid var(--border)}.ql-dropdown-search input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:16px;outline:none}.ql-dropdown-list{max-height:260px;overflow-y:auto}.ql-dropdown-item{padding:14px 18px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);font-size:15px;color:var(--text);transition:background .1s}.ql-dropdown-item:last-child{border-bottom:none}.ql-dropdown-item:active{background:var(--surface2)}.ql-big-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ql-big-btn{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:22px 14px;color:var(--text2);font-family:var(--sans);font-size:15px;font-weight:500;cursor:pointer;text-align:center;line-height:1.4;transition:all .15s}.ql-big-btn:active{transform:scale(.97)}.ql-big-btn.type-selected{border-color:var(--green);color:var(--green);background:rgba(56,201,142,.07)}.ql-big-btn.method-selected{border-color:var(--amber);color:var(--amber);background:rgba(247,164,79,.07)}.ql-big-btn-icon{font-size:26px;display:block;margin-bottom:8px}.ql-confirm-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px}.ql-confirm-row{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;border-bottom:1px solid var(--border);font-size:14px}.ql-confirm-row:last-child{border-bottom:none}.ql-confirm-label{color:var(--text3)}.ql-confirm-value{color:var(--text);font-weight:500}.ql-log-btn{width:100%;background:var(--green);border:none;border-radius:16px;padding:22px;color:#fff;font-family:var(--sans);font-size:19px;font-weight:600;cursor:pointer;letter-spacing:.01em;transition:all .15s}.ql-log-btn:active{transform:scale(.98);background:#2db87d}.ql-success{display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px}.ql-success-icon{font-size:72px;margin-bottom:20px}.ql-success-title{font-family:var(--serif);font-size:30px;margin-bottom:10px}.ql-success-sub{color:var(--text2);font-size:15px;margin-bottom:12px;line-height:1.6}.ql-success-time{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px}.ql-again-btn{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px 32px;color:var(--text);font-family:var(--sans);font-size:16px;font-weight:500;cursor:pointer;width:100%;transition:border-color .15s}
 </style>
@@ -59,6 +60,7 @@
     <button class="nav-item" onclick="showPage('invoices',this)"><span class="icon">◷</span> Invoices</button>
     <div class="nav-section">Practice</div>
     <button class="nav-item" onclick="showPage('clients',this)"><span class="icon">◑</span> Clients</button>
+    <button class="nav-item" onclick="showPage('new-clients',this)"><span class="icon">◐</span> New Clients</button>
     <button class="nav-item" onclick="showPage('supervision',this)"><span class="icon">◉</span> Supervision</button>
     <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Referrals</button>
     <button class="nav-item" onclick="showPage('statistics',this)"><span class="icon">◈</span> Statistics</button>
@@ -76,7 +78,7 @@
     <div class="stat-box"><div class="label">This Month Sessions</div><div class="value" id="d-month-sessions" style="color:var(--accent)">0</div><div class="sub" id="d-month-label">—</div></div>
     <div class="stat-box"><div class="label">This Month Income</div><div class="value" id="d-month-income" style="color:var(--green)">$0</div><div class="sub">billed this month</div></div>
   </div>
-  <div class="card"><div class="card-title">Monthly Income — 2026</div><div class="table-wrap"><table><thead><tr><th>Month</th><th>In-Person</th><th>Virtual</th><th>Sessions</th><th>Income</th></tr></thead><tbody id="d-monthly-body"></tbody></table></div></div>
+  <div class="card"><div class="card-title">Monthly Income — 2026</div><div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:500;margin-bottom:12px;">Income Progression</div><div style="position:relative;height:160px;"><canvas id="monthly-income-chart"></canvas></div></div><div class="table-wrap"><table><thead><tr><th>Month</th><th>In-Person</th><th>Virtual</th><th>Sessions</th><th>Income</th></tr></thead><tbody id="d-monthly-body"></tbody></table></div></div>
 </div>
 <div id="page-log-session" class="page">
   <div class="page-header"><h1>Log Session</h1><p>Add a session to your hour log</p></div>
@@ -121,7 +123,7 @@
   <div class="tabs"><button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button><button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button></div>
   <div class="card">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03" selected>March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="window.print()">🖨 Print</button></div></div>
-    <div class="invoice-header"><div><div class="invoice-title">Invoice</div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
+    <div class="invoice-header"><div><div style="display:flex;align-items:center;gap:10px;"><div class="invoice-title">Invoice</div><span id="inv-client-count" style="display:none;background:rgba(79,142,247,.15);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.04em;"></span></div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
     <div class="table-wrap"><table id="inv-table"><thead id="inv-thead"></thead><tbody id="inv-tbody"></tbody></table></div>
     <div id="inv-empty" class="empty" style="display:none;"><div class="empty-icon">🧾</div>No sessions for this agency and month.</div>
   </div>
@@ -131,6 +133,17 @@
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;"><div class="stat-box"><div class="label">Active</div><div class="value" id="c-active-count" style="color:var(--green)">0</div><div class="sub">currently seeing</div></div><div class="stat-box"><div class="label">Inactive</div><div class="value" id="c-inactive-count" style="color:var(--text3)">0</div><div class="sub">paused or ended</div></div></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Add Client</div><div class="form-grid"><div class="field"><label>Full Name</label><input type="text" id="c-name" placeholder="Client name"></div><div class="field"><label>Agency</label><select id="c-agency"><option value="DC">District Counseling (DC)</option><option value="SMS">Safe Mind Space (SMS)</option><option value="Emora">Emora</option><option value="ME">Private (ME)</option></select></div><div class="field"><label>Rate ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="c-rate" placeholder="0"></div></div><div class="field"><label>Method</label><select id="c-method"><option value="IP">In-Person</option><option value="V">Virtual</option></select></div><div class="field"><label>Gender</label><div style="display:flex;gap:8px;"><button type="button" id="c-gender-male" onclick="selectGender('male')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Male</button><button type="button" id="c-gender-female" onclick="selectGender('female')" style="flex:1;padding:8px;border-radius:8px;border:2px solid var(--border);background:var(--surface2);color:var(--text2);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .15s;">Female</button></div><input type="hidden" id="c-gender" value=""></div></div><div class="btn-row"><button class="btn btn-primary" onclick="addClient()">Add Client</button></div></div>
   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div class="card-title" style="margin:0;">All Clients</div><div style="display:flex;gap:6px;"><button onclick="filterClients('all',this)" class="btn btn-primary" style="font-size:11px;padding:4px 10px;">All</button><button onclick="filterClients('active',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Active</button><button onclick="filterClients('inactive',this)" class="btn btn-ghost" style="font-size:11px;padding:4px 10px;">Inactive</button></div></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Agency</th><th>Rate</th><th>Method</th><th>Gender</th><th>Last Seen</th><th>Status</th><th></th></tr></thead><tbody id="clients-tbody"></tbody></table></div><div id="clients-empty" class="empty" style="display:none;"><div class="empty-icon">👤</div>No clients yet.</div></div>
+</div>
+<div id="page-new-clients" class="page">
+  <div class="page-header"><h1>New Clients</h1><p>Clients grouped by the month of their first session</p></div>
+  <div class="card" style="margin-bottom:18px;display:flex;align-items:baseline;gap:14px;">
+    <span id="nc-ytd-count" style="font-family:var(--mono);font-size:42px;color:var(--accent);line-height:1;">0</span>
+    <span style="font-size:13px;color:var(--text2);"><span id="nc-ytd-year">2026</span> total number of new clients</span>
+  </div>
+  <div class="card">
+    <div id="nc-months"></div>
+    <div id="nc-empty" class="empty" style="display:none;"><div class="empty-icon">◐</div>No new clients yet this year.</div>
+  </div>
 </div>
 <div id="page-supervision" class="page">
   <div class="page-header"><h1>Supervision</h1><p>Tracking toward 100-hour requirement</p></div>
@@ -146,7 +159,7 @@
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div></div>
-  <div class="card" style="margin-bottom:18px;"><div class="card-title">Sessions by Agency</div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="card-title" style="margin:0;">Sessions by Agency</div><select id="agency-month-select" onchange="setAgencyView(this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer;"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03">March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option><option value="2026-07">July 2026</option><option value="2026-08">August 2026</option><option value="2026-09">September 2026</option><option value="2026-10">October 2026</option><option value="2026-11">November 2026</option><option value="2026-12">December 2026</option><option value="all">All Time</option></select></div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">In-Person vs Virtual — This Month</div><div class="grid-2"><div class="stat-box"><div class="label">In-Person</div><div class="value" id="stat-ip" style="color:var(--accent)">0</div><div class="sub">this month</div></div><div class="stat-box"><div class="label">Virtual</div><div class="value" id="stat-v" style="color:var(--green)">0</div><div class="sub">this month</div></div></div></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Caseload — Gender Breakdown</div><div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div></div>
 </div>
@@ -156,6 +169,7 @@
 <div class="modal-overlay" id="modal-edit-session"><div class="modal"><h2>Edit Session</h2><input type="hidden" id="es-id"><div class="form-grid"><div class="field"><label>Date</label><input type="date" id="es-date"></div><div class="field"><label>Client Name</label><input type="text" id="es-name"></div><div class="field"><label>Agency</label><select id="es-agency"><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option><option value="—">N/A</option></select></div><div class="field"><label>Hours</label><input type="number" id="es-hours" min="0.5" step="0.5"></div><div class="field"><label>Fee ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="es-fee" min="0"></div></div><div class="field"><label>Method</label><select id="es-method"><option value="IP">In-Person</option><option value="V">Virtual</option><option value="—">N/A</option></select></div><div class="field"><label>Description</label><select id="es-desc-sel" onchange="handleEditDescSel()"><option value="Intake session">Intake session</option><option value="Psychotherapy session">Psychotherapy session</option><option value="custom">Other</option></select></div><div class="field" id="es-custom-wrap" style="display:none;"><label>Custom</label><input type="text" id="es-custom"></div><div class="field"><label>Type</label><select id="es-type"><option value="clinical">Clinical</option><option value="supervision">Supervision</option><option value="training">Training</option></select></div><div class="field"><label>Insurance</label><input type="text" id="es-insurance"></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSession()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-session')">Cancel</button></div></div></div>
 <div class="modal-overlay" id="modal-edit-sup"><div class="modal" style="max-width:400px;"><h2>Edit Supervision</h2><input type="hidden" id="esup-id"><div class="form-grid two"><div class="field"><label>Date</label><input type="date" id="esup-date"></div><div class="field"><label>Type</label><select id="esup-type"><option value="Individual">Individual</option><option value="Group">Group</option></select></div><div class="field"><label>Hours</label><input type="number" id="esup-hours" min="0.5" step="0.5"></div><div class="field"><label>Cost ($)</label><div class="fee-wrap"><span class="dollar">$</span><input type="number" id="esup-cost"></div></div></div><div class="btn-row"><button class="btn btn-primary" onclick="saveEditSup()">Save Changes</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-sup')">Cancel</button></div></div></div>
 <div class="modal-overlay" id="modal-client-profile"><div class="modal" style="max-width:600px;"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;"><div><div style="font-family:var(--serif);font-size:22px;" id="cp-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="cp-meta">—</div></div><button class="btn btn-ghost" onclick="closeModal('modal-client-profile')">Close</button></div><div class="grid-4" style="margin-bottom:20px;"><div class="stat-box"><div class="label">Sessions</div><div class="value" id="cp-sessions" style="color:var(--accent);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Hours</div><div class="value" id="cp-hours" style="color:var(--green);font-size:22px;">0</div></div><div class="stat-box"><div class="label">Billed</div><div class="value" id="cp-billed" style="color:var(--amber);font-size:22px;">$0</div></div><div class="stat-box"><div class="label">Rate</div><div class="value" id="cp-rate" style="color:var(--text);font-size:22px;">$0</div></div></div><div class="card-title">Session History</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Method</th><th>Hrs</th><th>Fee</th></tr></thead><tbody id="cp-history"></tbody></table></div></div></div>
+<div class="modal-overlay" id="modal-edit-nc"><div class="modal" style="max-width:440px;"><h2>Edit New Client</h2><input type="hidden" id="enc-sid"><input type="hidden" id="enc-orig-name"><div class="form-grid two"><div class="field full"><label>Client Name</label><input type="text" id="enc-name"></div><div class="field full"><label>First Session Date</label><input type="date" id="enc-date"></div></div><div class="btn-row" style="justify-content:space-between;"><div style="display:flex;gap:10px;"><button class="btn btn-primary" onclick="saveEditNC()">Save</button><button class="btn btn-ghost" onclick="closeModal('modal-edit-nc')">Cancel</button></div><button class="btn" onclick="deleteNC()" style="background:transparent;border:1px solid var(--red);color:var(--red);">Delete…</button></div></div></div>
 <div id="toast" class="toast"></div>
 <script>
 // ============================================================
@@ -236,6 +250,17 @@ function renderDashboard(){
   const months=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
   let rows='';months.forEach((m,i)=>{const ms=sessions.filter(s=>s.date&&s.date.startsWith(m)&&s.type==='clinical');if(!ms.length)return;const ip=ms.filter(s=>s.method==='IP').length;const v=ms.filter(s=>s.method==='V').length;const inc=ms.reduce((a,s)=>a+(parseFloat(s.fee)||0),0);rows+=`<tr${m===monthStr?' style="background:rgba(79,142,247,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td>${ip||'\u2014'}</td><td>${v||'\u2014'}</td><td>${ms.length}</td><td style="font-family:var(--mono)">$${inc.toLocaleString()}</td></tr>`});
   document.getElementById('d-monthly-body').innerHTML=rows;
+  // Monthly income bar chart
+  const chartCanvas=document.getElementById('monthly-income-chart');
+  if(chartCanvas&&typeof Chart!=='undefined'){
+    if(window._monthlyIncomeChart)window._monthlyIncomeChart.destroy();
+    const chartMonths=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
+    const chartLabels=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const chartData=chartMonths.map(m=>sessions.filter(s=>s.date&&s.date.startsWith(m)&&s.type==='clinical').reduce((a,s)=>a+(parseFloat(s.fee)||0),0));
+    const bgColors=chartMonths.map(m=>m===monthStr?'rgba(79,142,247,0.85)':'rgba(79,142,247,0.25)');
+    const borderColors=chartMonths.map(m=>m===monthStr?'#4f8ef7':'rgba(79,142,247,0.5)');
+    window._monthlyIncomeChart=new Chart(chartCanvas,{type:'bar',data:{labels:chartLabels,datasets:[{data:chartData,backgroundColor:bgColors,borderColor:borderColors,borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y.toLocaleString()}}},scales:{x:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11}}},y:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11},callback:v=>'$'+v.toLocaleString()},beginAtZero:true}}}});
+  }
   const invDates=(_db.inv_dates||{});const remDiv=document.getElementById('invoice-reminders');const today=new Date();today.setHours(0,0,0,0);let rems='';
   ['DC','SMS'].forEach(ag=>{const d=invDates[ag]?.due;if(!d)return;const due=new Date(d);due.setHours(0,0,0,0);const diff=Math.ceil((due-today)/(1000*60*60*24));if(diff<0||diff>7)return;const color=diff<=2?'var(--red)':diff<=4?'var(--amber)':'var(--accent)';const msg=diff===0?'due today':diff===1?'due tomorrow':`due in ${diff} days`;rems+=`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">\uD83D\uDD14 ${ag==='DC'?'District Counseling':'Safe Mind Space'} Invoice \u2014 <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`});
   remDiv.innerHTML=rems;
@@ -256,7 +281,7 @@ function handleDescSelect(){const v=document.getElementById('s-desc-select').val
 
 function renderLog(){
   const sessions=load(KEYS.sessions);const search=(document.getElementById('log-search')?.value||'').toLowerCase();const agency=document.getElementById('log-agency')?.value||'';const month=document.getElementById('log-month')?.value||'';
-  let filtered=sessions.filter(s=>{if(agency&&s.agency!==agency)return false;if(month&&!(s.date||'').startsWith(month))return false;if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;return true}).sort((a,b)=>{const d=(b.date||'').localeCompare(a.date||'');return d!==0?d:(b.id||'').localeCompare(a.id||'');});
+  let filtered=sessions.filter(s=>{if(agency&&s.agency!==agency)return false;if(month&&!(s.date||'').startsWith(month))return false;if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;return true}).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const tbody=document.getElementById('log-tbody');const empty=document.getElementById('log-empty');
   if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';
   tbody.innerHTML=filtered.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${(s.name||'').replace(/'/g,"&#39;")}')">${s.name||'\u2014'}</td><td><span class="badge b-${(s.agency||'').toLowerCase()}">${s.agency||'\u2014'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.fee?'$'+s.fee:'\u2014'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'\u2014'}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc||''}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSession('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSession('${s.id}')">✕</button></td></tr>`).join('');
@@ -295,9 +320,11 @@ function renderInvoice(){
   const allSessions=load(KEYS.sessions).filter(s=>s.agency===agency);let sessions;
   if(agDates.start&&agDates.due){sessions=allSessions.filter(s=>s.date&&s.date>=agDates.start&&s.date<=agDates.due).sort((a,b)=>a.date.localeCompare(b.date))}else{sessions=allSessions.filter(s=>(s.date||'').startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date))}
   const empty=document.getElementById('inv-empty');const table=document.getElementById('inv-table');
+  const clientCountEl=document.getElementById('inv-client-count');if(clientCountEl)clientCountEl.style.display='none';
   if(!sessions.length){empty.style.display='block';table.style.display='none';document.getElementById('inv-total').textContent='$0';return}empty.style.display='none';table.style.display='table';
-  if(agency==='DC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th><th>50%</th><th>Total</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{const half=(s.fee/2).toFixed(2);total+=parseFloat(half);return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono)">$${s.fee}</td><td style="color:var(--text3)">0.5</td><td style="font-family:var(--mono);color:var(--green)">$${half}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
-  else{document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Insurance</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td>${s.insurance||'\u2014'}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
+  const uniqueClients=new Set(sessions.map(s=>s.name)).size;if(clientCountEl){clientCountEl.textContent=uniqueClients+' client'+(uniqueClients!==1?'s':'');clientCountEl.style.display='inline-block';}
+  if(agency==='DC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
+  else{document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
 }
 
 // ============================================================
@@ -320,7 +347,7 @@ function renderClients(){
 function toggleClientStatus(id){let clients=load(KEYS.clients);const idx=clients.findIndex(c=>c.id===id);if(idx===-1)return;clients[idx].status=clients[idx].status==='active'?'inactive':'active';save(KEYS.clients,clients);renderClients();populateClientLists();toast('Status updated')}
 function deleteClient(id){if(!confirm('Delete this client?'))return;let clients=load(KEYS.clients);clients=clients.filter(c=>c.id!==id);save(KEYS.clients,clients);renderClients();populateClientLists();toast('Client removed')}
 function openEditClient(id){const c=load(KEYS.clients).find(x=>x.id===id);if(!c)return;document.getElementById('ec-id').value=c.id;document.getElementById('ec-name').value=c.name;document.getElementById('ec-agency').value=c.agency;document.getElementById('ec-rate').value=c.rate;document.getElementById('ec-method').value=c.method;document.getElementById('ec-gender').value=c.gender||'';selectEditGender(c.gender||'');document.getElementById('ec-status').value=c.status||'active';openModal('modal-edit-client')}
-function saveEditClient(){const id=document.getElementById('ec-id').value;let clients=load(KEYS.clients);const idx=clients.findIndex(c=>c.id===id);if(idx===-1)return;clients[idx]={...clients[idx],name:document.getElementById('ec-name').value.trim(),agency:document.getElementById('ec-agency').value,rate:parseFloat(document.getElementById('ec-rate').value)||0,method:document.getElementById('ec-method').value,gender:document.getElementById('ec-gender').value,status:document.getElementById('ec-status').value};save(KEYS.clients,clients);closeModal('modal-edit-client');renderClients();populateClientLists();toast('Client updated')}
+function saveEditClient(){const id=document.getElementById('ec-id').value;let clients=load(KEYS.clients);const idx=clients.findIndex(c=>c.id===id);if(idx===-1)return;const oldRate=clients[idx].rate;const newRate=parseFloat(document.getElementById('ec-rate').value)||0;const clientName=clients[idx].name;clients[idx]={...clients[idx],name:document.getElementById('ec-name').value.trim(),agency:document.getElementById('ec-agency').value,rate:newRate,method:document.getElementById('ec-method').value,gender:document.getElementById('ec-gender').value,status:document.getElementById('ec-status').value};save(KEYS.clients,clients);if(newRate!==oldRate){const sessions=load(KEYS.sessions);const affected=sessions.filter(s=>s.name===clientName&&parseFloat(s.fee)===oldRate);if(affected.length&&confirm('Rate changed from $'+oldRate+' to $'+newRate+'.\n\nUpdate all '+affected.length+' past session'+(affected.length!==1?'s':'')+' for '+clientName+' to the new rate?')){const updated=sessions.map(s=>s.name===clientName&&parseFloat(s.fee)===oldRate?{...s,fee:newRate}:s);save(KEYS.sessions,updated);toast('Client updated — '+affected.length+' session'+(affected.length!==1?'s':'')+' updated to $'+newRate);}else{toast('Client updated');}}else{toast('Client updated');}closeModal('modal-edit-client');renderClients();populateClientLists();renderDashboard();}
 
 function openClientProfile(name){
   const sessions=load(KEYS.sessions).filter(s=>s.name===name).sort((a,b)=>(b.date||'').localeCompare(a.date||''));const client=load(KEYS.clients).find(c=>c.name===name);
@@ -341,7 +368,144 @@ function populateClientLists(){
 // QUICK LOG
 // ============================================================
 let _qlState={client:null,type:null,method:null};
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');if(id==='dashboard')renderDashboard();if(id==='session-log')renderLog();if(id==='clients')renderClients();if(id==='new-clients')renderNewClients();if(id==='supervision')renderSupervision();if(id==='referrals')renderReferrals();if(id==='statistics')renderStatistics();if(id==='invoices')renderInvoice();if(id==='quick-log')initQuickLog()}
+
+function renderNewClients(){
+  const sessions=load(KEYS.sessions);
+  const clients=load(KEYS.clients);
+  const now=new Date();
+  const year=now.getFullYear();
+  const currentMonth=now.getMonth();
+
+  // Build first-session-date map per client (track session id too).
+  // Only count true client-facing sessions: exclude type 'training' and anything
+  // whose description is not 'Intake session' or 'Psychotherapy session'.
+  const firstSeen={};
+  sessions.forEach(s=>{
+    if(!s.name||!s.date)return;
+    if(s.type==='training')return;
+    const desc=(s.desc||'').trim();
+    if(desc!=='Intake session'&&desc!=='Psychotherapy session')return;
+    if(!firstSeen[s.name]||s.date<firstSeen[s.name].date){
+      firstSeen[s.name]={date:s.date,agency:s.agency||'—',sessionId:s.id};
+    }
+  });
+
+  // Group by month for the current year
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const byMonth=monthNames.map(()=>[]);
+  Object.keys(firstSeen).forEach(name=>{
+    const f=firstSeen[name];
+    const d=new Date(f.date+'T00:00:00');
+    if(d.getFullYear()!==year)return;
+    // Prefer the agency saved on the client record; fall back to first-session agency
+    const clientRec=clients.find(c=>c.name===name);
+    const agency=(clientRec&&clientRec.agency)||f.agency;
+    byMonth[d.getMonth()].push({name,date:f.date,agency,sessionId:f.sessionId});
+  });
+
+  // Sort each month by date
+  byMonth.forEach(arr=>arr.sort((a,b)=>a.date.localeCompare(b.date)));
+
+  // Render rows
+  const ytd=byMonth.reduce((s,m)=>s+m.length,0);
+  document.getElementById('nc-ytd-count').textContent=ytd;
+  document.getElementById('nc-ytd-year').textContent=year;
+  const container=document.getElementById('nc-months');
+  const empty=document.getElementById('nc-empty');
+  if(ytd===0){container.innerHTML='';empty.style.display='block';return}
+  empty.style.display='none';
+
+  // Find the busiest month for proportional bar scaling
+  const maxCount=Math.max(...byMonth.map(m=>m.length),1);
+
+  container.innerHTML=monthNames.map((mName,idx)=>{
+    const clientsInMonth=byMonth[idx];
+    const count=clientsInMonth.length;
+    const isCurrent=idx===currentMonth;
+    const hasClients=count>0;
+    // Progress bar width relative to the busiest month
+    const barPct=hasClients?(count/maxCount)*100:0;
+    const body=hasClients?clientsInMonth.map(c=>{
+      const agencyKey=(c.agency||'').toLowerCase();
+      const validDot=['dc','sms','emora','me'].includes(agencyKey)?agencyKey:'me';
+      return `<div class="nc-client" onclick="openEditNC('${(c.name||'').replace(/'/g,"&#39;")}','${c.sessionId}')" style="cursor:pointer;"><span class="nc-dot ${validDot}"></span><span class="nc-client-name">${c.name}</span><span class="nc-client-meta">${fmtDate(c.date)} · ${c.agency||'—'}</span></div>`;
+    }).join(''):`<div style="color:var(--text3);font-size:12px;padding:4px 0;">No new clients this month.</div>`;
+    return `<div class="nc-row${hasClients?'':' empty-row'}" data-idx="${idx}"><div class="nc-head" onclick="ncToggle(${idx})"><span class="nc-month${isCurrent?' current':''}">${mName}${isCurrent?' · Current':''}</span><div class="nc-middle"><div class="nc-bar"><div class="nc-bar-fill" style="width:${barPct}%"></div></div></div><div class="nc-right"><span class="nc-count${hasClients?' has':''}">${count}</span><span class="nc-chevron">▸</span></div></div><div class="nc-body">${body}</div></div>`;
+  }).join('');
+
+  // Auto-expand the current month on first render
+  const currentRow=container.querySelector(`.nc-row[data-idx="${currentMonth}"]`);
+  if(currentRow&&byMonth[currentMonth].length)currentRow.classList.add('open');
+}
+
+function ncToggle(idx){
+  const row=document.querySelector(`#nc-months .nc-row[data-idx="${idx}"]`);
+  if(row)row.classList.toggle('open');
+}
+
+function openEditNC(name,sessionId){
+  // Decode any HTML-escaped apostrophes from the onclick attribute
+  const decoded=name.replace(/&#39;/g,"'");
+  document.getElementById('enc-sid').value=sessionId;
+  document.getElementById('enc-orig-name').value=decoded;
+  document.getElementById('enc-name').value=decoded;
+  const sessions=load(KEYS.sessions);
+  const s=sessions.find(x=>x.id===sessionId);
+  document.getElementById('enc-date').value=(s&&s.date)||'';
+  openModal('modal-edit-nc');
+}
+
+function saveEditNC(){
+  const sessionId=document.getElementById('enc-sid').value;
+  const origName=document.getElementById('enc-orig-name').value;
+  const newName=document.getElementById('enc-name').value.trim();
+  const newDate=document.getElementById('enc-date').value;
+  if(!newName){toast('Name cannot be empty',true);return}
+  if(!newDate){toast('Date cannot be empty',true);return}
+  // Update the first session's date
+  let sessions=load(KEYS.sessions);
+  const idx=sessions.findIndex(s=>s.id===sessionId);
+  if(idx===-1){toast('Session not found',true);return}
+  sessions[idx]={...sessions[idx],date:newDate};
+  // If name changed, rename across ALL sessions and the client roster
+  if(newName!==origName){
+    sessions=sessions.map(s=>s.name===origName?{...s,name:newName}:s);
+    let clients=load(KEYS.clients);
+    const cIdx=clients.findIndex(c=>c.name===origName);
+    if(cIdx!==-1){clients[cIdx]={...clients[cIdx],name:newName};save(KEYS.clients,clients);populateClientLists();}
+  }
+  // Also update the edited session's name if needed (covered by map above)
+  save(KEYS.sessions,sessions);
+  closeModal('modal-edit-nc');
+  renderNewClients();
+  renderDashboard();
+  toast('Updated');
+}
+
+function deleteNC(){
+  const sessionId=document.getElementById('enc-sid').value;
+  const name=document.getElementById('enc-orig-name').value;
+  const choice=prompt(`Delete options for "${name}":\n\n1 = Remove just the first session (client may move to a different month, or disappear if no other sessions)\n2 = Remove the client completely (all sessions + roster entry)\n\nType 1 or 2, or cancel:`);
+  if(choice!=='1'&&choice!=='2')return;
+  let sessions=load(KEYS.sessions);
+  if(choice==='1'){
+    sessions=sessions.filter(s=>s.id!==sessionId);
+    save(KEYS.sessions,sessions);
+    toast('First session removed');
+  }else{
+    sessions=sessions.filter(s=>s.name!==name);
+    save(KEYS.sessions,sessions);
+    let clients=load(KEYS.clients);
+    clients=clients.filter(c=>c.name!==name);
+    save(KEYS.clients,clients);
+    populateClientLists();
+    toast(name+' removed');
+  }
+  closeModal('modal-edit-nc');
+  renderNewClients();
+  renderDashboard();
+}
 function initQuickLog(){const now=new Date();const[y,m,d]=now.toISOString().split('T')[0].split('-');document.getElementById('ql-today-label').textContent=now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});document.getElementById('qlc-date').textContent=m+'/'+d+'/'+y;qlResetForm();qlPopulateClients()}
 function qlPopulateClients(){const clients=load(KEYS.clients).filter(c=>c.status==='active').sort((a,b)=>a.name.localeCompare(b.name));const list=document.getElementById('ql-list');if(!list)return;list.innerHTML=clients.map(c=>`<div class="ql-dropdown-item" onclick='qlSelectClient(${JSON.stringify(c).replace(/'/g,"&#39;")})'><span>${c.name}</span><span class="badge b-${c.agency.toLowerCase()}">${c.agency}</span></div>`).join('')}
 function qlToggleDropdown(){const dd=document.getElementById('ql-client-dropdown');const isOpen=dd.style.display==='block';if(isOpen){dd.style.display='none';return}dd.style.display='block';document.getElementById('ql-client-search').value='';qlFilterClients('');setTimeout(()=>document.getElementById('ql-client-search').focus(),100)}
@@ -387,13 +551,30 @@ function renderStatistics(){
   const weekSessions=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;const weekEarned=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
   document.getElementById('stats-boxes').innerHTML=`<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions YTD</div><div class="value" style="color:var(--accent)">${totalYTD}</div><div class="sub">in 2026</div></div><div class="stat-box"><div class="label">Earned YTD</div><div class="value" style="color:var(--green)">$${earnedYTD.toLocaleString()}</div><div class="sub">in 2026</div></div></div><div style="grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;"></div><div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions This Week</div><div class="value" style="color:var(--accent)">${weekSessions}</div><div class="sub">Mon \u2014 Sun</div></div><div class="stat-box"><div class="label">Earned This Week</div><div class="value" style="color:var(--green)">$${weekEarned.toLocaleString()}</div><div class="sub">Mon \u2014 Sun</div></div></div>`;
   const agencies=['DC','SMS','Emora','ME'];const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};const agColors={DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
-  const clinicalSessions=sessions.filter(s=>s.type==='clinical');const total=clinicalSessions.length;const agData=agencies.map(a=>({a,label:agNames[a],count:clinicalSessions.filter(s=>s.agency===a).length,income:clinicalSessions.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
-  const canvas=document.getElementById('agency-chart');if(canvas&&typeof Chart!=='undefined'){if(window._agencyChart)window._agencyChart.destroy();window._agencyChart=new Chart(canvas,{type:'doughnut',data:{labels:agData.map(d=>d.label),datasets:[{data:agData.map(d=>d.count),backgroundColor:agData.map(d=>d.color),borderWidth:2,borderColor:'#181c27'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} sessions (${Math.round((ctx.parsed/total)*100)}%)`}}}}})}
-  document.getElementById('agency-legend').innerHTML=agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:18px;">${d.count} \u00b7 <span style="font-size:17px;">${total?Math.round((d.count/total)*100):0}%</span></div><div style="font-family:var(--mono);font-size:15px;color:var(--green);">$${d.income.toLocaleString()}</div></div></div>`).join('');
+  const sel=document.getElementById('agency-month-select');if(sel&&!sel._initialized){sel.value=monthStr;sel._initialized=true;}
+  const selectedVal=(sel&&sel.value)||monthStr;
+  renderAgencyChart(sessions,selectedVal);
   const monthSessions=sessions.filter(s=>(s.date||'').startsWith(monthStr)&&s.type==='clinical');document.getElementById('stat-ip').textContent=monthSessions.filter(s=>s.method==='IP').length;document.getElementById('stat-v').textContent=monthSessions.filter(s=>s.method==='V').length;
   const active=clients.filter(c=>c.status==='active');const male=active.filter(c=>c.gender==='male').length;const female=active.filter(c=>c.gender==='female').length;const unknown=active.filter(c=>!c.gender||c.gender==='unknown').length;const tc=active.length;
   const gBar=(label,count,color)=>{if(!count)return'';const pct=tc?Math.round((count/tc)*100):0;return`<div style="flex:1;min-width:100px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">${label}</div><div style="font-family:var(--mono);font-size:28px;color:var(--text);margin-bottom:8px;">${count}</div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-size:11px;color:var(--text3);margin-top:5px;font-family:var(--mono)">${pct}%</div></div>`};
   document.getElementById('gender-stats').innerHTML=gBar('Male',male,'var(--accent)')+gBar('Female',female,'var(--pink)')+(unknown?gBar('Unknown',unknown,'var(--text3)'):'');
+}
+
+// ============================================================
+// AGENCY CHART TOGGLE
+// ============================================================
+function setAgencyView(val){
+  const sessions=load(KEYS.sessions);
+  renderAgencyChart(sessions,val);
+}
+function renderAgencyChart(sessions,selectedVal){
+  const agencies=['DC','SMS','Emora','ME'];const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};const agColors={DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
+  const pool=selectedVal==='all'?sessions.filter(s=>s.type==='clinical'):sessions.filter(s=>s.type==='clinical'&&(s.date||'').startsWith(selectedVal));
+  const total=pool.length;
+  const agData=agencies.map(a=>({a,label:agNames[a],count:pool.filter(s=>s.agency===a).length,income:pool.filter(s=>s.agency===a).reduce((x,s)=>x+(parseFloat(s.fee)||0),0),color:agColors[a]})).filter(d=>d.count>0);
+  const canvas=document.getElementById('agency-chart');if(canvas&&typeof Chart!=='undefined'){if(window._agencyChart)window._agencyChart.destroy();window._agencyChart=new Chart(canvas,{type:'doughnut',data:{labels:agData.map(d=>d.label),datasets:[{data:agData.map(d=>d.count),backgroundColor:agData.map(d=>d.color),borderWidth:2,borderColor:'#181c27'}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed} sessions (${Math.round((ctx.parsed/total)*100)}%)`}}}}})}
+  const emptyLabel=selectedVal==='all'?'No sessions logged yet.':'No sessions logged for this month.';
+  document.getElementById('agency-legend').innerHTML=agData.length?agData.map(d=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);"><div style="display:flex;align-items:center;gap:10px;"><span style="width:11px;height:11px;border-radius:3px;background:${d.color};flex-shrink:0;"></span><span style="font-size:13px;">${d.label}</span></div><div style="text-align:right;"><div style="font-family:var(--mono);font-size:18px;">${d.count} \u00b7 <span style="font-size:17px;">${total?Math.round((d.count/total)*100):0}%</span></div><div style="font-family:var(--mono);font-size:15px;color:var(--green);">$${d.income.toLocaleString()}</div></div></div>`).join(''):`<div style="color:var(--text3);font-size:13px;padding:12px 0;">${emptyLabel}</div>`;
 }
 
 // ============================================================
