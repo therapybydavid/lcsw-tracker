@@ -63,7 +63,6 @@
     <button class="nav-item" onclick="showPage('new-clients',this)"><span class="icon">◐</span> New Clients</button>
     <button class="nav-item" onclick="showPage('supervision',this)"><span class="icon">◉</span> Supervision</button>
     <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Referrals</button>
-    <button class="nav-item" onclick="showPage('statistics',this)"><span class="icon">◈</span> Statistics</button>
     <button class="nav-item" onclick="showPage('private-pay',this)"><span class="icon">◆</span> Private Pay</button>
   </nav>
 </aside>
@@ -80,6 +79,9 @@
     <div class="stat-box"><div class="label">This Month Income</div><div class="value" id="d-month-income" style="color:var(--green)">$0</div><div class="sub">billed this month</div></div>
   </div>
   <div class="card"><div class="card-title">Monthly Income — 2026</div><div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:500;margin-bottom:12px;">Income Progression</div><div style="position:relative;height:160px;"><canvas id="monthly-income-chart"></canvas></div></div><div class="table-wrap"><table><thead><tr><th>Month</th><th>In-Person</th><th>Virtual</th><th>Sessions</th><th>Income</th></tr></thead><tbody id="d-monthly-body"></tbody></table></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div><div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:500;margin-bottom:10px;">Sessions &amp; Income — Past 8 Weeks</div><div style="position:relative;height:220px;"><canvas id="weekly-sessions-chart"></canvas></div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="card-title" style="margin:0;">Sessions by Agency</div><select id="agency-month-select" onchange="setAgencyView(this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer;"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03">March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option><option value="2026-07">July 2026</option><option value="2026-08">August 2026</option><option value="2026-09">September 2026</option><option value="2026-10">October 2026</option><option value="2026-11">November 2026</option><option value="2026-12">December 2026</option><option value="all">All Time</option></select></div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Caseload — Gender Breakdown</div><div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div></div>
 </div>
 <div id="page-log-session" class="page">
   <div class="page-header"><h1>Log Session</h1><p>Add a session to your hour log</p></div>
@@ -159,7 +161,7 @@
 </div>
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
-  <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div></div>
+  <div class="card" style="margin-bottom:18px;"><div class="card-title">Session Stats</div><div style="display:grid;grid-template-columns:1fr;gap:8px;" id="stats-boxes"></div><div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:500;margin-bottom:10px;">Sessions &amp; Income — Past 8 Weeks</div><div style="position:relative;height:220px;"><canvas id="weekly-sessions-chart"></canvas></div></div></div>
   <div class="card" style="margin-bottom:18px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;"><div class="card-title" style="margin:0;">Sessions by Agency</div><select id="agency-month-select" onchange="setAgencyView(this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-family:var(--sans);font-size:12px;outline:none;cursor:pointer;"><option value="2026-01">January 2026</option><option value="2026-02">February 2026</option><option value="2026-03">March 2026</option><option value="2026-04">April 2026</option><option value="2026-05">May 2026</option><option value="2026-06">June 2026</option><option value="2026-07">July 2026</option><option value="2026-08">August 2026</option><option value="2026-09">September 2026</option><option value="2026-10">October 2026</option><option value="2026-11">November 2026</option><option value="2026-12">December 2026</option><option value="all">All Time</option></select></div><div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;"><div style="position:relative;width:180px;height:180px;flex-shrink:0;"><canvas id="agency-chart"></canvas></div><div id="agency-legend" style="flex:1;min-width:160px;"></div></div></div>
   <div class="card" style="margin-bottom:18px;"><div class="card-title">Caseload — Gender Breakdown</div><div id="gender-stats" style="display:flex;gap:24px;flex-wrap:wrap;"></div></div>
 </div>
@@ -167,39 +169,22 @@
 <div id="page-private-pay" class="page">
   <div class="page-header"><h1>Private Pay</h1><p>Your independent income — ME clients only</p></div>
   <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Client Goal</div>
-    <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;margin-bottom:14px;">
-      <div style="flex:1;min-width:200px;">
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px;">
-          <span id="pp-active-count" style="font-family:var(--mono);font-size:42px;color:var(--red);line-height:1;">0</span>
-          <span style="font-family:var(--mono);font-size:18px;color:var(--text3);">/ <span id="pp-goal-display">10</span> clients</span>
-        </div>
-        <div class="progress-bar" style="margin-bottom:6px;"><div id="pp-goal-bar" class="progress-fill" style="background:var(--red);width:0%;"></div></div>
-        <div id="pp-goal-pct" style="font-size:11px;color:var(--text3);font-family:var(--mono);">0% of goal</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <label style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-weight:500;">Set Target</label>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <input type="number" id="pp-goal-input" min="1" max="30" value="10" style="width:70px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;text-align:center;">
-          <button class="btn btn-ghost" onclick="savePPGoal()" style="font-size:12px;">Save</button>
-        </div>
-      </div>
-    </div>
-    <div id="pp-client-list" style="border-top:1px solid var(--border);padding-top:12px;"></div>
+    <div class="card-title">Active Clients</div>
+    <div id="pp-client-list"></div>
   </div>
   <div class="card" style="margin-bottom:18px;">
     <div class="card-title">Income Breakdown</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
-      <div class="stat-box"><div class="label">This Week</div><div class="value" id="pp-week-income" style="color:var(--red);">$0</div><div class="sub" id="pp-week-sessions">0 sessions</div></div>
-      <div class="stat-box"><div class="label">This Month</div><div class="value" id="pp-month-income" style="color:var(--red);">$0</div><div class="sub" id="pp-month-sessions">0 sessions</div></div>
-      <div class="stat-box"><div class="label">YTD 2026</div><div class="value" id="pp-ytd-income" style="color:var(--red);">$0</div><div class="sub" id="pp-ytd-sessions">0 sessions</div></div>
+      <div class="stat-box"><div class="label">This Week</div><div class="value" id="pp-week-income" style="color:var(--green);">$0</div><div class="sub" id="pp-week-sessions">0 sessions</div></div>
+      <div class="stat-box"><div class="label">This Month</div><div class="value" id="pp-month-income" style="color:var(--green);">$0</div><div class="sub" id="pp-month-sessions">0 sessions</div></div>
+      <div class="stat-box"><div class="label">YTD 2026</div><div class="value" id="pp-ytd-income" style="color:var(--green);">$0</div><div class="sub" id="pp-ytd-sessions">0 sessions</div></div>
     </div>
     <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline;">
       <span style="font-size:12px;color:var(--text2);">Private pay as % of total YTD income</span>
-      <span id="pp-pct-label" style="font-family:var(--mono);font-size:20px;color:var(--red);">0%</span>
+      <span id="pp-pct-label" style="font-family:var(--mono);font-size:20px;color:var(--green);">0%</span>
     </div>
     <div style="height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:6px;">
-      <div id="pp-income-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),var(--amber));width:0%;transition:width .6s;"></div>
+      <div id="pp-income-bar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--accent));width:0%;transition:width .6s;"></div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:var(--mono);">
       <span>ME: $<span id="pp-bar-me">0</span></span>
@@ -313,6 +298,7 @@ function renderDashboard(){
   const invDates=(_db.inv_dates||{});const remDiv=document.getElementById('invoice-reminders');const today=new Date();today.setHours(0,0,0,0);let rems='';
   ['DC','SMS'].forEach(ag=>{const d=invDates[ag]?.due;if(!d)return;const due=new Date(d);due.setHours(0,0,0,0);const diff=Math.ceil((due-today)/(1000*60*60*24));if(diff<0||diff>7)return;const color=diff<=2?'var(--red)':diff<=4?'var(--amber)':'var(--accent)';const msg=diff===0?'due today':diff===1?'due tomorrow':`due in ${diff} days`;rems+=`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">\uD83D\uDD14 ${ag==='DC'?'District Counseling':'Safe Mind Space'} Invoice \u2014 <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`});
   remDiv.innerHTML=rems;
+  renderStatistics();
 }
 
 // ============================================================
@@ -599,6 +585,27 @@ function renderStatistics(){
   const totalYTD=sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical').length;const earnedYTD=sessions.filter(s=>(s.date||'').startsWith('2026')&&s.type==='clinical'&&parseFloat(s.fee)>0).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
   const weekSessions=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).length;const weekEarned=sessions.filter(s=>s.date&&s.type==='clinical'&&parseFloat(s.fee)>0&&s.date>=monStr&&s.date<=sunStr).reduce((a,s)=>a+(parseFloat(s.fee)||0),0);
   document.getElementById('stats-boxes').innerHTML=`<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions YTD</div><div class="value" style="color:var(--accent)">${totalYTD}</div><div class="sub">in 2026</div></div><div class="stat-box"><div class="label">Earned YTD</div><div class="value" style="color:var(--green)">$${earnedYTD.toLocaleString()}</div><div class="sub">in 2026</div></div></div><div style="grid-column:1/-1;height:1px;background:var(--border);margin:2px 0;"></div><div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="stat-box"><div class="label">Sessions This Week</div><div class="value" style="color:var(--accent)">${weekSessions}</div><div class="sub">Mon \u2014 Sun</div></div><div class="stat-box"><div class="label">Earned This Week</div><div class="value" style="color:var(--green)">$${weekEarned.toLocaleString()}</div><div class="sub">Mon \u2014 Sun</div></div></div>`;
+  // Combined weekly sessions + income chart (past 8 weeks)
+  if(window._weeklyIncomeChart){window._weeklyIncomeChart.destroy();window._weeklyIncomeChart=null;}
+  const weekCanvas=document.getElementById('weekly-sessions-chart');
+  if(weekCanvas&&typeof Chart!=='undefined'){
+    if(window._weeklySessionsChart)window._weeklySessionsChart.destroy();
+    const wkLabels=[],wkData=[],wiData=[],wkBg=[],wkBorder=[];
+    const dayOfWk=now.getDay();const diffToMon=dayOfWk===0?-6:1-dayOfWk;
+    const curMon=new Date(now);curMon.setDate(now.getDate()+diffToMon);curMon.setHours(0,0,0,0);
+    for(let i=7;i>=0;i--){
+      const ws=new Date(curMon);ws.setDate(curMon.getDate()-i*7);
+      const we=new Date(ws);we.setDate(ws.getDate()+6);
+      const wsStr=ws.toISOString().split('T')[0];const weStr=we.toISOString().split('T')[0];
+      const wkSess=sessions.filter(s=>s.date&&s.type==='clinical'&&s.date>=wsStr&&s.date<=weStr);
+      wkData.push(wkSess.length);
+      wiData.push(wkSess.reduce((a,s)=>a+(parseFloat(s.fee)||0),0));
+      wkLabels.push(ws.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+      const cur=i===0;wkBg.push(cur?'rgba(79,142,247,0.85)':'rgba(79,142,247,0.25)');wkBorder.push(cur?'#4f8ef7':'rgba(79,142,247,0.5)');
+    }
+    const combinedPlugin={id:'wkCombined',afterDatasetsDraw(chart){const{ctx,data}=chart;ctx.save();data.datasets[0].data.forEach((val,i)=>{const bar=chart.getDatasetMeta(0).data[i];if(val>0){ctx.fillStyle='#ffffff';ctx.font='700 15px DM Mono, monospace';ctx.textAlign='center';ctx.textBaseline='bottom';ctx.fillText(val,bar.x,bar.y-4);}const inc=wiData[i];if(inc>0){ctx.fillStyle='#38c98e';ctx.font='600 13px DM Mono, monospace';ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText('$'+inc.toLocaleString(),bar.x,chart.scales.x.top+5);}});ctx.restore();}};
+    window._weeklySessionsChart=new Chart(weekCanvas,{type:'bar',data:{labels:wkLabels,datasets:[{data:wkData,backgroundColor:wkBg,borderColor:wkBorder,borderWidth:1.5,borderRadius:4,barPercentage:0.85,categoryPercentage:0.9}]},plugins:[combinedPlugin],options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:24,bottom:26}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.parsed.y+' sessions · $'+(wiData[ctx.dataIndex]||0).toLocaleString()}}},scales:{x:{grid:{display:false},ticks:{color:'#8892a8',font:{size:11},padding:20}},y:{display:false,beginAtZero:true}}}});
+  }
   const agencies=['DC','SMS','Emora','ME'];const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private'};const agColors={DC:'#4f8ef7',SMS:'#38c98e',Emora:'#f7a44f',ME:'#f75f5f'};
   const sel=document.getElementById('agency-month-select');if(sel&&!sel._initialized){sel.value=monthStr;sel._initialized=true;}
   const selectedVal=(sel&&sel.value)||monthStr;
