@@ -9,7 +9,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
+#login-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:1000;align-items:center;justify-content:center;}
+#login-screen.show{display:flex;}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:360px;max-width:95vw;}
+.login-box h1{font-family:var(--serif);font-size:26px;font-weight:400;margin-bottom:6px;}
+.login-box p{font-size:13px;color:var(--text3);margin-bottom:28px;}
+.login-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.login-field label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);font-weight:500;}
+.login-field input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none;transition:border-color .15s;}
+.login-field input:focus{border-color:var(--accent);}
+.login-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s;}
+.login-btn:hover{background:#3a7de8;}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;text-align:center;min-height:16px;}
+</style>
 :root{--bg:#0f1117;--surface:#181c27;--surface2:#1e2333;--border:#2a3045;--accent:#4f8ef7;--green:#38c98e;--amber:#f7a44f;--red:#f75f5f;--pink:#e879a0;--text:#e8eaf2;--text2:#8892a8;--text3:#5a6278;--serif:'DM Serif Display',serif;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;--radius:12px}
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
 .app{display:flex;min-height:100vh}.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:100;overflow-y:auto}.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
@@ -37,6 +51,23 @@
 </style>
 </head>
 <body>
+<div id="login-screen">
+  <div class="login-box">
+    <h1>LCSW Tracker</h1>
+    <p>David Robles — Private Access</p>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
 <div class="app">
 <aside class="sidebar">
   <div class="sidebar-logo">
@@ -213,6 +244,33 @@ const firebaseConfig={apiKey:"AIzaSyARzjrwt_Asr-_ca5bBYUBoFUMKM8sRAFc",authDomai
 firebase.initializeApp(firebaseConfig);
 const fbDb=firebase.database();
 const fbRef=fbDb.ref('lcsw_tracker');
+const fbAuth=firebase.auth();
+fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  errEl.textContent='';
+  try{
+    await fbAuth.signInWithEmailAndPassword(email,password);
+  }catch(e){
+    errEl.textContent='Invalid email or password. Please try again.';
+  }
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').classList.contains('show'))doLogin();
+});
+
+fbAuth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('login-screen').classList.remove('show');
+    boot();
+  }else{
+    document.getElementById('login-screen').classList.add('show');
+  }
+});
 
 // ============================================================
 // DATA — Firebase Realtime Database
@@ -699,7 +757,6 @@ function renderPrivatePay(){
   if(hasAny){tbody.innerHTML=rows;empty.style.display='none';}else{tbody.innerHTML='';empty.style.display='block';}
 }
 
-boot();
 </script>
 </body>
 </html>
