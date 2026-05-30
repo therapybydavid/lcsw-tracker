@@ -92,7 +92,7 @@
     <button class="nav-item" onclick="showPage('clients',this)"><span class="icon">◑</span> Clients</button>
     <button class="nav-item" onclick="showPage('new-clients',this)"><span class="icon">◐</span> New Clients</button>
     <button class="nav-item" onclick="showPage('supervision',this)"><span class="icon">◉</span> Supervision</button>
-    <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Referrals</button>
+    <button class="nav-item" onclick="showPage('referrals',this)"><span class="icon">◎</span> Sources</button>
     <button class="nav-item" onclick="showPage('private-pay',this)"><span class="icon">◆</span> Private Pay</button>
     <div class="nav-section">Local</div>
     <a class="nav-item" href="http://localhost:8083/Clients/lcsw-dashboard.html" target="_blank" style="text-decoration:none;"><span class="icon">📁</span> Client Files</a>
@@ -187,9 +187,17 @@
   <div class="card"><div class="card-title">Supervision Log</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Hours</th><th>Cost</th><th></th></tr></thead><tbody id="sup-tbody"></tbody></table></div><div id="sup-empty" class="empty" style="display:none;"><div class="empty-icon">📚</div>No supervision logged yet.</div></div>
 </div>
 <div id="page-referrals" class="page">
-  <div class="page-header"><h1>Referral Sources</h1><p>Track where your clients come from</p></div>
-  <div class="card" style="margin-bottom:18px;"><div class="card-title">Add Referral</div><div class="form-grid"><div class="field"><label>Client Name</label><input type="text" id="ref-name" placeholder="Full name"></div><div class="field"><label>Source</label><select id="ref-source"><option value="Psychology Today">Psychology Today</option><option value="Therapist.com">Therapist.com</option><option value="Zocdoc">Zocdoc</option><option value="Open Path">Open Path</option><option value="Mental Health Match">Mental Health Match</option><option value="Word of Mouth">Word of Mouth</option><option value="Other">Other</option></select></div><div class="field"><label>Status</label><select id="ref-status"><option value="converted">Converted</option><option value="pending">Pending</option><option value="declined">Declined</option></select></div></div><div class="btn-row"><button class="btn btn-primary" onclick="addReferral()">Add Referral</button></div></div>
-  <div id="ref-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;"></div>
+  <div class="page-header"><h1>Client Sources</h1><p>Where your caseload comes from</p></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;">
+    <div class="stat-box"><div class="label">Total Active</div><div class="value" id="src-total" style="color:var(--text)">0</div><div class="sub">clients</div></div>
+    <div class="stat-box"><div class="label">Agency</div><div class="value" id="src-agency-count" style="color:var(--accent)">0</div><div class="sub">DC · SMS · Emora</div></div>
+    <div class="stat-box"><div class="label">Private Pay</div><div class="value" id="src-pp-count" style="color:var(--pink)">0</div><div class="sub">ME clients</div></div>
+    <div class="stat-box"><div class="label">Missing Source</div><div class="value" id="src-nosource-count" style="color:var(--amber)">0</div><div class="sub">need to fill in</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card"><div class="card-title">Agencies</div><div id="src-agencies"></div></div>
+    <div class="card"><div class="card-title">Private Pay Sources</div><div id="src-sources"></div></div>
+  </div>
 </div>
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
@@ -623,18 +631,37 @@ function openEditSup(id){const s=load(KEYS.supervision).find(x=>x.id===id);if(!s
 function saveEditSup(){const id=document.getElementById('esup-id').value;let sup=load(KEYS.supervision);const idx=sup.findIndex(s=>s.id===id);if(idx===-1)return;sup[idx]={...sup[idx],date:document.getElementById('esup-date').value,type:document.getElementById('esup-type').value,hours:parseFloat(document.getElementById('esup-hours').value)||0,cost:parseFloat(document.getElementById('esup-cost').value)||0};save(KEYS.supervision,sup);closeModal('modal-edit-sup');renderSupervision();toast('Updated')}
 
 // ============================================================
-// REFERRALS
+// SOURCES (replaces Referrals)
 // ============================================================
-function addReferral(){const name=document.getElementById('ref-name').value.trim();if(!name){toast('Please enter a name',true);return}const refs=load(KEYS.referrals);refs.push({id:uid(),name,source:document.getElementById('ref-source').value,status:document.getElementById('ref-status').value});save(KEYS.referrals,refs);document.getElementById('ref-name').value='';toast('Referral added');renderReferrals()}
-function updateReferralStatus(id,status){let refs=load(KEYS.referrals);const idx=refs.findIndex(r=>r.id===id);if(idx===-1)return;refs[idx].status=status;save(KEYS.referrals,refs);renderReferrals();toast('Status updated')}
-function deleteReferral(id){if(!confirm('Delete this referral?'))return;let refs=load(KEYS.referrals);refs=refs.filter(r=>r.id!==id);save(KEYS.referrals,refs);renderReferrals();toast('Referral deleted')}
 
 function renderReferrals(){
-  const refs=load(KEYS.referrals);const sources=['Psychology Today','Therapist.com','Open Path','Mental Health Match','Word of Mouth','Other'];const dotColor={converted:'var(--green)',pending:'var(--amber)',declined:'var(--red)'};
-  const allCounts=sources.map(s=>({s,count:refs.filter(r=>r.source===s&&r.status==='converted').length}));const maxConv=Math.max(...allCounts.map(x=>x.count),1);const topSource=allCounts.find(x=>x.count===maxConv&&maxConv>0)?.s;
-  const grid=document.getElementById('ref-grid');
-  grid.innerHTML=sources.map(src=>{const all=refs.filter(r=>r.source===src);if(!all.length)return'';const conv=all.filter(r=>r.status==='converted').length;const pend=all.filter(r=>r.status==='pending').length;const decl=all.filter(r=>r.status==='declined').length;const total=all.length;const rate=total?Math.round((conv/total)*100):0;const isTop=src===topSource;
-    return`<div style="background:var(--surface);border:1px solid ${isTop?'var(--green)':'var(--border)'};border-radius:12px;padding:16px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-size:13px;font-weight:600;">${src}</div>${isTop?'<span style="font-size:10px;color:var(--green);background:rgba(56,201,142,0.1);padding:2px 8px;border-radius:4px;font-weight:600;letter-spacing:0.05em;">Most Fruitful</span>':''}</div>${[['Converted',conv,'var(--green)'],['Pending',pend,'var(--amber)'],['Declined',decl,'var(--red)']].map(([label,count,color])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><div style="font-size:11px;color:var(--text3);width:60px;">${label}</div><div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;"><div style="width:${total?(count/total)*100:0}%;height:100%;background:${color};border-radius:3px;"></div></div><div style="font-family:var(--mono);font-size:11px;color:var(--text2);width:14px;text-align:right;">${count}</div></div>`).join('')}<div style="font-family:var(--mono);font-size:22px;color:var(--text);margin-top:12px;">${rate}%</div><div style="font-size:11px;color:var(--text3);">conversion \u00b7 ${total} referral${total!==1?'s':''}</div><div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">${all.map(c=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12.5px;color:var(--text2);border-bottom:1px solid rgba(42,48,69,0.3);"><span>${c.name}</span><div style="display:flex;align-items:center;gap:6px;"><select onchange="updateReferralStatus('${c.id}',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;color:var(--text2);font-family:var(--sans);font-size:11px;outline:none;cursor:pointer;"><option value="converted" ${c.status==='converted'?'selected':''}>Converted</option><option value="pending" ${c.status==='pending'?'selected':''}>Pending</option><option value="declined" ${c.status==='declined'?'selected':''}>Declined</option></select><span style="width:7px;height:7px;border-radius:50%;background:${dotColor[c.status]||'var(--text3)'};flex-shrink:0;display:inline-block;"></span><button onclick="deleteReferral('${c.id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 2px;opacity:0.6;" title="Delete">✕</button></div></div>`).join('')}</div></div>`}).join('');
+  const clients=load(KEYS.clients);
+  const active=clients.filter(c=>c.status==='active');
+  const agencyClients=active.filter(c=>c.agency!=='ME');
+  const ppClients=active.filter(c=>c.agency==='ME');
+  const noSource=ppClients.filter(c=>!c.source);
+  document.getElementById('src-total').textContent=active.length;
+  document.getElementById('src-agency-count').textContent=agencyClients.length;
+  document.getElementById('src-pp-count').textContent=ppClients.length;
+  document.getElementById('src-nosource-count').textContent=noSource.length;
+
+  const agencies=[{key:'DC',name:'District Counseling',color:'var(--accent)'},{key:'SMS',name:'Safe Mind Space',color:'var(--green)'},{key:'Emora',name:'Emora',color:'var(--amber)'}];
+  const maxA=Math.max(...agencies.map(a=>active.filter(c=>c.agency===a.key).length),1);
+  document.getElementById('src-agencies').innerHTML=agencies.map(a=>{
+    const cs=active.filter(c=>c.agency===a.key);if(!cs.length)return'';
+    return`<div style="margin-bottom:18px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:13px;font-weight:500;color:var(--text);">${a.name}</span><span style="font-family:var(--mono);font-size:20px;color:${a.color};">${cs.length}</span></div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:7px;"><div style="width:${(cs.length/maxA)*100}%;height:100%;background:${a.color};border-radius:3px;transition:width .5s;"></div></div><div style="font-size:11px;color:var(--text3);line-height:1.7;">${cs.map(c=>c.name).join(' · ')}</div></div>`;
+  }).join('')||'<div style="color:var(--text3);font-size:13px;">No agency clients yet.</div>';
+
+  const SOURCES=['Psychology Today','Therapist.com','Zocdoc','Open Path','Mental Health Match','Word of Mouth','Insurance Panel','Other'];
+  const buckets=SOURCES.map(s=>({s,cs:ppClients.filter(c=>c.source===s)})).filter(x=>x.cs.length);
+  if(noSource.length)buckets.push({s:'Unknown',cs:noSource});
+  const maxP=Math.max(...buckets.map(x=>x.cs.length),1);
+  document.getElementById('src-sources').innerHTML=buckets.length
+    ?buckets.map(({s,cs})=>{const isUnk=s==='Unknown';const color=isUnk?'var(--amber)':'var(--pink)';
+      return`<div style="margin-bottom:18px;"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span style="font-size:13px;font-weight:500;color:${isUnk?'var(--amber)':'var(--text)'};">${isUnk?'⚠ Unknown':s}</span><span style="font-family:var(--mono);font-size:20px;color:${color};">${cs.length}</span></div><div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-bottom:7px;"><div style="width:${(cs.length/maxP)*100}%;height:100%;background:${color};border-radius:3px;transition:width .5s;"></div></div><div style="font-size:11px;color:var(--text3);line-height:1.7;">${cs.map(c=>c.name).join(' · ')}</div></div>`;
+    }).join('')
+    :'<div style="color:var(--text3);font-size:13px;">No private pay clients yet.</div>';
+}
 }
 
 // ============================================================
