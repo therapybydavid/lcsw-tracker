@@ -193,16 +193,7 @@
     <div class="stat-box"><div class="label">Agency</div><div class="value" id="src-agency-count" style="color:var(--accent)">0</div><div class="sub">DC · SMS · Emora</div></div>
     <div class="stat-box"><div class="label">Private Pay</div><div class="value" id="src-pp-count" style="color:var(--pink)">0</div><div class="sub">ME clients</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-    <div>
-      <div class="card-title" style="margin-bottom:12px;">Agencies</div>
-      <div id="src-agency-cards" style="display:flex;flex-direction:column;gap:10px;"></div>
-    </div>
-    <div>
-      <div class="card-title" style="margin-bottom:12px;">Private Pay Sources</div>
-      <div id="src-pp-cards" style="display:flex;flex-direction:column;gap:10px;"></div>
-    </div>
-  </div>
+  <div id="src-all-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
 </div>
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
@@ -649,29 +640,45 @@ function renderReferrals(){
   document.getElementById('src-agency-count').textContent=agencyClients.length;
   document.getElementById('src-pp-count').textContent=ppClients.length;
 
-  const srcCard=(label,count,color,total)=>{
+  const card=(label,count,color)=>{
     const pct=total?Math.round((count/total)*100):0;
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div>
-        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px;">${label}</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">${pct}% of caseload</div>
+    const barW=total?(count/total)*100:0;
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};border-radius:10px;padding:16px 22px;display:flex;align-items:center;gap:20px;">
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">${label}</div>
+        <div style="height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">
+          <div style="width:${barW}%;height:100%;background:${color};border-radius:2px;transition:width .6s;"></div>
+        </div>
       </div>
-      <div style="font-family:var(--mono);font-size:36px;font-weight:600;color:${color};line-height:1;">${count}</div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:var(--mono);font-size:38px;font-weight:700;color:${color};line-height:1;">${count}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px;">${pct}%</div>
+      </div>
     </div>`;
   };
+
+  const divider=(label)=>`<div style="display:flex;align-items:center;gap:10px;margin:6px 0;">
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+    <div style="font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;">${label}</div>
+    <div style="flex:1;height:1px;background:var(--border);"></div>
+  </div>`;
 
   const agencies=[
     {label:'Safe Mind Space',count:active.filter(c=>c.agency==='SMS').length,color:'var(--green)'},
     {label:'District Counseling',count:active.filter(c=>c.agency==='DC').length,color:'var(--accent)'},
     {label:'Emora',count:active.filter(c=>c.agency==='Emora').length,color:'var(--amber)'},
-  ].filter(r=>r.count>0);
-  document.getElementById('src-agency-cards').innerHTML=agencies.map(a=>srcCard(a.label,a.count,a.color,total)).join('')
-    ||'<div style="color:var(--text3);font-size:13px;">No agency clients yet.</div>';
+  ].filter(r=>r.count>0).sort((a,b)=>b.count-a.count);
 
   const SOURCES=['Psychology Today','Therapist.com','Zocdoc','Open Path','Mental Health Match','Word of Mouth','Insurance Panel','Other'];
-  const ppRows=SOURCES.map(s=>({label:s,count:ppClients.filter(c=>c.source===s).length})).filter(r=>r.count>0);
-  document.getElementById('src-pp-cards').innerHTML=ppRows.map(r=>srcCard(r.label,r.count,'var(--pink)',total)).join('')
-    ||'<div style="color:var(--text3);font-size:13px;">No private pay clients yet.</div>';
+  const ppRows=SOURCES.map(s=>({label:s,count:ppClients.filter(c=>c.source===s).length,color:'#c4b5fd'})).filter(r=>r.count>0).sort((a,b)=>b.count-a.count);
+
+  const agHtml=agencies.map(a=>card(a.label,a.count,a.color)).join('');
+  const ppHtml=ppRows.map(r=>card(r.label,r.count,r.color)).join('');
+  document.getElementById('src-all-cards').innerHTML=
+    (agHtml?agHtml:'')
+    +(agHtml&&ppHtml?divider('Private Pay'):'')
+    +(ppHtml?ppHtml:'')
+    ||'<div style="color:var(--text3);font-size:13px;padding:20px;">No clients yet.</div>';
 }
 
 // ============================================================
