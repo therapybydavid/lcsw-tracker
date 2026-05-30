@@ -188,14 +188,20 @@
 </div>
 <div id="page-referrals" class="page">
   <div class="page-header"><h1>Client Sources</h1><p>Where your caseload comes from</p></div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px;">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
     <div class="stat-box"><div class="label">Total Active</div><div class="value" id="src-total" style="color:var(--text)">0</div><div class="sub">clients</div></div>
     <div class="stat-box"><div class="label">Agency</div><div class="value" id="src-agency-count" style="color:var(--accent)">0</div><div class="sub">DC · SMS · Emora</div></div>
     <div class="stat-box"><div class="label">Private Pay</div><div class="value" id="src-pp-count" style="color:var(--pink)">0</div><div class="sub">ME clients</div></div>
   </div>
-  <div class="card">
-    <div class="card-title">Breakdown</div>
-    <div class="table-wrap"><table><thead><tr><th>Source</th><th>Clients</th><th>% of Caseload</th></tr></thead><tbody id="src-tbody"></tbody></table></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div>
+      <div class="card-title" style="margin-bottom:12px;">Agencies</div>
+      <div id="src-agency-cards" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+    <div>
+      <div class="card-title" style="margin-bottom:12px;">Private Pay Sources</div>
+      <div id="src-pp-cards" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
   </div>
 </div>
 <div id="page-statistics" class="page">
@@ -643,19 +649,29 @@ function renderReferrals(){
   document.getElementById('src-agency-count').textContent=agencyClients.length;
   document.getElementById('src-pp-count').textContent=ppClients.length;
 
-  const agencyRows=[
-    {label:'District Counseling',count:active.filter(c=>c.agency==='DC').length,color:'var(--accent)'},
+  const srcCard=(label,count,color,total)=>{
+    const pct=total?Math.round((count/total)*100):0;
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:3px;">${label}</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">${pct}% of caseload</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:36px;font-weight:600;color:${color};line-height:1;">${count}</div>
+    </div>`;
+  };
+
+  const agencies=[
     {label:'Safe Mind Space',count:active.filter(c=>c.agency==='SMS').length,color:'var(--green)'},
+    {label:'District Counseling',count:active.filter(c=>c.agency==='DC').length,color:'var(--accent)'},
     {label:'Emora',count:active.filter(c=>c.agency==='Emora').length,color:'var(--amber)'},
   ].filter(r=>r.count>0);
+  document.getElementById('src-agency-cards').innerHTML=agencies.map(a=>srcCard(a.label,a.count,a.color,total)).join('')
+    ||'<div style="color:var(--text3);font-size:13px;">No agency clients yet.</div>';
 
   const SOURCES=['Psychology Today','Therapist.com','Zocdoc','Open Path','Mental Health Match','Word of Mouth','Insurance Panel','Other'];
-  const ppRows=SOURCES.map(s=>({label:s,count:ppClients.filter(c=>c.source===s).length,color:'var(--pink)'})).filter(r=>r.count>0);
-
-  const divider=agencyRows.length&&ppRows.length?`<tr><td colspan="3" style="padding:4px 12px;"><div style="height:1px;background:var(--border);"></div></td></tr>`:'';
-  const row=({label,count,color})=>`<tr><td style="color:var(--text);font-weight:500;">${label}</td><td style="font-family:var(--mono);color:${color};font-size:16px;">${count}</td><td style="font-family:var(--mono);color:var(--text3);">${total?Math.round((count/total)*100)+'%':'—'}</td></tr>`;
-  document.getElementById('src-tbody').innerHTML=agencyRows.map(row).join('')+divider+ppRows.map(row).join('')
-    ||'<tr><td colspan="3" style="color:var(--text3);">No clients yet.</td></tr>';
+  const ppRows=SOURCES.map(s=>({label:s,count:ppClients.filter(c=>c.source===s).length})).filter(r=>r.count>0);
+  document.getElementById('src-pp-cards').innerHTML=ppRows.map(r=>srcCard(r.label,r.count,'var(--pink)',total)).join('')
+    ||'<div style="color:var(--text3);font-size:13px;">No private pay clients yet.</div>';
 }
 
 // ============================================================
