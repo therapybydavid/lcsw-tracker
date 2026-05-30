@@ -193,7 +193,30 @@
     <div class="stat-box"><div class="label">Agency</div><div class="value" id="src-agency-count" style="color:var(--accent)">0</div><div class="sub">DC · SMS · Emora</div></div>
     <div class="stat-box"><div class="label">Private Pay</div><div class="value" id="src-pp-count" style="color:var(--pink)">0</div><div class="sub">ME clients</div></div>
   </div>
-  <div id="src-all-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:28px 24px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:20px;">Agencies</div>
+      <div style="position:relative;width:200px;height:200px;margin-bottom:24px;">
+        <canvas id="src-agency-chart"></canvas>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text);line-height:1;" id="src-agency-total">0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">clients</div>
+        </div>
+      </div>
+      <div id="src-agency-legend" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:28px 24px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:20px;">Private Pay Sources</div>
+      <div style="position:relative;width:200px;height:200px;margin-bottom:24px;">
+        <canvas id="src-pp-chart"></canvas>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <div style="font-family:var(--mono);font-size:36px;font-weight:700;color:var(--text);line-height:1;" id="src-pp-total">0</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px;">clients</div>
+        </div>
+      </div>
+      <div id="src-pp-legend" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
+    </div>
+  </div>
 </div>
 <div id="page-statistics" class="page">
   <div class="page-header"><h1>Statistics</h1><p>Practice analytics for 2026</p></div>
@@ -630,6 +653,7 @@ function saveEditSup(){const id=document.getElementById('esup-id').value;let sup
 // SOURCES (replaces Referrals)
 // ============================================================
 
+let _srcAgChart=null,_srcPpChart=null;
 function renderReferrals(){
   const clients=load(KEYS.clients);
   const active=clients.filter(c=>c.status==='active');
@@ -640,45 +664,39 @@ function renderReferrals(){
   document.getElementById('src-agency-count').textContent=agencyClients.length;
   document.getElementById('src-pp-count').textContent=ppClients.length;
 
-  const card=(label,count,color)=>{
-    const pct=total?Math.round((count/total)*100):0;
-    const barW=total?(count/total)*100:0;
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${color};border-radius:10px;padding:16px 22px;display:flex;align-items:center;gap:20px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;">${label}</div>
-        <div style="height:3px;background:var(--surface2);border-radius:2px;overflow:hidden;">
-          <div style="width:${barW}%;height:100%;background:${color};border-radius:2px;transition:width .6s;"></div>
-        </div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:var(--mono);font-size:38px;font-weight:700;color:${color};line-height:1;">${count}</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px;">${pct}%</div>
-      </div>
-    </div>`;
-  };
-
-  const divider=(label)=>`<div style="display:flex;align-items:center;gap:10px;margin:6px 0;">
-    <div style="flex:1;height:1px;background:var(--border);"></div>
-    <div style="font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;">${label}</div>
-    <div style="flex:1;height:1px;background:var(--border);"></div>
-  </div>`;
-
   const agencies=[
-    {label:'Safe Mind Space',count:active.filter(c=>c.agency==='SMS').length,color:'var(--green)'},
-    {label:'District Counseling',count:active.filter(c=>c.agency==='DC').length,color:'var(--accent)'},
-    {label:'Emora',count:active.filter(c=>c.agency==='Emora').length,color:'var(--amber)'},
-  ].filter(r=>r.count>0).sort((a,b)=>b.count-a.count);
+    {label:'Safe Mind Space',count:active.filter(c=>c.agency==='SMS').length,color:'#38c98e'},
+    {label:'District Counseling',count:active.filter(c=>c.agency==='DC').length,color:'#4f8ef7'},
+    {label:'Emora',count:active.filter(c=>c.agency==='Emora').length,color:'#f7a44f'},
+  ].filter(r=>r.count>0);
 
   const SOURCES=['Psychology Today','Therapist.com','Zocdoc','Open Path','Mental Health Match','Word of Mouth','Insurance Panel','Other'];
-  const ppRows=SOURCES.map(s=>({label:s,count:ppClients.filter(c=>c.source===s).length,color:'#c4b5fd'})).filter(r=>r.count>0).sort((a,b)=>b.count-a.count);
+  const ppColors=['#c4b5fd','#93c5fd','#6ee7b7','#fca5a5','#fde68a','#a5b4fc','#f9a8d4','#d1d5db'];
+  const ppRows=SOURCES.map((s,i)=>({label:s,count:ppClients.filter(c=>c.source===s).length,color:ppColors[i]})).filter(r=>r.count>0);
 
-  const agHtml=agencies.map(a=>card(a.label,a.count,a.color)).join('');
-  const ppHtml=ppRows.map(r=>card(r.label,r.count,r.color)).join('');
-  document.getElementById('src-all-cards').innerHTML=
-    (agHtml?agHtml:'')
-    +(agHtml&&ppHtml?divider('Private Pay'):'')
-    +(ppHtml?ppHtml:'')
-    ||'<div style="color:var(--text3);font-size:13px;padding:20px;">No clients yet.</div>';
+  const legend=(items,sectionTotal)=>items.map(({label,count,color})=>`
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;"></div>
+      <div style="flex:1;font-size:13px;color:var(--text2);">${label}</div>
+      <div style="font-family:var(--mono);font-size:13px;color:var(--text);">${count}</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text3);width:32px;text-align:right;">${sectionTotal?Math.round((count/sectionTotal)*100)+'%':'—'}</div>
+    </div>`).join('');
+
+  document.getElementById('src-agency-total').textContent=agencyClients.length;
+  document.getElementById('src-pp-total').textContent=ppClients.length;
+  document.getElementById('src-agency-legend').innerHTML=legend(agencies,agencyClients.length);
+  document.getElementById('src-pp-legend').innerHTML=legend(ppRows,ppClients.length);
+
+  if(_srcAgChart)_srcAgChart.destroy();
+  if(_srcPpChart)_srcPpChart.destroy();
+  const chartOpts={type:'doughnut',options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{animateScale:true}}};
+
+  const agCtx=document.getElementById('src-agency-chart').getContext('2d');
+  _srcAgChart=new Chart(agCtx,{...chartOpts,data:{labels:agencies.map(a=>a.label),datasets:[{data:agencies.map(a=>a.count),backgroundColor:agencies.map(a=>a.color),borderColor:'#181c27',borderWidth:3,hoverOffset:4}]}});
+
+  const ppCtx=document.getElementById('src-pp-chart').getContext('2d');
+  const ppData=ppRows.length?ppRows:[{label:'None',count:1,color:'#2a3045'}];
+  _srcPpChart=new Chart(ppCtx,{...chartOpts,data:{labels:ppData.map(a=>a.label),datasets:[{data:ppData.map(a=>a.count),backgroundColor:ppData.map(a=>a.color),borderColor:'#181c27',borderWidth:3,hoverOffset:4}]}});
 }
 
 // ============================================================
