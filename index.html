@@ -471,7 +471,21 @@ function addClient(){const name=document.getElementById('c-name').value.trim();i
 function toggleClientNoFields(){const e=document.getElementById('c-clientno-wrap');if(e)e.style.display=document.getElementById('c-agency').value==='MC'?'block':'none';}
 function toggleEditClientNoFields(){const e=document.getElementById('ec-clientno-wrap');if(e)e.style.display=document.getElementById('ec-agency').value==='MC'?'block':'none';}
 
+function autoArchiveInactive(){
+  const clients=load(KEYS.clients);const sessions=load(KEYS.sessions);const today=new Date();let changed=0;
+  clients.forEach(c=>{
+    if((c.status||'active')!=='active')return;
+    const cs=sessions.filter(s=>s.name===c.name&&s.date).sort((a,b)=>b.date.localeCompare(a.date));
+    if(!cs.length)return;
+    const daysSince=Math.floor((today-new Date(cs[0].date))/86400000);
+    if(daysSince>=30){c.status='inactive';changed++;}
+  });
+  if(changed){save(KEYS.clients,clients);populateClientLists();toast(changed+' client'+(changed!==1?'s':'')+' auto-archived (30+ days)');}
+  return changed;
+}
+
 function renderClients(){
+  autoArchiveInactive();
   const clients=load(KEYS.clients);const active=clients.filter(c=>c.status==='active');const inactive=clients.filter(c=>c.status!=='active');
   document.getElementById('c-active-count').textContent=active.length;document.getElementById('c-inactive-count').textContent=inactive.length;
   let filtered=clientFilter==='all'?clients:clients.filter(c=>(c.status||'active')===clientFilter);if(agencyFilter==='no-source'){filtered=filtered.filter(c=>c.agency==='ME'&&!c.source);}else if(agencyFilter){filtered=filtered.filter(c=>c.agency===agencyFilter);}const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
