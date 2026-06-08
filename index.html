@@ -485,7 +485,6 @@ function autoArchiveInactive(){
 }
 
 function renderClients(){
-  autoArchiveInactive();
   const clients=load(KEYS.clients);const active=clients.filter(c=>c.status==='active');const inactive=clients.filter(c=>c.status!=='active');
   document.getElementById('c-active-count').textContent=active.length;document.getElementById('c-inactive-count').textContent=inactive.length;
   let filtered=clientFilter==='all'?clients:clients.filter(c=>(c.status||'active')===clientFilter);if(agencyFilter==='no-source'){filtered=filtered.filter(c=>c.agency==='ME'&&!c.source);}else if(agencyFilter){filtered=filtered.filter(c=>c.agency===agencyFilter);}const sorted=[...filtered].sort((a,b)=>a.name.localeCompare(b.name));
@@ -801,6 +800,7 @@ async function boot(){
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('sup-date').value=new Date().toISOString().split('T')[0];
+  autoArchiveInactive();
   renderDashboard();renderSupervision();populateClientLists();
 }
 
