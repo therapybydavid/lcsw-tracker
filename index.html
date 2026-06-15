@@ -150,7 +150,7 @@
 </div>
 </div>
 <div id="page-session-log" class="page">
-  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;"><div><h1>Session Log</h1><p>Complete record of all hours</p></div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-primary" onclick="openMcExport()">🗓 MindClub Timesheet</button><button class="btn btn-green" onclick="exportExcel()">⬇ Export Master Log</button></div></div>
+  <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;"><div><h1>Session Log</h1><p>Complete record of all hours</p></div><div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;justify-content:flex-end;"><button class="btn btn-primary" onclick="openMcExport()">🗓 MindClub Timesheet</button><button class="btn btn-ghost" onclick="exportLogXlsx()">⬇ Export Filtered</button><button class="btn btn-green" onclick="exportExcel()">⬇ Export Master Log</button></div></div>
   <div class="card">
     <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;"><input type="text" id="log-search" placeholder="Search..." oninput="renderLog()" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;min-width:160px;"><select id="log-agency" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;"><option value="">All Agencies</option><option value="DC">DC</option><option value="SMS">SMS</option><option value="Emora">Emora</option><option value="ME">ME</option><option value="MC">MC</option></select><select id="log-month" onchange="renderLog()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;"><option value="">All Months</option></select></div>
     <div class="table-wrap"><table><thead><tr><th>Date</th><th>Client</th><th>Agency</th><th>Hrs</th><th>Fee</th><th>Method</th><th>Description</th><th></th></tr></thead><tbody id="log-tbody"></tbody></table></div>
@@ -414,6 +414,36 @@ function renderLog(){
   const tbody=document.getElementById('log-tbody');const empty=document.getElementById('log-empty');
   if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return}empty.style.display='none';
   tbody.innerHTML=filtered.map(s=>`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);cursor:pointer;text-decoration:underline;text-decoration-color:var(--text3)" onclick="openClientProfile('${(s.name||'').replace(/'/g,"&#39;")}')">${s.name||'\u2014'}</td><td><span class="badge b-${(s.agency||'').toLowerCase()}">${s.agency||'\u2014'}</span></td><td style="font-family:var(--mono)">${s.hours}</td><td style="font-family:var(--mono)">${s.fee?'$'+s.fee:'\u2014'}</td><td><span class="badge b-${(s.method||'').toLowerCase()}">${s.method||'\u2014'}</span></td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.desc||''}</td><td style="display:flex;gap:4px;"><button class="btn-edit" onclick="openEditSession('${s.id}')">Edit</button><button class="btn-danger" onclick="deleteSession('${s.id}')">✕</button></td></tr>`).join('');
+}
+function exportLogXlsx(){
+  const sessions=load(KEYS.sessions);
+  const search=(document.getElementById('log-search')?.value||'').toLowerCase();
+  const agency=document.getElementById('log-agency')?.value||'';
+  const month=document.getElementById('log-month')?.value||'';
+  const filtered=sessions.filter(s=>{
+    if(agency&&s.agency!==agency)return false;
+    if(month&&!(s.date||'').startsWith(month))return false;
+    if(search&&!`${s.name} ${s.agency} ${s.desc}`.toLowerCase().includes(search))return false;
+    return true;
+  }).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!filtered.length){toast('No sessions to export',true);return;}
+  let totalHrs=0,totalFee=0;
+  const rows=filtered.map(s=>{totalHrs+=parseFloat(s.hours)||0;totalFee+=parseFloat(s.fee)||0;return[fmtDate(s.date),s.name||'',s.agency||'',parseFloat(s.hours)||0,s.fee?'$'+(parseFloat(s.fee)||0).toFixed(2):'',s.method||'',s.desc||''];});
+  const agNames={DC:'District Counseling',SMS:'Safe Mind Space',Emora:'Emora',ME:'Private',MC:'MindClub'};
+  const label=[agency?(agNames[agency]||agency):'All Agencies',month?(MC_MONTHS[+month.split('-')[1]-1]+' '+month.split('-')[0]):'All Months',search?'Search: "'+search+'"':''].filter(Boolean).join(' · ');
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Session Log — David Robles, LMSW'],
+    [label],
+    [],
+    ['Date','Client','Agency','Hours','Fee','Method','Description'],
+    ...rows,
+    [],
+    ['','','Totals',Math.round(totalHrs*100)/100,'$'+totalFee.toFixed(2),'','']
+  ]);
+  ws['!cols']=[{wch:12},{wch:24},{wch:10},{wch:7},{wch:10},{wch:8},{wch:30}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Sessions');
+  const fname=('SessionLog_'+(agency||'All')+'_'+(month||'All')+'.xlsx').replace(/\s/g,'_');
+  XLSX.writeFile(wb,fname);toast('Exported '+filtered.length+' sessions');
 }
 function deleteSession(id){let s=load(KEYS.sessions);s=s.filter(x=>x.id!==id);save(KEYS.sessions,s);renderLog();renderDashboard();toast('Deleted')}
 function openEditSession(id){const s=load(KEYS.sessions).find(x=>x.id===id);if(!s)return;document.getElementById('es-id').value=s.id;document.getElementById('es-date').value=s.date||'';document.getElementById('es-name').value=s.name||'';document.getElementById('es-agency').value=s.agency||'\u2014';document.getElementById('es-hours').value=s.hours;document.getElementById('es-fee').value=s.fee;document.getElementById('es-method').value=s.method||'\u2014';document.getElementById('es-type').value=s.type||'clinical';document.getElementById('es-insurance').value=s.insurance||'';document.getElementById('es-mc-client').value=s.clientNo||'';document.getElementById('es-mc-proc').value=s.procCode||'';const known=['Intake session','Psychotherapy session'];if(known.includes(s.desc)){document.getElementById('es-desc-sel').value=s.desc;document.getElementById('es-custom-wrap').style.display='none'}else{document.getElementById('es-desc-sel').value='custom';document.getElementById('es-custom').value=s.desc||'';document.getElementById('es-custom-wrap').style.display='block'}openModal('modal-edit-session')}
