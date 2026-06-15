@@ -161,7 +161,7 @@
   <div class="page-header"><h1>Invoices</h1><p>Generate agency invoices</p></div>
   <div class="tabs"><button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button><button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button><button class="tab" onclick="switchInvoice('MC',this)">MindClub</button></div>
   <div class="card">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="window.print()">🖨 Print</button></div></div>
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div></div>
     <div class="invoice-header"><div><div style="display:flex;align-items:center;gap:10px;"><div class="invoice-title">Invoice</div><span id="inv-client-count" style="display:none;background:rgba(79,142,247,.15);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.04em;"></span></div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
     <div class="table-wrap"><table id="inv-table"><thead id="inv-thead"></thead><tbody id="inv-tbody"></tbody></table></div>
     <div id="inv-empty" class="empty" style="display:none;"><div class="empty-icon">🧾</div>No sessions for this agency and month.</div>
@@ -456,6 +456,44 @@ function renderInvoice(){
   if(agency==='DC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
   else if(agency==='MC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client #</th><th>Procedure</th><th>Hrs</th></tr>';let totalHrs=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{const hrs=parseFloat(s.hours)||0;totalHrs+=hrs;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);font-family:var(--mono);font-size:12px">${s.clientNo||s.name||''}</td><td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${s.procCode||''}</td><td style="font-family:var(--mono);color:var(--text)">${hrs}</td></tr>`}).join('');document.getElementById('inv-total').textContent=(Math.round(totalHrs*100)/100)+' hrs'}
   else{document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
+}
+
+function exportInvoiceXlsx(){
+  const agency=currentInvAgency;const month=document.getElementById('inv-month')?.value||'';
+  const saved=(_db.inv_dates||{});const agDates=saved[agency]||{};
+  const allSessions=load(KEYS.sessions).filter(s=>s.agency===agency);
+  let sessions;
+  if(agDates.start&&agDates.due){sessions=allSessions.filter(s=>s.date&&s.date>=agDates.start&&s.date<=agDates.due).sort((a,b)=>a.date.localeCompare(b.date));}
+  else{sessions=allSessions.filter(s=>(s.date||'').startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));}
+  if(!sessions.length){toast('No sessions to export',true);return;}
+  const agNames={DC:'District Counseling',SMS:'Safe Mind Space',MC:'MindClub'};
+  let rows,headers,footer;
+  if(agency==='MC'){
+    headers=[['Date','Client #','Procedure Code','Hours']];
+    let totalHrs=0;
+    rows=sessions.map(s=>{const h=parseFloat(s.hours)||0;totalHrs+=h;return[fmtDate(s.date),s.clientNo||s.name||'',s.procCode||'',h];});
+    footer=[['','','Total Hours',Math.round(totalHrs*100)/100]];
+  }else{
+    headers=[['Date','Client','Fee']];
+    let total=0;
+    rows=sessions.map(s=>{const f=parseFloat(s.fee)||0;total+=f;return[fmtDate(s.date),s.name,'$'+f.toFixed(2)];});
+    footer=[['','Total','$'+total.toFixed(2)]];
+  }
+  const ws=XLSX.utils.aoa_to_sheet([
+    ['Invoice — David Robles, LMSW'],
+    [agNames[agency]||agency],
+    [month?MC_MONTHS[+month.split('-')[1]-1]+' '+month.split('-')[0]:''],
+    [],
+    ...headers,
+    ...rows,
+    [],
+    ...footer
+  ]);
+  ws['!cols']=agency==='MC'?[{wch:14},{wch:22},{wch:18},{wch:8}]:[{wch:14},{wch:26},{wch:12}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Invoice');
+  const fname=`Invoice_${agNames[agency]||agency}_${month||'export'}.xlsx`.replace(/\s/g,'_');
+  XLSX.writeFile(wb,fname);
+  toast('Invoice exported');
 }
 
 // ============================================================
