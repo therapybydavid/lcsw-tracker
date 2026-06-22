@@ -232,10 +232,6 @@
 <div id="page-private-pay" class="page">
   <div class="page-header"><h1>Private Pay</h1><p>Your independent income — ME clients only</p></div>
   <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Active Clients</div>
-    <div id="pp-client-list"></div>
-  </div>
-  <div class="card" style="margin-bottom:18px;">
     <div class="card-title">Income Breakdown</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
       <div class="stat-box"><div class="label">This Week</div><div class="value" id="pp-week-income" style="color:var(--green);">$0</div><div class="sub" id="pp-week-sessions">0 sessions</div></div>
@@ -255,9 +251,14 @@
     </div>
   </div>
   <div class="card" style="margin-bottom:18px;">
-    <div class="card-title">Month by Month</div>
+    <div class="card-title">Monthly Income — 2026</div>
+    <div style="position:relative;height:160px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);"><canvas id="pp-monthly-chart"></canvas></div>
     <div class="table-wrap"><table><thead><tr><th>Month</th><th>Sessions</th><th>Income</th><th>Avg / Session</th></tr></thead><tbody id="pp-monthly-body"></tbody></table></div>
     <div id="pp-monthly-empty" class="empty" style="display:none;"><div class="empty-icon">◆</div>No private pay sessions yet.</div>
+  </div>
+  <div class="card" style="margin-bottom:18px;">
+    <div class="card-title">Active Clients</div>
+    <div id="pp-client-list"></div>
   </div>
 </div>
 </main>
@@ -894,13 +895,21 @@ function renderPrivatePay(){
   const meYTD=sum(ytdMe);const agencyYTD=totalYTD-meYTD;const incPct=totalYTD?Math.round((meYTD/totalYTD)*100):0;
   document.getElementById('pp-pct-label').textContent=incPct+'%';document.getElementById('pp-income-bar').style.width=incPct+'%';document.getElementById('pp-bar-me').textContent=meYTD.toLocaleString();document.getElementById('pp-bar-agency').textContent=agencyYTD.toLocaleString();
 
-  // Monthly breakdown
+  // Monthly breakdown + chart
   const months=['2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09','2026-10','2026-11','2026-12'];
   const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
   let rows='';let hasAny=false;
-  months.forEach((m,i)=>{const ms=meSessions.filter(s=>(s.date||'').startsWith(m));if(!ms.length)return;hasAny=true;const inc=sum(ms);const avg=ms.length?Math.round(inc/ms.length):0;rows+=`<tr${m===monthStr?' style="background:rgba(247,95,95,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td style="font-family:var(--mono)">${ms.length}</td><td style="font-family:var(--mono);color:var(--green)">$${inc.toLocaleString()}</td><td style="font-family:var(--mono);color:var(--text2)">$${avg}</td></tr>`;});
+  months.forEach((m,i)=>{const ms=meSessions.filter(s=>(s.date||'').startsWith(m));if(!ms.length)return;hasAny=true;const inc=sum(ms);const avg=ms.length?Math.round(inc/ms.length):0;rows+=`<tr${m===monthStr?' style="background:rgba(56,201,142,0.05)"':''}><td style="color:var(--text)">${mnames[i]}</td><td style="font-family:var(--mono)">${ms.length}</td><td style="font-family:var(--mono);color:var(--green)">$${inc.toLocaleString()}</td><td style="font-family:var(--mono);color:var(--text2)">$${avg}</td></tr>`;});
   const tbody=document.getElementById('pp-monthly-body');const empty=document.getElementById('pp-monthly-empty');
   if(hasAny){tbody.innerHTML=rows;empty.style.display='none';}else{tbody.innerHTML='';empty.style.display='block';}
+  const ppCanvas=document.getElementById('pp-monthly-chart');
+  if(ppCanvas&&typeof Chart!=='undefined'){
+    if(window._ppMonthlyChart)window._ppMonthlyChart.destroy();
+    const chartData=months.map(m=>meSessions.filter(s=>(s.date||'').startsWith(m)).reduce((a,s)=>a+(parseFloat(s.fee)||0),0));
+    const bgColors=months.map(m=>m===monthStr?'rgba(56,201,142,0.85)':'rgba(56,201,142,0.25)');
+    const borderColors=months.map(m=>m===monthStr?'#38c98e':'rgba(56,201,142,0.5)');
+    window._ppMonthlyChart=new Chart(ppCanvas,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{data:chartData,backgroundColor:bgColors,borderColor:borderColors,borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y.toLocaleString()}}},scales:{x:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11}}},y:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11},callback:v=>'$'+v.toLocaleString()},beginAtZero:true}}}});
+  }
 }
 
 </script>
