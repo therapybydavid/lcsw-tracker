@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LCSW Tracker — David Robles</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -499,6 +499,65 @@ function exportInvoiceXlsx(){
   if(!sessions.length){toast('No sessions to export',true);return;}
   const agNames={DC:'District Counseling',SMS:'Safe Mind Space',MC:'MindClub'};
   let rows,headers,footer;
+  const wb=XLSX.utils.book_new();
+  const fname=`Invoice_${agNames[agency]||agency}_${month||'export'}.xlsx`.replace(/\s/g,'_');
+
+  if(agency==='SMS'){
+    // Styled invoice matching Safe Mind Space PDF format
+    const fmtSlash=dt=>{const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
+    const invoiceDate=agDates.due?fmtSlash(agDates.due):fmtSlash(sessions[sessions.length-1].date);
+    let total=0;
+    const dataRows=sessions.map(s=>{const f=parseFloat(s.fee)||40;total+=f;return[fmtSlash(s.date),s.name||'','','$'+f.toFixed(0)];});
+    const BLANK_ROWS=3;
+    const aoa=[
+      ['SAFE MIND SPACE COUNSELING GROUP LLC','','',''],
+      ['www.safemindspacecg.com  |  safemindspacecounselinggroup@gmail.com','','',''],
+      ['1335 Regents Park Drive #14O Houston, TX 77058','','',''],
+      ['Office: 832-284-4009','','',''],
+      ['','','',''],
+      ['INVOICE','',`Date: ${invoiceDate}`,''],
+      ['','','',''],
+      ['Contractor: David Robles, LMSW','','Rate: $40 per session',''],
+      ['','','',''],
+      ['Date','Name','Insurance','Fee'],
+      ...dataRows,
+      ...Array(BLANK_ROWS).fill(['','','','']),
+      ['','','','$'+total.toFixed(0)],
+    ];
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols']=[{wch:12},{wch:26},{wch:16},{wch:12}];
+    const R=(r,c)=>({r,c});
+    ws['!merges']=[
+      {s:R(0,0),e:R(0,3)},{s:R(1,0),e:R(1,3)},{s:R(2,0),e:R(2,3)},{s:R(3,0),e:R(3,3)},
+      {s:R(5,0),e:R(5,1)},{s:R(5,2),e:R(5,3)},
+      {s:R(7,0),e:R(7,1)},{s:R(7,2),e:R(7,3)},
+    ];
+    const blueFill={patternType:'solid',fgColor:{rgb:'BDD7EE'}};
+    const greenFill={patternType:'solid',fgColor:{rgb:'92D050'}};
+    const thin={style:'thin',color:{rgb:'000000'}};
+    const bord={top:thin,bottom:thin,left:thin,right:thin};
+    const cr=(r,c)=>XLSX.utils.encode_cell({r,c});
+    const setStyle=(r,c,s)=>{if(!ws[cr(r,c)])ws[cr(r,c)]={t:'s',v:''};ws[cr(r,c)].s=s;};
+    // Row 0: company header — blue, bold
+    for(let c=0;c<4;c++)setStyle(0,c,{fill:blueFill,font:{bold:true,sz:11}});
+    // Row 5: INVOICE row — blue, bold
+    for(let c=0;c<4;c++)setStyle(5,c,{fill:blueFill,font:{bold:true}});
+    // Row 9: table header — bold + borders
+    for(let c=0;c<4;c++)setStyle(9,c,{font:{bold:true},border:bord});
+    // Data rows: borders
+    for(let r=10;r<10+dataRows.length;r++)for(let c=0;c<4;c++)setStyle(r,c,{border:bord});
+    // Blank rows: borders
+    for(let r=10+dataRows.length;r<10+dataRows.length+BLANK_ROWS;r++)for(let c=0;c<4;c++)setStyle(r,c,{border:bord});
+    // Total row
+    const tr=10+dataRows.length+BLANK_ROWS;
+    for(let c=0;c<3;c++)setStyle(tr,c,{border:bord});
+    setStyle(tr,3,{fill:greenFill,font:{bold:true},border:bord,alignment:{horizontal:'right'}});
+    XLSX.utils.book_append_sheet(wb,ws,'Invoice');
+    XLSX.writeFile(wb,fname);
+    toast('Invoice exported');
+    return;
+  }
+
   if(agency==='MC'){
     headers=[['Date','Client #','Procedure Code','Hours']];
     let totalHrs=0;
@@ -521,8 +580,7 @@ function exportInvoiceXlsx(){
     ...footer
   ]);
   ws['!cols']=agency==='MC'?[{wch:14},{wch:22},{wch:18},{wch:8}]:[{wch:14},{wch:26},{wch:12}];
-  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Invoice');
-  const fname=`Invoice_${agNames[agency]||agency}_${month||'export'}.xlsx`.replace(/\s/g,'_');
+  XLSX.utils.book_append_sheet(wb,ws,'Invoice');
   XLSX.writeFile(wb,fname);
   toast('Invoice exported');
 }
