@@ -161,7 +161,7 @@
   <div class="page-header"><h1>Invoices</h1><p>Generate agency invoices</p></div>
   <div class="tabs"><button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button><button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button><button class="tab" onclick="switchInvoice('MC',this)">MindClub</button></div>
   <div class="card">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div></div>
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div><div><button class="btn btn-ghost" id="sms-rate-btn" style="display:none;color:var(--green);" onclick="smsRateUpdate()">⬆ Update to $45</button></div></div>
     <div class="invoice-header"><div><div style="display:flex;align-items:center;gap:10px;"><div class="invoice-title">Invoice</div><span id="inv-client-count" style="display:none;background:rgba(79,142,247,.15);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.04em;"></span></div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
     <div class="table-wrap"><table id="inv-table"><thead id="inv-thead"></thead><tbody id="inv-tbody"></tbody></table></div>
     <div id="inv-empty" class="empty" style="display:none;"><div class="empty-icon">🧾</div>No sessions for this agency and month.</div>
@@ -468,7 +468,20 @@ function mcSessionFields(agency){const mc=agency==='MC';['s-mc-client-wrap','s-m
 // INVOICES
 // ============================================================
 let currentInvAgency='DC';
-function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderInvoice()}
+function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const rb=document.getElementById('sms-rate-btn');if(rb)rb.style.display=agency==='SMS'?'block':'none';renderInvoice()}
+function smsRateUpdate(){
+  const cutoff='2026-07-01';
+  const clients=load(KEYS.clients);
+  const sessions=load(KEYS.sessions);
+  const ac=clients.filter(c=>c.agency==='SMS'&&parseFloat(c.rate)===40);
+  const as=sessions.filter(s=>s.agency==='SMS'&&(s.date||'')>=cutoff&&parseFloat(s.fee)===40);
+  if(!ac.length&&!as.length){toast('Nothing to update — no $40 SMS records from July 1+ found');return;}
+  if(!confirm('Update SMS rate $40 → $45?\n\n• '+ac.length+' client'+(ac.length!==1?'s':'')+' (rate field)\n• '+as.length+' session'+(as.length!==1?'s':'')+' from July 1 onward\n\nSessions before July 1 stay at $40.'))return;
+  save(KEYS.clients,clients.map(c=>c.agency==='SMS'&&parseFloat(c.rate)===40?{...c,rate:45}:c));
+  save(KEYS.sessions,sessions.map(s=>s.agency==='SMS'&&(s.date||'')>=cutoff&&parseFloat(s.fee)===40?{...s,fee:45}:s));
+  toast('Updated: '+ac.length+' client'+(ac.length!==1?'s':'')+' + '+as.length+' session'+(as.length!==1?'s':'')+' → $45');
+  renderClients();renderDashboard();renderInvoice();
+}
 function saveInvDates(){const agency=currentInvAgency;const due=document.getElementById('inv-due').value;const start=document.getElementById('inv-start').value;const saved=(_db.inv_dates||{});saved[agency]={due,start};_db.inv_dates=saved;fbRef.child('inv_dates').set(saved);toast('Dates saved');renderInvoice()}
 
 function renderInvoice(){
@@ -507,7 +520,7 @@ function exportInvoiceXlsx(){
     const fmtSlash=dt=>{const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
     const invoiceDate=agDates.due?fmtSlash(agDates.due):fmtSlash(sessions[sessions.length-1].date);
     let total=0;
-    const dataRows=sessions.map(s=>{const f=parseFloat(s.fee)||40;total+=f;return[fmtSlash(s.date),s.name||'','','$'+f.toFixed(0)];});
+    const dataRows=sessions.map(s=>{const f=parseFloat(s.fee)||45;total+=f;return[fmtSlash(s.date),s.name||'','','$'+f.toFixed(0)];});
     const BLANK_ROWS=3;
     const aoa=[
       ['SAFE MIND SPACE COUNSELING GROUP LLC','','',''],
@@ -517,7 +530,7 @@ function exportInvoiceXlsx(){
       ['','','',''],
       ['INVOICE','',`Date: ${invoiceDate}`,''],
       ['','','',''],
-      ['Contractor: David Robles, LMSW','','Rate: $40 per session',''],
+      ['Contractor: David Robles, LMSW','','Rate: $45 per session',''],
       ['','','',''],
       ['Date','Name','Insurance','Fee'],
       ...dataRows,
