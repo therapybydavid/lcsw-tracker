@@ -159,7 +159,7 @@
 </div>
 <div id="page-invoices" class="page">
   <div class="page-header"><h1>Invoices</h1><p>Generate agency invoices</p></div>
-  <div class="tabs"><button class="tab active" onclick="switchInvoice('DC',this)">District Counseling</button><button class="tab" onclick="switchInvoice('SMS',this)">Safe Mind Space</button></div>
+  <div class="tabs"><button class="tab active" onclick="switchInvoice('SMS',this)">Safe Mind Space</button></div>
   <div class="card">
     <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div><div><button class="btn btn-ghost" id="sms-rate-btn" style="display:none;color:var(--green);" onclick="smsRateUpdate()">⬆ Update to $45</button></div></div>
     <div class="invoice-header"><div><div style="display:flex;align-items:center;gap:10px;"><div class="invoice-title">Invoice</div><span id="inv-client-count" style="display:none;background:rgba(79,142,247,.15);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.04em;"></span></div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
@@ -389,7 +389,7 @@ function renderDashboard(){
     window._monthlyIncomeChart=new Chart(chartCanvas,{type:'bar',data:{labels:chartLabels,datasets:[{data:chartData,backgroundColor:bgColors,borderColor:borderColors,borderWidth:1.5,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' $'+ctx.parsed.y.toLocaleString()}}},scales:{x:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11}}},y:{grid:{color:'rgba(42,48,69,0.5)'},ticks:{color:'#8892a8',font:{size:11},callback:v=>'$'+v.toLocaleString()},beginAtZero:true}}}});
   }
   const invDates=(_db.inv_dates||{});const remDiv=document.getElementById('invoice-reminders');const today=new Date();today.setHours(0,0,0,0);let rems='';
-  ['DC','SMS'].forEach(ag=>{const d=invDates[ag]?.due;if(!d)return;const due=new Date(d);due.setHours(0,0,0,0);const diff=Math.ceil((due-today)/(1000*60*60*24));if(diff<0||diff>7)return;const color=diff<=2?'var(--red)':diff<=4?'var(--amber)':'var(--accent)';const msg=diff===0?'due today':diff===1?'due tomorrow':`due in ${diff} days`;rems+=`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">\uD83D\uDD14 ${ag==='DC'?'District Counseling':'Safe Mind Space'} Invoice \u2014 <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`});
+  ['SMS'].forEach(ag=>{const d=invDates[ag]?.due;if(!d)return;const due=new Date(d);due.setHours(0,0,0,0);const diff=Math.ceil((due-today)/(1000*60*60*24));if(diff<0||diff>7)return;const color=diff<=2?'var(--red)':diff<=4?'var(--amber)':'var(--accent)';const msg=diff===0?'due today':diff===1?'due tomorrow':`due in ${diff} days`;rems+=`<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid ${color};border-left:3px solid ${color};border-radius:10px;padding:10px 14px;margin-bottom:8px;"><span style="font-size:13px;">\uD83D\uDD14 Safe Mind Space Invoice \u2014 <span style="color:${color};font-weight:600;">${msg}</span></span><button onclick="document.querySelector('[onclick*=invoices]').click()" style="background:${color};border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">View</button></div>`});
   remDiv.innerHTML=rems;
   renderStatistics();
 }
@@ -468,7 +468,7 @@ function mcSessionFields(agency){const mc=agency==='MC';['s-mc-client-wrap','s-m
 // ============================================================
 // INVOICES
 // ============================================================
-let currentInvAgency='DC';
+let currentInvAgency='SMS';
 function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const rb=document.getElementById('sms-rate-btn');if(rb)rb.style.display=agency==='SMS'?'block':'none';renderInvoice()}
 function smsRateUpdate(){
   const cutoff='2026-07-01';
@@ -488,8 +488,9 @@ function saveInvDates(){const agency=currentInvAgency;const due=document.getElem
 function renderInvoice(){
   const agency=currentInvAgency;const month=document.getElementById('inv-month')?.value||'2026-03';const saved=(_db.inv_dates||{});const agDates=saved[agency]||{};
   const dueInput=document.getElementById('inv-due');const startInput=document.getElementById('inv-start');const dueLabel=document.getElementById('inv-due-label');const startLabel=document.getElementById('inv-start-label');
-  if(dueInput)dueInput.value=agDates.due||'';if(startInput)startInput.value=agDates.start||'';if(dueLabel)dueLabel.textContent=({DC:'DC',SMS:'SMS',MC:'MindClub'}[agency]||agency)+' Due Date';if(startLabel)startLabel.textContent='Billing Start';
-  const agNames={DC:'District Counseling',SMS:'Safe Mind Space',MC:'MindClub'};document.getElementById('inv-agency-name').textContent=agNames[agency]||agency;
+  if(dueInput)dueInput.value=agDates.due||'';if(startInput)startInput.value=agDates.start||'';if(dueLabel)dueLabel.textContent=({SMS:'SMS',MC:'MindClub'}[agency]||agency)+' Due Date';if(startLabel)startLabel.textContent='Billing Start';
+  const agNames={SMS:'Safe Mind Space',MC:'MindClub'};document.getElementById('inv-agency-name').textContent=agNames[agency]||agency;
+  const _rb=document.getElementById('sms-rate-btn');if(_rb)_rb.style.display=agency==='SMS'?'block':'none';
   const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return`${m}/${d}/${y}`};
   const periodText=agDates.start&&agDates.due?`Billing: ${fmt(agDates.start)} \u2014 ${fmt(agDates.due)}`:agDates.due?`Due: ${fmt(agDates.due)}`:'Due date not set';document.getElementById('inv-period').textContent=periodText;
   const allSessions=load(KEYS.sessions).filter(s=>s.agency===agency);let sessions;
@@ -498,8 +499,7 @@ function renderInvoice(){
   const clientCountEl=document.getElementById('inv-client-count');if(clientCountEl)clientCountEl.style.display='none';
   if(!sessions.length){empty.style.display='block';table.style.display='none';document.getElementById('inv-total').textContent='$0';return}empty.style.display='none';table.style.display='table';
   const uniqueClients=new Set(sessions.map(s=>s.name)).size;if(clientCountEl){clientCountEl.textContent=uniqueClients+' client'+(uniqueClients!==1?'s':'');clientCountEl.style.display='inline-block';}
-  if(agency==='DC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
-  else if(agency==='MC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client #</th><th>Procedure</th><th>Hrs</th></tr>';let totalHrs=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{const hrs=parseFloat(s.hours)||0;totalHrs+=hrs;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);font-family:var(--mono);font-size:12px">${s.clientNo||s.name||''}</td><td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${s.procCode||''}</td><td style="font-family:var(--mono);color:var(--text)">${hrs}</td></tr>`}).join('');document.getElementById('inv-total').textContent=(Math.round(totalHrs*100)/100)+' hrs'}
+  if(agency==='MC'){document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client #</th><th>Procedure</th><th>Hrs</th></tr>';let totalHrs=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{const hrs=parseFloat(s.hours)||0;totalHrs+=hrs;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text);font-family:var(--mono);font-size:12px">${s.clientNo||s.name||''}</td><td style="font-family:var(--mono);font-size:12px;color:var(--text2)">${s.procCode||''}</td><td style="font-family:var(--mono);color:var(--text)">${hrs}</td></tr>`}).join('');document.getElementById('inv-total').textContent=(Math.round(totalHrs*100)/100)+' hrs'}
   else{document.getElementById('inv-thead').innerHTML='<tr><th>Date</th><th>Client</th><th>Fee</th></tr>';let total=0;document.getElementById('inv-tbody').innerHTML=sessions.map(s=>{total+=parseFloat(s.fee)||0;return`<tr><td style="font-family:var(--mono);font-size:12px">${fmtDate(s.date)}</td><td style="color:var(--text)">${s.name}</td><td style="font-family:var(--mono);color:var(--green)">$${s.fee}</td></tr>`}).join('');document.getElementById('inv-total').textContent='$'+total.toFixed(2)}
 }
 
@@ -511,7 +511,7 @@ function exportInvoiceXlsx(){
   if(agDates.start&&agDates.due){sessions=allSessions.filter(s=>s.date&&s.date>=agDates.start&&s.date<=agDates.due).sort((a,b)=>a.date.localeCompare(b.date));}
   else{sessions=allSessions.filter(s=>(s.date||'').startsWith(month)).sort((a,b)=>a.date.localeCompare(b.date));}
   if(!sessions.length){toast('No sessions to export',true);return;}
-  const agNames={DC:'District Counseling',SMS:'Safe Mind Space',MC:'MindClub'};
+  const agNames={SMS:'Safe Mind Space',MC:'MindClub'};
   let rows,headers,footer;
   const wb=XLSX.utils.book_new();
   const fname=`Invoice_${agNames[agency]||agency}_${month||'export'}.xlsx`.replace(/\s/g,'_');
