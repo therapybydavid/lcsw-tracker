@@ -977,7 +977,17 @@ async function boot(){
   document.getElementById('s-date').value=localDateStr();
   document.getElementById('sup-date').value=localDateStr();
   populateMonthDropdowns();renderDashboard();renderSupervision();populateClientLists();
+  openFromHash();
 }
+// A #hash (e.g. /lcsw-tracker/#quick-log, used by the Quick Log home-screen shortcut)
+// opens that page directly instead of the dashboard.
+function openFromHash(){
+  const id=(location.hash||'').replace(/^#/,'');
+  if(!id||!document.getElementById('page-'+id))return;
+  const nav=document.querySelector(`.nav-item[onclick*="'${id}'"]`);
+  showPage(id,nav);
+}
+window.addEventListener('hashchange',openFromHash);
 
 // ============================================================
 // PRIVATE PAY
