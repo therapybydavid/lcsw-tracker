@@ -100,14 +100,10 @@
     <h1>LCSW Tracker</h1>
     <p>David Robles — Private Access</p>
     <div class="login-field">
-      <label>Email</label>
-      <input type="email" id="login-email" placeholder="you@email.com" autocomplete="email">
+      <label>Access Code</label>
+      <input type="password" id="login-pin" placeholder="••••" inputmode="numeric" maxlength="6" autocomplete="off" style="font-size:22px;letter-spacing:6px;text-align:center;">
     </div>
-    <div class="login-field">
-      <label>Password</label>
-      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <button class="login-btn" onclick="doLogin()">Enter</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -325,15 +321,16 @@ const fbRef=fbDb.ref('lcsw_tracker');
 const fbAuth=firebase.auth();
 fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
+function doLogin(){
+  const pin=document.getElementById('login-pin').value.trim();
   const errEl=document.getElementById('login-error');
-  errEl.textContent='';
-  try{
-    await fbAuth.signInWithEmailAndPassword(email,password);
-  }catch(e){
-    errEl.textContent='Invalid email or password. Please try again.';
+  if(pin==='1614'){
+    sessionStorage.setItem('lcsw_auth','1');
+    document.getElementById('login-screen').classList.remove('show');
+    boot();
+  }else{
+    errEl.textContent='Incorrect code. Please try again.';
+    document.getElementById('login-pin').value='';
   }
 }
 
@@ -341,14 +338,13 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&document.getElementById('login-screen').classList.contains('show'))doLogin();
 });
 
-fbAuth.onAuthStateChanged(user=>{
-  if(user){
-    document.getElementById('login-screen').classList.remove('show');
-    boot();
-  }else{
-    document.getElementById('login-screen').classList.add('show');
-  }
-});
+if(sessionStorage.getItem('lcsw_auth')==='1'){
+  document.getElementById('login-screen').classList.remove('show');
+  boot();
+}else{
+  document.getElementById('login-screen').classList.add('show');
+  setTimeout(()=>document.getElementById('login-pin').focus(),100);
+}
 
 // ============================================================
 // DATA — Firebase Realtime Database
