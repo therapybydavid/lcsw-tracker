@@ -201,7 +201,7 @@
   <div class="page-header"><h1>Invoices</h1><p>Generate agency invoices</p></div>
   <div class="tabs"><button class="tab active" onclick="switchInvoice('SMS',this)">Safe Mind Space</button></div>
   <div class="card">
-    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div><div><button class="btn btn-ghost" id="sms-rate-btn" style="display:none;color:var(--green);" onclick="smsRateUpdate()">⬆ Update to $45</button></div></div>
+    <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;"><div class="field"><label>Invoice Month</label><select id="inv-month" onchange="renderInvoice()"></select></div><div class="field"><label id="inv-start-label">Billing Start</label><input type="date" id="inv-start" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div class="field"><label id="inv-due-label">Due Date</label><input type="date" id="inv-due" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--sans);font-size:13px;outline:none;cursor:pointer;"></div><div><button class="btn btn-ghost" onclick="saveInvDates()">Save Dates</button></div><div><button class="btn btn-ghost" onclick="exportInvoiceXlsx()">⬇ Export Excel</button></div><div id="sms-pdf-wrap"><button class="btn btn-ghost" onclick="exportInvoicePdf()">⬇ Create PDF</button></div><div><button class="btn btn-ghost" id="sms-rate-btn" style="display:none;color:var(--green);" onclick="smsRateUpdate()">⬆ Update to $45</button></div></div>
     <div class="invoice-header"><div><div style="display:flex;align-items:center;gap:10px;"><div class="invoice-title">Invoice</div><span id="inv-client-count" style="display:none;background:rgba(79,142,247,.15);color:var(--accent);font-family:var(--mono);font-size:12px;font-weight:600;padding:3px 9px;border-radius:6px;letter-spacing:.04em;"></span></div><div style="font-size:13px;color:var(--text2);margin-top:4px;">David Robles, LMSW</div></div><div style="text-align:right;"><div style="font-size:13px;color:var(--text2);" id="inv-agency-name">—</div><div style="font-size:12px;color:var(--text3);margin-top:3px;" id="inv-period">—</div><div class="invoice-total" id="inv-total">$0</div></div></div>
     <div class="table-wrap"><table id="inv-table"><thead id="inv-thead"></thead><tbody id="inv-tbody"></tbody></table></div>
     <div id="inv-empty" class="empty" style="display:none;"><div class="empty-icon">🧾</div>No sessions for this agency and month.</div>
@@ -509,7 +509,7 @@ function mcSessionFields(agency){const mc=agency==='MC';['s-mc-client-wrap','s-m
 // INVOICES
 // ============================================================
 let currentInvAgency='SMS';
-function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const rb=document.getElementById('sms-rate-btn');if(rb)rb.style.display=agency==='SMS'?'block':'none';renderInvoice()}
+function switchInvoice(agency,el){currentInvAgency=agency;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');const rb=document.getElementById('sms-rate-btn');if(rb)rb.style.display=agency==='SMS'?'block':'none';const _pw=document.getElementById('sms-pdf-wrap');if(_pw)_pw.style.display=agency==='SMS'?'block':'none';renderInvoice()}
 function smsRateUpdate(){
   const cutoff='2026-07-01';
   const clients=load(KEYS.clients);
@@ -530,7 +530,7 @@ function renderInvoice(){
   const dueInput=document.getElementById('inv-due');const startInput=document.getElementById('inv-start');const dueLabel=document.getElementById('inv-due-label');const startLabel=document.getElementById('inv-start-label');
   if(dueInput)dueInput.value=agDates.due||'';if(startInput)startInput.value=agDates.start||'';if(dueLabel)dueLabel.textContent=({SMS:'SMS',MC:'MindClub'}[agency]||agency)+' Due Date';if(startLabel)startLabel.textContent='Billing Start';
   const agNames={SMS:'Safe Mind Space',MC:'MindClub'};document.getElementById('inv-agency-name').textContent=agNames[agency]||agency;
-  const _rb=document.getElementById('sms-rate-btn');if(_rb)_rb.style.display=agency==='SMS'?'block':'none';
+  const _rb=document.getElementById('sms-rate-btn');if(_rb)_rb.style.display=agency==='SMS'?'block':'none';const _pw=document.getElementById('sms-pdf-wrap');if(_pw)_pw.style.display=agency==='SMS'?'block':'none';
   const fmt=v=>{if(!v)return'';const[y,m,d]=v.split('-');return`${m}/${d}/${y}`};
   const periodText=agDates.start&&agDates.due?`Billing: ${fmt(agDates.start)} \u2014 ${fmt(agDates.due)}`:agDates.due?`Due: ${fmt(agDates.due)}`:'Due date not set';document.getElementById('inv-period').textContent=periodText;
   const allSessions=load(KEYS.sessions).filter(s=>s.agency===agency);let sessions;
@@ -637,6 +637,61 @@ function exportInvoiceXlsx(){
   XLSX.utils.book_append_sheet(wb,ws,'Invoice');
   XLSX.writeFile(wb,fname);
   toast('Invoice exported');
+}
+
+// ── Safe Mind Space fillable PDF invoice (fills the agency's official form) ──
+const SMS_PDF_ROWS=11;
+const SMS_PDF_EMAIL='david@therapybydavid.com';
+function _smsSlash(dt){const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
+function _smsMoney(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
+// Pure builder: template bytes + sessions + meta -> {bytes,count,total,pages}. Testable in node.
+async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
+  const rows=sessions.map(s=>({date:_smsSlash(s.date),name:s.name||'',ins:s.insurance||'',fee:parseFloat(s.fee)||45}));
+  const total=rows.reduce((a,r)=>a+r.fee,0);
+  const pages=Math.max(1,Math.ceil(rows.length/SMS_PDF_ROWS));
+  const fill=async(chunk,pi)=>{
+    const doc=await PDFLib.PDFDocument.load(tplBytes);const form=doc.getForm();
+    const set=(f,v)=>{if(v==null||v==='')return;try{form.getTextField(f).setText(String(v));}catch(e){}};
+    set('contractor_name','David Robles, LMSW');
+    set('invoice_number',meta.invoiceNo+(pages>1?' ('+(pi+1)+' of '+pages+')':''));
+    set('invoice_date',meta.invoiceDate);
+    set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
+    set('contractor_email',SMS_PDF_EMAIL);
+    chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsMoney(r.fee));});
+    if(pi===pages-1){set('number_of_services',rows.length);set('total_amount_due',_smsMoney(total));}
+    set('contractor_signature','David Robles');set('signature_date',meta.signDate);
+    return doc;
+  };
+  if(pages===1){const doc=await fill(rows,0);return{bytes:await doc.save(),count:rows.length,total,pages:1};}
+  // More than 11 sessions: one filled copy of the form per 11 rows, flattened and stitched into one PDF.
+  const out=await PDFLib.PDFDocument.create();
+  for(let pi=0;pi<pages;pi++){
+    const doc=await fill(rows.slice(pi*SMS_PDF_ROWS,(pi+1)*SMS_PDF_ROWS),pi);
+    doc.getForm().flatten();
+    const[pg]=await out.copyPages(doc,[0]);out.addPage(pg);
+  }
+  return{bytes:await out.save(),count:rows.length,total,pages};
+}
+
+async function exportInvoicePdf(){
+  const agency=currentInvAgency;if(agency!=='SMS'){toast('PDF invoice is only set up for Safe Mind Space',true);return;}
+  const month=document.getElementById('inv-month')?.value||'';
+  const saved=(_db.inv_dates||{});const agDates=saved[agency]||{};
+  const all=load(KEYS.sessions).filter(s=>s.agency===agency);
+  let sessions,periodStart,periodEnd;
+  if(agDates.start&&agDates.due){sessions=all.filter(s=>s.date&&s.date>=agDates.start&&s.date<=agDates.due);periodStart=agDates.start;periodEnd=agDates.due;}
+  else{sessions=all.filter(s=>(s.date||'').startsWith(month));const[y,m]=month.split('-').map(Number);periodStart=month+'-01';periodEnd=month+'-'+String(new Date(y,m,0).getDate()).padStart(2,'0');}
+  sessions.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  if(!sessions.length){toast('No sessions to export',true);return;}
+  if(typeof PDFLib==='undefined'){toast('PDF engine still loading — try again in a moment',true);return;}
+  const t=new Date();const today=(t.getMonth()+1)+'/'+t.getDate()+'/'+t.getFullYear();
+  try{
+    const tpl=await fetch('sms-invoice.pdf').then(r=>{if(!r.ok)throw new Error('template fetch '+r.status);return r.arrayBuffer();});
+    const res=await buildSmsInvoicePdf(PDFLib,tpl,sessions,{invoiceNo:'SMS-'+month.replace('-',''),invoiceDate:agDates.due?_smsSlash(agDates.due):_smsSlash(sessions[sessions.length-1].date),periodStart:_smsSlash(periodStart),periodEnd:_smsSlash(periodEnd),signDate:today});
+    const blob=new Blob([res.bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='Invoice_Safe_Mind_Space_'+(month||'export')+'.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+    toast('PDF invoice downloaded — '+res.count+' session'+(res.count!==1?'s':'')+', '+_smsMoney(res.total)+(res.pages>1?', '+res.pages+' pages':''));
+  }catch(e){toast('PDF error: '+(e.message||e),true);}
 }
 
 // ============================================================
