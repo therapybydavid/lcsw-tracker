@@ -109,6 +109,7 @@
 </div>
 
 <div class="app">
+<div id="data-error-banner" style="display:none;position:sticky;top:0;z-index:500;background:var(--red);color:#fff;font-family:var(--sans);font-size:13px;font-weight:500;text-align:center;padding:10px 16px;"></div>
 <div class="mobile-bar"><button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button><span class="mobile-bar-title">LCSW Tracker</span></div>
 <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
 <aside class="sidebar" id="sidebar">
@@ -321,6 +322,29 @@ const fbRef=fbDb.ref('lcsw_tracker');
 const fbAuth=firebase.auth();
 fbAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
+// ============================================================
+// AUTH — sign in to Firebase (anonymous)
+// ============================================================
+// The PIN screen only gated the UI locally — it never told Firebase
+// anything, so every read/write was going out unauthenticated. If the
+// database rules require auth (or get locked down to require it), that
+// read fails, the error was swallowed, and the dashboard just rendered
+// its empty defaults: 0 hours, $0, 0.0%, with nothing visible saying why.
+// This signs in (silently, once) before any data read so rules requiring
+// auth != null actually pass.
+let _authReady=null;
+function ensureAuth(){
+  if(_authReady)return _authReady;
+  _authReady=new Promise((resolve,reject)=>{
+    if(fbAuth.currentUser){resolve(fbAuth.currentUser);return}
+    const unsub=fbAuth.onAuthStateChanged(user=>{
+      if(user){unsub();resolve(user)}
+    });
+    fbAuth.signInAnonymously().catch(err=>{unsub();reject(err)});
+  });
+  return _authReady;
+}
+
 function doLogin(){
   const pin=document.getElementById('login-pin').value.trim();
   const errEl=document.getElementById('login-error');
@@ -354,7 +378,7 @@ let _db={sessions:[],clients:[],supervision:[],referrals:[],inv_dates:{},seeded:
 function localDateStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
 function load(key){return _db[key]||[]}
-function save(key,data){_db[key]=data;fbRef.child(key).set(data).catch(err=>console.warn('Firebase save error:',err))}
+function save(key,data){_db[key]=data;fbRef.child(key).set(data).catch(err=>{console.warn('Firebase save error:',err);toast('Not saved — '+(err&&err.code?err.code:'connection error'),true)})}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function fmtDate(d){if(!d)return'\u2014';const s=String(d).split('T')[0];const p=s.split('-');if(p.length!==3)return d;return p[1]+'/'+p[2]+'/'+p[0]}
 
@@ -362,6 +386,15 @@ function fmtDate(d){if(!d)return'\u2014';const s=String(d).split('T')[0];const p
 // TOAST
 // ============================================================
 function toast(msg,err){const el=document.getElementById('toast');el.textContent=msg;el.style.background=err?'var(--red)':'var(--green)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+
+// ============================================================
+// DATA ERROR BANNER — visible, persistent (unlike the fading toast)
+// ============================================================
+// A failed load used to fail silently: the dashboard just rendered its
+// empty defaults with nothing on screen saying why. This makes a broken
+// connection look broken instead of looking like zero hours logged.
+function showDataError(msg){const el=document.getElementById('data-error-banner');if(!el)return;el.textContent='⚠ '+msg;el.style.display='block'}
+function hideDataError(){const el=document.getElementById('data-error-banner');if(!el)return;el.style.display='none'}
 
 // ============================================================
 // SYNC STATUS
@@ -1023,12 +1056,17 @@ document.addEventListener('click',e=>{['s-client-dropdown'].forEach(id=>{const d
 async function boot(){
   document.getElementById('sync-status').textContent='Loading...';document.getElementById('sync-status').style.opacity='1';document.getElementById('sync-status').style.color='var(--text3)';
   try{
+    await ensureAuth();
     const snap=await fbRef.once('value');const data=snap.val();
     function coerceDb(d){['sessions','clients','supervision','referrals'].forEach(k=>{if(d[k]&&!Array.isArray(d[k]))d[k]=Object.values(d[k]);else if(!d[k])d[k]=[];});if(!d.inv_dates)d.inv_dates={};if(!d.pp_goal)d.pp_goal=10;}
     if(data){_db=data;coerceDb(_db);}
     // Listen for real-time updates from other devices
-    fbRef.on('value',snap=>{const fresh=snap.val();if(fresh){_db=fresh;coerceDb(_db);}});
-  }catch(e){console.warn('Could not load from Firebase:',e)}
+    fbRef.on('value',snap=>{const fresh=snap.val();if(fresh){_db=fresh;coerceDb(_db);}},err=>{showDataError('Live sync lost — '+(err&&err.code?err.code:'connection error'));});
+    hideDataError();
+  }catch(e){
+    console.warn('Could not load from Firebase:',e);
+    showDataError('Could not load your data — '+(e&&e.code?e.code:(e&&e.message)||'unknown error'));
+  }
   document.getElementById('sync-status').style.opacity='0';
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('s-date').value=localDateStr();
