@@ -681,6 +681,7 @@ const SMS_PDF_EMAIL='drobles@safemindspacecg.com';
 const SMS_ROW_H=25,SMS_TABLE_TOP=507,SMS_FOOT_TOP=226,SMS_MARGIN=36;
 function _smsSlash(dt){const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
 function _smsMoney(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
+function _smsDollars(n){const c=Math.round(n*100);return c%100?_smsMoney(n):'$'+c/100;} // form shows $45 / $1305; keeps cents if any
 // Pure builder: template bytes + sessions + meta -> {bytes,count,total,pages}. Testable in node.
 async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
   const rows=sessions.map(s=>({date:_smsSlash(s.date),name:s.name||'',ins:s.insurance||'',fee:parseFloat(s.fee)||45}));
@@ -694,8 +695,8 @@ async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
     set('invoice_date',meta.invoiceDate);
     set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
     set('contractor_email',SMS_PDF_EMAIL);
-    chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsMoney(r.fee));});
-    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',Number.isInteger(Math.round(total*100)/100)?'$'+Math.round(total):_smsMoney(total));} // whole dollars show as $1305
+    chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsDollars(r.fee));});
+    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',_smsDollars(total));}
     set('contractor_signature','David Robles');set('signature_date',meta.signDate);
     return doc;
   };
