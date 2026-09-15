@@ -681,7 +681,7 @@ const SMS_PDF_EMAIL='drobles@safemindspacecg.com';
 const SMS_ROW_H=25,SMS_TABLE_TOP=507,SMS_FOOT_TOP=226,SMS_MARGIN=36;
 function _smsSlash(dt){const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
 function _smsMoney(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
-function _smsDollars(n){const c=Math.round(n*100);return c%100?_smsMoney(n):'$'+c/100;} // form shows $45 / $1305; keeps cents if any
+function _smsDollars(n){const c=Math.round(n*100);return '$'+(c/100).toLocaleString('en-US',{minimumFractionDigits:c%100?2:0,maximumFractionDigits:2});} // form shows $45 / $1,305; keeps cents if any
 // Pure builder: template bytes + sessions + meta -> {bytes,count,total,pages}. Testable in node.
 async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
   const rows=sessions.map(s=>({date:_smsSlash(s.date),name:s.name||'',ins:s.insurance||'',fee:parseFloat(s.fee)||45}));
