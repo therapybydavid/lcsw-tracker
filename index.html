@@ -695,7 +695,7 @@ async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
     set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
     set('contractor_email',SMS_PDF_EMAIL);
     chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsMoney(r.fee));});
-    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',_smsMoney(total));}
+    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',Number.isInteger(Math.round(total*100)/100)?'$'+Math.round(total):_smsMoney(total));} // whole dollars show as $1305
     set('contractor_signature','David Robles');set('signature_date',meta.signDate);
     return doc;
   };
