@@ -750,7 +750,7 @@ async function exportInvoicePdf(){
   const t=new Date();const today=(t.getMonth()+1)+'/'+t.getDate()+'/'+t.getFullYear();
   try{
     const tpl=await fetch('sms-invoice.pdf').then(r=>{if(!r.ok)throw new Error('template fetch '+r.status);return r.arrayBuffer();});
-    const res=await buildSmsInvoicePdf(PDFLib,tpl,sessions,{invoiceNo:'SMS-'+month.replace('-',''),invoiceDate:agDates.due?_smsSlash(agDates.due):_smsSlash(sessions[sessions.length-1].date),periodStart:_smsSlash(periodStart),periodEnd:_smsSlash(periodEnd),signDate:today});
+    const res=await buildSmsInvoicePdf(PDFLib,tpl,sessions,{invoiceNo:'DR-'+periodStart.replace(/-/g,''),invoiceDate:agDates.due?_smsSlash(agDates.due):_smsSlash(sessions[sessions.length-1].date),periodStart:_smsSlash(periodStart),periodEnd:_smsSlash(periodEnd),signDate:today});
     const blob=new Blob([res.bytes],{type:'application/pdf'});const url=URL.createObjectURL(blob);
     const a=document.createElement('a');a.href=url;a.download='Invoice_Safe_Mind_Space_'+(month||'export')+'.pdf';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
     toast('PDF invoice downloaded — '+res.count+' session'+(res.count!==1?'s':'')+', '+_smsMoney(res.total)+(res.pages>1?', '+res.pages+' pages':''));
