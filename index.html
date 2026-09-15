@@ -676,36 +676,63 @@ function exportInvoiceXlsx(){
 
 // ── Safe Mind Space fillable PDF invoice (fills the agency's official form) ──
 const SMS_PDF_ROWS=11;
-const SMS_PDF_EMAIL='david@therapybydavid.com';
+const SMS_PDF_EMAIL='drobles@safemindspacecg.com';
+// Template geometry (PDF points): table header row 507-531, row k occupies 507-25k..507-25(k-1), totals/signature block sits below 232.
+const SMS_ROW_H=25,SMS_TABLE_TOP=507,SMS_FOOT_TOP=226,SMS_MARGIN=36;
 function _smsSlash(dt){const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
 function _smsMoney(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
 // Pure builder: template bytes + sessions + meta -> {bytes,count,total,pages}. Testable in node.
 async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
   const rows=sessions.map(s=>({date:_smsSlash(s.date),name:s.name||'',ins:s.insurance||'',fee:parseFloat(s.fee)||45}));
   const total=rows.reduce((a,r)=>a+r.fee,0);
-  const pages=Math.max(1,Math.ceil(rows.length/SMS_PDF_ROWS));
-  const fill=async(chunk,pi)=>{
+  const chunks=Math.max(1,Math.ceil(rows.length/SMS_PDF_ROWS));
+  const fill=async(chunk,ci)=>{
     const doc=await PDFLib.PDFDocument.load(tplBytes);const form=doc.getForm();
     const set=(f,v)=>{if(v==null||v==='')return;try{form.getTextField(f).setText(String(v));}catch(e){}};
     set('contractor_name','David Robles, LMSW');
-    set('invoice_number',meta.invoiceNo+(pages>1?' ('+(pi+1)+' of '+pages+')':''));
+    set('invoice_number',meta.invoiceNo);
     set('invoice_date',meta.invoiceDate);
     set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
     set('contractor_email',SMS_PDF_EMAIL);
     chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsMoney(r.fee));});
-    if(pi===pages-1){set('number_of_services',rows.length);set('total_amount_due',_smsMoney(total));}
+    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',_smsMoney(total));}
     set('contractor_signature','David Robles');set('signature_date',meta.signDate);
     return doc;
   };
-  if(pages===1){const doc=await fill(rows,0);return{bytes:await doc.save(),count:rows.length,total,pages:1};}
-  // More than 11 sessions: one filled copy of the form per 11 rows, flattened and stitched into one PDF.
-  const out=await PDFLib.PDFDocument.create();
-  for(let pi=0;pi<pages;pi++){
-    const doc=await fill(rows.slice(pi*SMS_PDF_ROWS,(pi+1)*SMS_PDF_ROWS),pi);
-    doc.getForm().flatten();
-    const[pg]=await out.copyPages(doc,[0]);out.addPage(pg);
+  if(chunks===1){const doc=await fill(rows,0);return{bytes:await doc.save(),count:rows.length,total,pages:1};}
+  // More than 11 sessions: fill one flattened form per 11 rows as a source, then cut it into strips
+  // (header, each row, totals/signature) and lay them out as one continuous table.
+  // Header block on page 1 only, totals + signature on the last page only.
+  const src=[];
+  for(let ci=0;ci<chunks;ci++){const d=await fill(rows.slice(ci*SMS_PDF_ROWS,(ci+1)*SMS_PDF_ROWS),ci);d.getForm().flatten();src.push(d);}
+  const W=612,H=792,contTop=H-SMS_MARGIN-24; // continuation pages: column header row pinned to the top margin
+  const fit=top=>Math.floor((top-SMS_MARGIN)/SMS_ROW_H),fitFoot=top=>Math.floor((top-(SMS_FOOT_TOP+6))/SMS_ROW_H);
+  const layout=[];let i=0;
+  for(let first=true;;first=false){
+    const top=first?SMS_TABLE_TOP:contTop,rem=rows.length-i;
+    if(rem<=fitFoot(top)){layout.push({first,top,from:i,to:rows.length,foot:true});break;}
+    const take=Math.min(fit(top),rem-1); // always carry at least one row onto the totals page
+    layout.push({first,top,from:i,to:i+take,foot:false});i+=take;
   }
-  return{bytes:await out.save(),count:rows.length,total,pages};
+  const out=await PDFLib.PDFDocument.create();
+  // Copy each source page in first (brings its fonts along), embed it once, then draw clipped strips of it.
+  const emb=[];for(const d of src){const[cp]=await out.copyPages(d,[0]);emb.push(await out.embedPage(cp));}
+  const strip=(page,e,bottom,top,y)=>{ // draw source band [bottom,top] with its bottom edge at y
+    page.pushOperators(PDFLib.pushGraphicsState(),PDFLib.rectangle(0,y,W,top-bottom),PDFLib.clip(),PDFLib.endPath());
+    page.drawPage(e,{x:0,y:y-bottom});
+    page.pushOperators(PDFLib.popGraphicsState());
+  };
+  for(const L of layout){
+    const page=out.addPage([W,H]);
+    if(L.first)strip(page,emb[0],SMS_TABLE_TOP-0.5,H,SMS_TABLE_TOP-0.5);
+    else strip(page,emb[0],SMS_TABLE_TOP-0.5,SMS_TABLE_TOP+24.5,L.top-0.5);
+    for(let r=L.from;r<L.to;r++){
+      const srcBottom=SMS_TABLE_TOP-SMS_ROW_H*(r%SMS_PDF_ROWS+1),k=r-L.from+1;
+      strip(page,emb[Math.floor(r/SMS_PDF_ROWS)],srcBottom-0.5,srcBottom+SMS_ROW_H+0.5,L.top-SMS_ROW_H*k-0.5);
+    }
+    if(L.foot)strip(page,emb[chunks-1],0,SMS_FOOT_TOP,0);
+  }
+  return{bytes:await out.save(),count:rows.length,total,pages:layout.length};
 }
 
 async function exportInvoicePdf(){
