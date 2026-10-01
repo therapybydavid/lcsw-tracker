@@ -677,63 +677,87 @@ function exportInvoiceXlsx(){
 // ── Safe Mind Space fillable PDF invoice (fills the agency's official form) ──
 const SMS_PDF_ROWS=11;
 const SMS_PDF_EMAIL='drobles@safemindspacecg.com';
-// Template geometry (PDF points): table header row 507-531, row k occupies 507-25k..507-25(k-1), totals/signature block sits below 232.
-const SMS_ROW_H=25,SMS_TABLE_TOP=507,SMS_FOOT_TOP=226,SMS_MARGIN=36;
+// Template geometry (PDF points): column header row 507-531, 11 rows of 25pt from 507 down to 232,
+// totals + certification + signature 60-228, confidentiality rule and line 30-50.
+const SMS_ROW_H=25,SMS_TABLE_TOP=507,SMS_TABLE_BOT=232,SMS_MIN_ROW_H=18.3,SMS_CONT_TOP=714,SMS_BODY_BOT=62,SMS_MIN_LAST=3;
+const SMS_COLS=[[36,85],[121,220],[341,145],[486,90]]; // [x,width] of each table column
 function _smsSlash(dt){const[y,m,d]=(dt||'').split('-');return y?`${+m}/${+d}/${y}`:'';}
 function _smsMoney(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
 function _smsDollars(n){const c=Math.round(n*100);return '$'+(c/100).toLocaleString('en-US',{minimumFractionDigits:c%100?2:0,maximumFractionDigits:2});} // form shows $45 / $1,305; keeps cents if any
+// Shrink (8pt down to 6pt), then trim with an ellipsis, so text stays inside its box. Drops characters Helvetica can't encode.
+function _smsFit(font,t,maxW){
+  try{font.widthOfTextAtSize(t,8);}catch(e){t=t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7e\xa0-\xff]/g,'');}
+  let s=8;while(s>6&&font.widthOfTextAtSize(t,s)>maxW)s-=0.5;
+  if(font.widthOfTextAtSize(t,s)>maxW){while(t.length>1&&font.widthOfTextAtSize(t+'\u2026',s)>maxW)t=t.slice(0,-1);t+='\u2026';}
+  return{t,s};
+}
 // Pure builder: template bytes + sessions + meta -> {bytes,count,total,pages}. Testable in node.
 async function buildSmsInvoicePdf(PDFLib,tplBytes,sessions,meta){
   const rows=sessions.map(s=>({date:_smsSlash(s.date),name:s.name||'',ins:s.insurance||'',fee:parseFloat(s.fee)||45}));
-  const total=rows.reduce((a,r)=>a+r.fee,0);
-  const chunks=Math.max(1,Math.ceil(rows.length/SMS_PDF_ROWS));
-  const fill=async(chunk,ci)=>{
-    const doc=await PDFLib.PDFDocument.load(tplBytes);const form=doc.getForm();
-    const set=(f,v)=>{if(v==null||v==='')return;try{form.getTextField(f).setText(String(v));}catch(e){}};
-    set('contractor_name','David Robles, LMSW');
-    set('invoice_number',meta.invoiceNo);
-    set('invoice_date',meta.invoiceDate);
-    set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
-    set('contractor_email',SMS_PDF_EMAIL);
-    chunk.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsDollars(r.fee));});
-    if(ci===chunks-1){set('number_of_services',rows.length);set('total_amount_due',_smsDollars(total));}
-    set('contractor_signature','David Robles');set('signature_date',meta.signDate);
-    return doc;
-  };
-  if(chunks===1){const doc=await fill(rows,0);return{bytes:await doc.save(),count:rows.length,total,pages:1};}
-  // More than 11 sessions: fill one flattened form per 11 rows as a source, then cut it into strips
-  // (header, each row, totals/signature) and lay them out as one continuous table.
-  // Header block on page 1 only, totals + signature on the last page only.
-  const src=[];
-  for(let ci=0;ci<chunks;ci++){const d=await fill(rows.slice(ci*SMS_PDF_ROWS,(ci+1)*SMS_PDF_ROWS),ci);d.getForm().flatten();src.push(d);}
-  const W=612,H=792,contTop=H-SMS_MARGIN-24; // continuation pages: column header row pinned to the top margin
-  const fit=top=>Math.floor((top-SMS_MARGIN)/SMS_ROW_H),fitFoot=top=>Math.floor((top-(SMS_FOOT_TOP+6))/SMS_ROW_H);
-  const layout=[];let i=0;
-  for(let first=true;;first=false){
-    const top=first?SMS_TABLE_TOP:contTop,rem=rows.length-i;
-    if(rem<=fitFoot(top)){layout.push({first,top,from:i,to:rows.length,foot:true});break;}
-    const take=Math.min(fit(top),rem-1); // always carry at least one row onto the totals page
-    layout.push({first,top,from:i,to:i+take,foot:false});i+=take;
+  const total=rows.reduce((a,r)=>a+r.fee,0),N=rows.length;
+  const doc=await PDFLib.PDFDocument.load(tplBytes);const form=doc.getForm();
+  const set=(f,v)=>{if(v==null||v==='')return;try{form.getTextField(f).setText(String(v));}catch(e){}};
+  set('contractor_name','David Robles, LMSW');
+  set('invoice_number',meta.invoiceNo);
+  set('invoice_date',meta.invoiceDate);
+  set('service_period_start',meta.periodStart);set('service_period_end',meta.periodEnd);
+  set('contractor_email',SMS_PDF_EMAIL);
+  set('number_of_services',N);set('total_amount_due',_smsDollars(total));
+  set('contractor_signature','David Robles');set('signature_date',meta.signDate);
+  if(N<=SMS_PDF_ROWS){
+    rows.forEach((r,i)=>{const n=String(i+1).padStart(2,'0');set('service_date_'+n,r.date);set('client_name_'+n,r.name);set('insurance_'+n,r.ins);set('contract_fee_'+n,_smsDollars(r.fee));});
+    return{bytes:await doc.save(),count:N,total,pages:1};
+  }
+  // More than 11 sessions: flatten the filled form (header + totals, rows left empty), cut it into bands,
+  // and draw the rows ourselves in the form's own style. Up to 15 rows stay on one page with slightly shorter rows.
+  // Longer invoices run one continuous table across pages: contractor block on page 1, column headers on every page,
+  // totals + signature right under the last row, confidentiality line and page numbers at the foot of every page.
+  form.flatten();
+  const W=612,H=792,span=SMS_TABLE_TOP-SMS_TABLE_BOT,layout=[];
+  if(N*SMS_MIN_ROW_H<=span)layout.push({first:true,top:SMS_TABLE_TOP,from:0,to:N,last:true,h:span/N});
+  else for(let i=0,first=true;;first=false){
+    const top=first?SMS_TABLE_TOP:SMS_CONT_TOP,rem=N-i;
+    if(rem<=Math.floor((top-SMS_TABLE_BOT)/SMS_ROW_H)){layout.push({first,top,from:i,to:N,last:true,h:SMS_ROW_H});break;}
+    const take=Math.min(Math.floor((top-SMS_BODY_BOT)/SMS_ROW_H),rem-SMS_MIN_LAST); // the totals page always gets a few rows
+    layout.push({first,top,from:i,to:i+take,last:false,h:SMS_ROW_H});i+=take;
   }
   const out=await PDFLib.PDFDocument.create();
-  // Copy each source page in first (brings its fonts along), embed it once, then draw clipped strips of it.
-  const emb=[];for(const d of src){const[cp]=await out.copyPages(d,[0]);emb.push(await out.embedPage(cp));}
-  const strip=(page,e,bottom,top,y)=>{ // draw source band [bottom,top] with its bottom edge at y
+  const[cp]=await out.copyPages(doc,[0]);const emb=await out.embedPage(cp);
+  const font=await out.embedFont(PDFLib.StandardFonts.Helvetica),bold=await out.embedFont(PDFLib.StandardFonts.HelveticaBold);
+  const{rgb}=PDFLib,LINE=rgb(.784314,.831373,.847059),INK=rgb(.141176,.2,.227451),MUTED=rgb(.376471,.45098,.486275),WHITE=rgb(1,1,1);
+  const strip=(page,bottom,top,y)=>{ // draw template band [bottom,top] with its bottom edge at y
     page.pushOperators(PDFLib.pushGraphicsState(),PDFLib.rectangle(0,y,W,top-bottom),PDFLib.clip(),PDFLib.endPath());
-    page.drawPage(e,{x:0,y:y-bottom});
+    page.drawPage(emb,{x:0,y:y-bottom});
     page.pushOperators(PDFLib.popGraphicsState());
   };
-  for(const L of layout){
+  const right=(page,t,y,size,f)=>page.drawText(t,{x:576-f.widthOfTextAtSize(t,size),y,size,font:f,color:MUTED});
+  const drawRow=(page,yTop,h,r)=>{ // same cell lines, input boxes, and 8pt Helvetica the form uses
+    const y=yTop-h,pad=3*h/SMS_ROW_H,bh=h-2*pad;
+    [r.date,r.name,r.ins,_smsDollars(r.fee)].forEach((v,c)=>{
+      const[x,w]=SMS_COLS[c];
+      page.drawRectangle({x,y,width:w,height:h,borderColor:LINE,borderWidth:.6});
+      page.drawRectangle({x:x+3.35,y:y+pad+.35,width:w-6.7,height:bh-.7,color:WHITE,borderColor:LINE,borderWidth:.7});
+      if(!v)return;
+      const{t,s}=_smsFit(font,String(v),w-9.4);
+      page.drawText(t,{x:x+4.7,y:y+pad+bh/2-font.heightAtSize(s,{descender:false})/2,size:s,font,color:INK});
+    });
+  };
+  layout.forEach((L,pi)=>{
     const page=out.addPage([W,H]);
-    if(L.first)strip(page,emb[0],SMS_TABLE_TOP-0.5,H,SMS_TABLE_TOP-0.5);
-    else strip(page,emb[0],SMS_TABLE_TOP-0.5,SMS_TABLE_TOP+24.5,L.top-0.5);
-    for(let r=L.from;r<L.to;r++){
-      const srcBottom=SMS_TABLE_TOP-SMS_ROW_H*(r%SMS_PDF_ROWS+1),k=r-L.from+1;
-      strip(page,emb[Math.floor(r/SMS_PDF_ROWS)],srcBottom-0.5,srcBottom+SMS_ROW_H+0.5,L.top-SMS_ROW_H*k-0.5);
+    if(L.first)strip(page,SMS_TABLE_TOP-0.5,H,SMS_TABLE_TOP-0.5); // title bar, contractor block, column headers
+    else{
+      page.drawText('Services provided (continued)',{x:36,y:L.top+36,size:9,font:bold,color:INK});
+      right(page,'Invoice '+meta.invoiceNo,L.top+36,8,font);
+      strip(page,SMS_TABLE_TOP-0.5,SMS_TABLE_TOP+24.5,L.top-0.5);
     }
-    if(L.foot)strip(page,emb[chunks-1],0,SMS_FOOT_TOP,0);
-  }
-  return{bytes:await out.save(),count:rows.length,total,pages:layout.length};
+    for(let r=L.from;r<L.to;r++)drawRow(page,L.top-L.h*(r-L.from),L.h,rows[r]);
+    const yb=L.top-L.h*(L.to-L.from);
+    if(L.last)strip(page,60,228,yb-(SMS_TABLE_BOT-60)); // totals, certification, signature, same gap under the table as the form
+    else right(page,'Continued on next page',yb-12,7.5,font);
+    strip(page,0,56,0); // confidentiality line
+    if(layout.length>1)right(page,'Page '+(pi+1)+' of '+layout.length,35,7,font);
+  });
+  return{bytes:await out.save(),count:N,total,pages:layout.length};
 }
 
 async function exportInvoicePdf(){
